@@ -61,7 +61,9 @@ export function useRequestSniffing() {
   }
 
   const resetRequests = () => {
+    console.log('resetRequests called - current requests count:', requests.length)
     setRequests([])
+    console.log('resetRequests completed - requests should now be empty')
   }
 
   const reloadPage = () => {

@@ -9,11 +9,20 @@ import { Sorting } from './components/Sorting'
 import { useSorting } from './hooks/useSorting'
 import { useDragAndDrop } from './hooks/useDragAndDrop'
 import { ImageItem } from './components/ImageItem'
+import { Export } from './components/Export'
 
 function Panel() {
-  const { requests, isListening, toggleListening, reloadPage } =
+  const { requests, isListening, toggleListening, reloadPage, resetRequests } =
     useRequestSniffing()
   const { images } = useImageSniffer(requests)
+  
+  // Debug function to wrap resetRequests
+  const handleClearImages = () => {
+    console.log('Clear Images button clicked!')
+    console.log('Current requests count:', requests.length)
+    console.log('Current images count:', images.length)
+    resetRequests()
+  }
   const {
     filteredImages,
     availableFileTypes,
@@ -52,6 +61,9 @@ function Panel() {
         <button onClick={reloadPage} className="btn btn-reload">
           Reload Page
         </button>
+        <button onClick={handleClearImages} className="btn btn-clear">
+          Clear Images
+        </button>
         <span className="listening-status">
           {isListening
             ? 'Listening for network traffic...'
@@ -79,6 +91,7 @@ function Panel() {
             totalImages={filteredImages.length}
           />
         )}
+        {sortedImages.length > 0 && <Export sortedImages={sortedImages} />}
         <h2>Detected Images ({sortedImages.length})</h2>
         {images.length === 0 ? (
           <div className="no-images">
