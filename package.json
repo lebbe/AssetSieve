@@ -1,0 +1,31 @@
+{
+  "name": "devtools-hello-world-panel",
+  "version": "1.0.0",
+  "description": "A Chrome extension that adds a Hello World panel to DevTools",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "lint": "oxlint src",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@types/chrome": "^0.1.24",
+    "@types/node": "^22.7.7",
+    "@types/react": "^18.3.10",
+    "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-react": "^4.3.3",
+    "oxlint": "^1.23.0",
+    "typescript": "^5.9.3",
+    "vite": "^5.4.9"
+  },
+  "private": true,
+  "prettier": {
+    "semi": false,
+    "singleQuote": true
+  }
+}
