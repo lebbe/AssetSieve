@@ -1,5 +1,6 @@
 import { FilterState } from '../hooks/useFilter'
 import { ImageData } from '../hooks/useImageSniffer'
+import './Filter.css'
 
 interface FilterProps {
   filters: FilterState
