@@ -21,6 +21,7 @@ export interface ImageData {
 
 export function useRequestSniffing() {
   const [requests, setRequests] = useState<NetworkRequest[]>([])
+  const [isListening, setIsListening] = useState<boolean>(true)
 
   useEffect(() => {
     // Set up the network request listener
@@ -37,7 +38,10 @@ export function useRequestSniffing() {
           chromeRequest: request,
         }
 
-        setRequests((prev) => [...prev, newRequest])
+        // Only add request if listening is enabled
+        if (isListening) {
+          setRequests((prev) => [...prev, newRequest])
+        }
       })
     }
 
@@ -50,9 +54,30 @@ export function useRequestSniffing() {
         onRequestFinished
       )
     }
-  }, [])
+  }, [isListening])
 
-  return { requests }
+  const toggleListening = () => {
+    setIsListening((prev) => !prev)
+  }
+
+  const resetRequests = () => {
+    setRequests([])
+  }
+
+  const reloadPage = () => {
+    // Reset requests first
+    setRequests([])
+    // Reload the inspected page
+    chrome.devtools.inspectedWindow.reload()
+  }
+
+  return {
+    requests,
+    isListening,
+    toggleListening,
+    resetRequests,
+    reloadPage,
+  }
 }
 
 export function useImageSniffer(requests: NetworkRequest[]) {

@@ -19,6 +19,34 @@ h1 {
   font-size: 24px;
 }
 
+/* Control Buttons Styles */
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+  padding: 12px 16px;
+  background-color: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 6px;
+}
+
+.btn-reload {
+  background-color: #17a2b8;
+  color: white;
+}
+
+.btn-reload:hover {
+  background-color: #138496;
+}
+
+.listening-status {
+  margin-left: auto;
+  font-size: 13px;
+  color: #6c757d;
+  font-weight: 500;
+}
+
 p {
   color: #666;
   margin: 0 0 24px 0;

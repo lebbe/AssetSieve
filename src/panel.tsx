@@ -11,7 +11,8 @@ import { useDragAndDrop } from './hooks/useDragAndDrop'
 import { ImageItem } from './components/ImageItem'
 
 function Panel() {
-  const { requests } = useRequestSniffing()
+  const { requests, isListening, toggleListening, reloadPage } =
+    useRequestSniffing()
   const { images } = useImageSniffer(requests)
   const {
     filteredImages,
@@ -41,6 +42,22 @@ function Panel() {
   return (
     <div className="container">
       <h1>AssetSieve</h1>
+      <div className="controls">
+        <button
+          onClick={toggleListening}
+          className={`btn ${isListening ? 'btn-stop' : 'btn-start'}`}
+        >
+          {isListening ? 'Stop Listening' : 'Start Listening'}
+        </button>
+        <button onClick={reloadPage} className="btn btn-reload">
+          Reload Page
+        </button>
+        <span className="listening-status">
+          {isListening
+            ? 'Listening for network traffic...'
+            : 'Network monitoring paused'}
+        </span>
+      </div>
       <div className="image-analysis">
         {images.length > 0 && (
           <Filter
