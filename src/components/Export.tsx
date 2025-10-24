@@ -210,7 +210,6 @@ export function Export({ sortedImages }: ExportProps) {
   return (
     <div className="export-container">
       <div className="export-controls">
-        <h3>Export</h3>
         <div className="export-buttons">
           <button
             onClick={handleExportAll}

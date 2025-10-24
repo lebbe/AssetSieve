@@ -302,7 +302,6 @@ p {
 
 /* Image card styles are now in ImageItem.css */
 
-
 /* Sorting Component Styles */
 .sorting-controls {
   display: flex;
@@ -438,6 +437,15 @@ p {
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
+.panel-card-title {
+  margin: 0 0 16px 0;
+  color: #333;
+  font-size: 16px;
+  font-weight: 600;
+  border-bottom: 1px solid #dee2e6;
+  padding-bottom: 8px;
+}
+
 /* Control Panels Layout */
 .control-panels {
   display: flex;
@@ -468,14 +476,6 @@ p {
   display: flex;
   align-items: center;
   gap: 12px;
-}
-
-.preview-size-controls h3 {
-  margin: 0;
-  color: #333;
-  font-size: 16px;
-  font-weight: 600;
-  white-space: nowrap;
 }
 
 .preview-size-select {

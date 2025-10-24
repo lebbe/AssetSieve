@@ -23,7 +23,6 @@ export function Filter({
 }: FilterProps) {
   return (
     <div className="filter-container">
-      <h3>Filters</h3>
       <div className="filter-controls">
         <div className="filter-row">
           <div className="filter-group">

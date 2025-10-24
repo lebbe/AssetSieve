@@ -11,7 +11,6 @@ export function PreviewSize({ previewSize, setPreviewSize }: PreviewSizeProps) {
   return (
     <div className="preview-size-container">
       <div className="preview-size-controls">
-        <h3>Preview Size</h3>
         <select
           value={previewSize}
           onChange={handleSizeChange}

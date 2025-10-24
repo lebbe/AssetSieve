@@ -1,9 +1,4 @@
 /* Filter Component Styles */
-.filter-container h3 {
-  margin: 0 0 16px 0;
-  color: #495057;
-  font-size: 16px;
-}
 
 .filter-controls {
   display: flex;

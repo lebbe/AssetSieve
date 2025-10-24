@@ -57,7 +57,7 @@ function Panel() {
   return (
     <div className="container">
       <h1>AssetSieve</h1>
-      <PanelCard>
+      <PanelCard title="Network">
         <div className="controls">
           <button
             onClick={toggleListening}
@@ -80,7 +80,7 @@ function Panel() {
       </PanelCard>
       <div className="image-analysis">
         {images.length > 0 && (
-          <PanelCard>
+          <PanelCard title="Filters">
             <Filter
               availableFileTypes={availableFileTypes}
               filters={filters}
@@ -94,7 +94,7 @@ function Panel() {
         )}
         {filteredImages.length > 0 && (
           <div className="control-panels">
-            <PanelCard>
+            <PanelCard title="Sorting">
               <Sorting
                 sortBy={sortBy}
                 setSortBy={setSortBy}
@@ -103,7 +103,7 @@ function Panel() {
                 totalImages={filteredImages.length}
               />
             </PanelCard>
-            <PanelCard>
+            <PanelCard title="Display">
               <PreviewSize
                 previewSize={previewSize}
                 setPreviewSize={setPreviewSize}
@@ -112,7 +112,7 @@ function Panel() {
           </div>
         )}
         {sortedImages.length > 0 && (
-          <PanelCard className="export-panel-card">
+          <PanelCard className="export-panel-card" title="Export">
             <Export sortedImages={sortedImages} />
           </PanelCard>
         )}
