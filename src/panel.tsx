@@ -12,7 +12,7 @@ import { ImageItem } from './components/ImageItem'
 import { Export } from './components/Export'
 import { Display } from './components/Display'
 import { PanelCard } from './components/PanelCard'
-import { useState } from 'react'
+import { useDisplayOptions } from './hooks/useDisplayOptions'
 
 function Panel() {
   const {
@@ -42,15 +42,14 @@ function Panel() {
     setImageOrder,
   } = useSorting(filteredImages)
 
-  const [previewSize, setPreviewSize] = useState<'small' | 'medium' | 'large'>(
-    'small'
-  )
-  const [density, setDensity] = useState<
-    'compact' | 'comfortable' | 'spacious'
-  >('comfortable')
-  const [showDetails, setShowDetails] = useState<'full' | 'minimal' | 'none'>(
-    'full'
-  )
+  const {
+    previewSize,
+    setPreviewSize,
+    density,
+    setDensity,
+    showDetails,
+    setShowDetails,
+  } = useDisplayOptions()
 
   const {
     draggedIndex,
