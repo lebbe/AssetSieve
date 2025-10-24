@@ -10,7 +10,7 @@ import { useSorting } from './hooks/useSorting'
 import { useDragAndDrop } from './hooks/useDragAndDrop'
 import { ImageItem } from './components/ImageItem'
 import { Export } from './components/Export'
-import { PreviewSize } from './components/PreviewSize'
+import { Display } from './components/Display'
 import { PanelCard } from './components/PanelCard'
 import { useState } from 'react'
 
@@ -44,6 +44,12 @@ function Panel() {
 
   const [previewSize, setPreviewSize] = useState<'small' | 'medium' | 'large'>(
     'small'
+  )
+  const [density, setDensity] = useState<
+    'compact' | 'comfortable' | 'spacious'
+  >('comfortable')
+  const [showDetails, setShowDetails] = useState<'full' | 'minimal' | 'none'>(
+    'full'
   )
 
   const {
@@ -104,9 +110,13 @@ function Panel() {
               />
             </PanelCard>
             <PanelCard title="Display">
-              <PreviewSize
+              <Display
                 previewSize={previewSize}
                 setPreviewSize={setPreviewSize}
+                density={density}
+                setDensity={setDensity}
+                showDetails={showDetails}
+                setShowDetails={setShowDetails}
               />
             </PanelCard>
           </div>
@@ -125,12 +135,13 @@ function Panel() {
             </p>
           </div>
         ) : (
-          <div className="images-grid">
+          <div className={`images-grid images-grid--${density}`}>
             {sortedImages.map((image, index) => (
               <ImageItem
                 key={`${image.url}-${index}`}
                 image={image}
                 size={previewSize}
+                showDetails={showDetails}
                 index={index}
                 onDragStart={handleDragStart}
                 onDragEnd={handleDragEnd}

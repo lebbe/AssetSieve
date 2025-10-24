@@ -1,0 +1,85 @@
+import './Display.css'
+
+interface DisplayProps {
+  previewSize: 'small' | 'medium' | 'large'
+  setPreviewSize: (size: 'small' | 'medium' | 'large') => void
+  density: 'compact' | 'comfortable' | 'spacious'
+  setDensity: (density: 'compact' | 'comfortable' | 'spacious') => void
+  showDetails: 'full' | 'minimal' | 'none'
+  setShowDetails: (details: 'full' | 'minimal' | 'none') => void
+}
+
+export function Display({
+  previewSize,
+  setPreviewSize,
+  density,
+  setDensity,
+  showDetails,
+  setShowDetails,
+}: DisplayProps) {
+  const handleSizeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setPreviewSize(e.target.value as 'small' | 'medium' | 'large')
+  }
+
+  const handleDensityChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setDensity(e.target.value as 'compact' | 'comfortable' | 'spacious')
+  }
+
+  const handleDetailsChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setShowDetails(e.target.value as 'full' | 'minimal' | 'none')
+  }
+
+  return (
+    <div className="display-container">
+      <div className="display-controls">
+        <div className="display-group">
+          <label htmlFor="size-select" className="display-label">
+            Size:
+          </label>
+          <select
+            id="size-select"
+            value={previewSize}
+            onChange={handleSizeChange}
+            className="display-select"
+          >
+            <option value="small">Small</option>
+            <option value="medium">Medium</option>
+            <option value="large">Large</option>
+          </select>
+        </div>
+
+        <div className="display-group">
+          <label htmlFor="density-select" className="display-label">
+            Density:
+          </label>
+          <select
+            id="density-select"
+            value={density}
+            onChange={handleDensityChange}
+            className="display-select"
+          >
+            <option value="compact">Compact</option>
+            <option value="comfortable">Comfortable</option>
+            <option value="spacious">Spacious</option>
+          </select>
+        </div>
+
+        <div className="display-group">
+          <label htmlFor="details-select" className="display-label">
+            Details:
+          </label>
+          <select
+            id="details-select"
+            value={showDetails}
+            onChange={handleDetailsChange}
+            className="display-select"
+          >
+            <option value="full">Full Info</option>
+            <option value="minimal">Basic Info</option>
+            <option value="none">Image Only</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  )
+}

@@ -460,6 +460,22 @@ p {
   margin-top: 16px;
 }
 
+/* Density Styles for Images Grid */
+.images-grid--compact .image-card {
+  padding: 4px 8px;
+  gap: 8px;
+}
+
+.images-grid--comfortable .image-card {
+  padding: 8px 12px;
+  gap: 12px;
+}
+
+.images-grid--spacious .image-card {
+  padding: 12px 16px;
+  gap: 16px;
+}
+
 @media (max-width: 768px) {
   .control-panels {
     flex-direction: column;

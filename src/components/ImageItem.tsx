@@ -16,6 +16,7 @@ const getImageTypeFromMime = (mimeType: string) => {
 type Props = {
   image: ImageData
   size: 'small' | 'medium' | 'large'
+  showDetails?: 'full' | 'minimal' | 'none'
   index: number
   onDragStart?: (index: number) => void
   onDragEnd?: () => void
@@ -28,6 +29,7 @@ type Props = {
 export function ImageItem({
   image,
   size,
+  showDetails = 'full',
   index,
   onDragStart,
   onDragEnd,
@@ -96,41 +98,63 @@ export function ImageItem({
           </div>
         )}
       </div>
-      <div className="image-details">
-        <div className="image-url" title={image.url}>
-          <a href={image.url} target="_blank" rel="noopener noreferrer">
-            {image.url.split('/').pop() || 'Unknown filename'}
-          </a>
-        </div>
-        <div className="image-info">
-          <div className="info-row">
-            <span className="info-label">Type:</span>
-            <span className="info-value type-badge">
-              {getImageTypeFromMime(image.mimeType)}
-            </span>
+      {showDetails !== 'none' && (
+        <div className="image-details">
+          <div className="image-url" title={image.url}>
+            <a href={image.url} target="_blank" rel="noopener noreferrer">
+              {image.url.split('/').pop() || 'Unknown filename'}
+            </a>
           </div>
-          <div className="info-row">
-            <span className="info-label">Size:</span>
-            <span className="info-value">{formatFileSize(image.size)}</span>
-          </div>
-          <div className="info-row">
-            <span className="info-label">Dimensions:</span>
-            <span className="info-value">
-              {image.width && image.height
-                ? `${image.width} × ${image.height}px`
-                : 'Unknown'}
-            </span>
-          </div>
-          {image.width && image.height && (
-            <div className="info-row">
-              <span className="info-label">Aspect Ratio:</span>
-              <span className="info-value">
-                {(image.width / image.height).toFixed(2)}:1
-              </span>
+          {showDetails === 'full' ? (
+            <div className="image-info">
+              <div className="info-row">
+                <span className="info-label">Type:</span>
+                <span className="info-value type-badge">
+                  {getImageTypeFromMime(image.mimeType)}
+                </span>
+              </div>
+              <div className="info-row">
+                <span className="info-label">Size:</span>
+                <span className="info-value">{formatFileSize(image.size)}</span>
+              </div>
+              <div className="info-row">
+                <span className="info-label">Dimensions:</span>
+                <span className="info-value">
+                  {image.width && image.height
+                    ? `${image.width} × ${image.height}px`
+                    : 'Unknown'}
+                </span>
+              </div>
+              {image.width && image.height && (
+                <div className="info-row">
+                  <span className="info-label">Aspect Ratio:</span>
+                  <span className="info-value">
+                    {(image.width / image.height).toFixed(2)}:1
+                  </span>
+                </div>
+              )}
+            </div>
+          ) : (
+            // Minimal details
+            <div className="image-info">
+              <div className="info-row">
+                <span className="info-label">Type:</span>
+                <span className="info-value type-badge">
+                  {getImageTypeFromMime(image.mimeType)}
+                </span>
+              </div>
+              <div className="info-row">
+                <span className="info-label">Dimensions:</span>
+                <span className="info-value">
+                  {image.width && image.height
+                    ? `${image.width} × ${image.height}px`
+                    : 'Unknown'}
+                </span>
+              </div>
             </div>
           )}
         </div>
-      </div>
+      )}
     </div>
   )
 }

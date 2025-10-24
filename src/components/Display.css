@@ -1,0 +1,47 @@
+/* Display Component Styles */
+.display-container {
+  min-width: 200px;
+}
+
+.display-controls {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.display-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+  min-width: 120px;
+}
+
+.display-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: #495057;
+  text-align: left;
+}
+
+.display-select {
+  padding: 6px 12px;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  background-color: white;
+  color: #495057;
+  font-size: 14px;
+  cursor: pointer;
+  transition: border-color 0.2s ease;
+  flex: 1;
+}
+
+.display-select:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+.display-select:hover {
+  border-color: #adb5bd;
+}
