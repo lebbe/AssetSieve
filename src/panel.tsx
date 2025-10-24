@@ -10,6 +10,8 @@ import { useSorting } from './hooks/useSorting'
 import { useDragAndDrop } from './hooks/useDragAndDrop'
 import { ImageItem } from './components/ImageItem'
 import { Export } from './components/Export'
+import { PreviewSize } from './components/PreviewSize'
+import { useState } from 'react'
 
 function Panel() {
   const {
@@ -38,6 +40,10 @@ function Panel() {
     setReversed,
     setImageOrder,
   } = useSorting(filteredImages)
+
+  const [previewSize, setPreviewSize] = useState<'small' | 'medium' | 'large'>(
+    'small'
+  )
 
   const {
     draggedIndex,
@@ -82,13 +88,19 @@ function Panel() {
           />
         )}
         {filteredImages.length > 0 && (
-          <Sorting
-            sortBy={sortBy}
-            setSortBy={setSortBy}
-            reversed={reversed}
-            setReversed={setReversed}
-            totalImages={filteredImages.length}
-          />
+          <div className="control-panels">
+            <Sorting
+              sortBy={sortBy}
+              setSortBy={setSortBy}
+              reversed={reversed}
+              setReversed={setReversed}
+              totalImages={filteredImages.length}
+            />
+            <PreviewSize
+              previewSize={previewSize}
+              setPreviewSize={setPreviewSize}
+            />
+          </div>
         )}
         {sortedImages.length > 0 && <Export sortedImages={sortedImages} />}
         <h2>Detected Images ({sortedImages.length})</h2>
@@ -105,7 +117,7 @@ function Panel() {
               <ImageItem
                 key={`${image.url}-${index}`}
                 image={image}
-                size="small"
+                size={previewSize}
                 index={index}
                 onDragStart={handleDragStart}
                 onDragEnd={handleDragEnd}
