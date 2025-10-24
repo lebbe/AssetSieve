@@ -1,5 +1,6 @@
 import { FilterState } from '../hooks/useFilter'
 import { ImageData } from '../hooks/useImageSniffer'
+import { InputContainer } from './InputContainer'
 import './Filter.css'
 
 interface FilterProps {
@@ -25,8 +26,7 @@ export function Filter({
     <div className="filter-container">
       <div className="filter-controls">
         <div className="filter-row">
-          <div className="filter-group">
-            <label htmlFor="path-filter">Path:</label>
+          <InputContainer label="Path" htmlFor="path-filter">
             <input
               id="path-filter"
               type="text"
@@ -35,9 +35,8 @@ export function Filter({
               onChange={(e) => handleInputChange('path', e.target.value)}
               className="filter-input"
             />
-          </div>
-          <div className="filter-group">
-            <label htmlFor="filename-filter">Filename:</label>
+          </InputContainer>
+          <InputContainer label="Filename" htmlFor="filename-filter">
             <input
               id="filename-filter"
               type="text"
@@ -46,12 +45,11 @@ export function Filter({
               onChange={(e) => handleInputChange('filename', e.target.value)}
               className="filter-input"
             />
-          </div>
+          </InputContainer>
         </div>
 
         <div className="filter-row">
-          <div className="filter-group">
-            <label htmlFor="min-width-filter">Min Width:</label>
+          <InputContainer label="Min Width" htmlFor="min-width-filter">
             <input
               id="min-width-filter"
               type="number"
@@ -60,9 +58,8 @@ export function Filter({
               onChange={(e) => handleInputChange('minWidth', e.target.value)}
               className="filter-input filter-number"
             />
-          </div>
-          <div className="filter-group">
-            <label htmlFor="min-height-filter">Min Height:</label>
+          </InputContainer>
+          <InputContainer label="Min Height" htmlFor="min-height-filter">
             <input
               id="min-height-filter"
               type="number"
@@ -71,7 +68,7 @@ export function Filter({
               onChange={(e) => handleInputChange('minHeight', e.target.value)}
               className="filter-input filter-number"
             />
-          </div>
+          </InputContainer>
         </div>
 
         {availableFileTypes.length > 0 && (

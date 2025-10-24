@@ -1,4 +1,5 @@
 import { SortBy } from '../hooks/useSorting'
+import { InputContainer } from './InputContainer'
 
 interface SortingProps {
   sortBy: SortBy
@@ -28,21 +29,20 @@ export function Sorting({
   return (
     <div className="sorting-container">
       <div className="sorting-controls">
-        <label htmlFor="sort-select" className="sorting-label">
-          Sort by:
-        </label>
-        <select
-          id="sort-select"
-          value={sortBy}
-          onChange={(e) => setSortBy(e.target.value as SortBy)}
-          className="sorting-select"
-        >
-          {sortOptions.map((option) => (
-            <option key={option.value} value={option.value}>
-              {option.label}
-            </option>
-          ))}
-        </select>
+        <InputContainer label="Sort by" htmlFor="sort-select">
+          <select
+            id="sort-select"
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value as SortBy)}
+            className="sorting-select"
+          >
+            {sortOptions.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+        </InputContainer>
         <label className="reverse-checkbox-label">
           <input
             type="checkbox"

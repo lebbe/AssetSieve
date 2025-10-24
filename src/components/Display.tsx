@@ -1,3 +1,4 @@
+import { InputContainer } from './InputContainer'
 import './Display.css'
 
 interface DisplayProps {
@@ -32,10 +33,7 @@ export function Display({
   return (
     <div className="display-container">
       <div className="display-controls">
-        <div className="display-group">
-          <label htmlFor="size-select" className="display-label">
-            Size:
-          </label>
+        <InputContainer label="Size">
           <select
             id="size-select"
             value={previewSize}
@@ -46,12 +44,9 @@ export function Display({
             <option value="medium">Medium</option>
             <option value="large">Large</option>
           </select>
-        </div>
+        </InputContainer>
 
-        <div className="display-group">
-          <label htmlFor="density-select" className="display-label">
-            Density:
-          </label>
+        <InputContainer label="Density">
           <select
             id="density-select"
             value={density}
@@ -62,12 +57,9 @@ export function Display({
             <option value="comfortable">Comfortable</option>
             <option value="spacious">Spacious</option>
           </select>
-        </div>
+        </InputContainer>
 
-        <div className="display-group">
-          <label htmlFor="details-select" className="display-label">
-            Details:
-          </label>
+        <InputContainer label="Details">
           <select
             id="details-select"
             value={showDetails}
@@ -78,7 +70,7 @@ export function Display({
             <option value="minimal">Basic Info</option>
             <option value="none">Image Only</option>
           </select>
-        </div>
+        </InputContainer>
       </div>
     </div>
   )

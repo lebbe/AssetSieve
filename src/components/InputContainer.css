@@ -1,0 +1,20 @@
+/* Input Container Component Styles */
+.input-container {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+  min-width: 120px;
+}
+
+.input-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: #495057;
+  text-align: left;
+}
+
+.input-wrapper {
+  display: flex;
+  flex-direction: column;
+}
