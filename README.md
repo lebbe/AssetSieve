@@ -15,6 +15,12 @@ Imagine you're reading a digital magazine or comic online. The images load one b
 - **Create a PDF** with all images perfectly arranged
 - **Download individual images** to your computer
 
+## Screenshot
+
+![AssetSieve Interface](pokedex.jpg)
+
+_AssetSieve in action: The extension interface shows captured Pokémon images with filtering options, sorting controls, and export functionality. Notice how you can filter by dimensions, file size, search by filename, and see detailed information for each image including size and resolution._
+
 ---
 
 ## How to Use AssetSieve
