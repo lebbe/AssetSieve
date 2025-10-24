@@ -13,19 +13,31 @@ export interface ImageData {
 export function useImageSniffer(requests: NetworkRequest[]) {
   const [images, setImages] = useState<ImageData[]>([])
 
+  // Effect to sync images with requests (cleanup removed images)
   useEffect(() => {
-    // If requests is empty, clear all images
     if (requests.length === 0) {
       setImages([])
       return
     }
+
+    const imageRequestUrls = new Set(
+      requests
+        .filter((request) => request.mimeType.startsWith('image/'))
+        .map((request) => request.url)
+    )
+
+    setImages((prev) => prev.filter((img) => imageRequestUrls.has(img.url)))
+  }, [requests])
+
+  // Effect to process new image requests
+  useEffect(() => {
+    if (requests.length === 0) return
 
     const imageRequests = requests.filter(
       (request) =>
         request.mimeType.startsWith('image/') && request.chromeRequest
     )
 
-    // Process new images that haven't been processed yet
     const newImageRequests = imageRequests.filter(
       (request) => !images.some((img) => img.url === request.url)
     )
@@ -37,7 +49,6 @@ export function useImageSniffer(requests: NetworkRequest[]) {
 
       request.chromeRequest.getContent((content, encoding) => {
         if (content && encoding === 'base64') {
-          // Create an image element to get dimensions
           const img = new Image()
 
           const addImageData = (
@@ -54,7 +65,6 @@ export function useImageSniffer(requests: NetworkRequest[]) {
             }
 
             setImages((prev) => {
-              // Check if already exists to avoid duplicates
               if (prev.some((img) => img.url === request.url)) {
                 return prev
               }
@@ -66,7 +76,6 @@ export function useImageSniffer(requests: NetworkRequest[]) {
           img.onerror = () => addImageData(null, null)
           img.src = `data:${request.mimeType};base64,${content}`
         } else {
-          // Add image data even if we can't get base64 content
           const imageData: ImageData = {
             url: request.url,
             mimeType: request.mimeType,
