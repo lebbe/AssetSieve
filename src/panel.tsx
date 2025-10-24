@@ -11,6 +11,7 @@ import { useDragAndDrop } from './hooks/useDragAndDrop'
 import { ImageItem } from './components/ImageItem'
 import { Export } from './components/Export'
 import { PreviewSize } from './components/PreviewSize'
+import { PanelCard } from './components/PanelCard'
 import { useState } from 'react'
 
 function Panel() {
@@ -56,53 +57,65 @@ function Panel() {
   return (
     <div className="container">
       <h1>AssetSieve</h1>
-      <div className="controls">
-        <button
-          onClick={toggleListening}
-          className={`btn ${isListening ? 'btn-stop' : 'btn-start'}`}
-        >
-          {isListening ? 'Stop Listening' : 'Start Listening'}
-        </button>
-        <button onClick={reloadPage} className="btn btn-reload">
-          Reload Page
-        </button>
-        <button onClick={resetRequests} className="btn btn-clear">
-          Clear Images
-        </button>
-        <span className="listening-status">
-          {isListening
-            ? 'Listening for network traffic...'
-            : 'Network monitoring paused'}
-        </span>
-      </div>
+      <PanelCard>
+        <div className="controls">
+          <button
+            onClick={toggleListening}
+            className={`btn ${isListening ? 'btn-stop' : 'btn-start'}`}
+          >
+            {isListening ? 'Stop Listening' : 'Start Listening'}
+          </button>
+          <button onClick={reloadPage} className="btn btn-reload">
+            Reload Page
+          </button>
+          <button onClick={resetRequests} className="btn btn-clear">
+            Clear Images
+          </button>
+          <span className="listening-status">
+            {isListening
+              ? 'Listening for network traffic...'
+              : 'Network monitoring paused'}
+          </span>
+        </div>
+      </PanelCard>
       <div className="image-analysis">
         {images.length > 0 && (
-          <Filter
-            availableFileTypes={availableFileTypes}
-            filters={filters}
-            handleInputChange={handleInputChange}
-            handleFileTypeToggle={handleFileTypeToggle}
-            clearFilters={clearFilters}
-            filteredImages={filteredImages}
-            totalImages={images.length}
-          />
+          <PanelCard>
+            <Filter
+              availableFileTypes={availableFileTypes}
+              filters={filters}
+              handleInputChange={handleInputChange}
+              handleFileTypeToggle={handleFileTypeToggle}
+              clearFilters={clearFilters}
+              filteredImages={filteredImages}
+              totalImages={images.length}
+            />
+          </PanelCard>
         )}
         {filteredImages.length > 0 && (
           <div className="control-panels">
-            <Sorting
-              sortBy={sortBy}
-              setSortBy={setSortBy}
-              reversed={reversed}
-              setReversed={setReversed}
-              totalImages={filteredImages.length}
-            />
-            <PreviewSize
-              previewSize={previewSize}
-              setPreviewSize={setPreviewSize}
-            />
+            <PanelCard>
+              <Sorting
+                sortBy={sortBy}
+                setSortBy={setSortBy}
+                reversed={reversed}
+                setReversed={setReversed}
+                totalImages={filteredImages.length}
+              />
+            </PanelCard>
+            <PanelCard>
+              <PreviewSize
+                previewSize={previewSize}
+                setPreviewSize={setPreviewSize}
+              />
+            </PanelCard>
           </div>
         )}
-        {sortedImages.length > 0 && <Export sortedImages={sortedImages} />}
+        {sortedImages.length > 0 && (
+          <PanelCard className="export-panel-card">
+            <Export sortedImages={sortedImages} />
+          </PanelCard>
+        )}
         <h2>Detected Images ({sortedImages.length})</h2>
         {images.length === 0 ? (
           <div className="no-images">
