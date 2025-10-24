@@ -14,16 +14,12 @@ export function useImageSniffer(requests: NetworkRequest[]) {
   const [images, setImages] = useState<ImageData[]>([])
 
   useEffect(() => {
-    console.log('useImageSniffer useEffect triggered - requests count:', requests.length)
-    console.log('Current images count:', images.length)
-    
     // If requests is empty, clear all images
     if (requests.length === 0) {
-      console.log('No requests found, clearing all images')
       setImages([])
       return
     }
-    
+
     const imageRequests = requests.filter(
       (request) =>
         request.mimeType.startsWith('image/') && request.chromeRequest

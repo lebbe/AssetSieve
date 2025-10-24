@@ -20,6 +20,7 @@ type Props = {
   onDragStart?: (index: number) => void
   onDragEnd?: () => void
   onDragOver?: (index: number) => void
+  onDelete?: (url: string) => void
   isDragging?: boolean
   dragOverIndex?: number | null
 }
@@ -31,6 +32,7 @@ export function ImageItem({
   onDragStart,
   onDragEnd,
   onDragOver,
+  onDelete,
   isDragging,
   dragOverIndex,
 }: Props) {
@@ -53,6 +55,12 @@ export function ImageItem({
     e.preventDefault()
   }
 
+  const handleDelete = (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    onDelete?.(image.url)
+  }
+
   return (
     <div
       className={`image-card ${isDragging ? 'image-card--dragging' : ''} ${
@@ -67,6 +75,14 @@ export function ImageItem({
       <div className="drag-handle" title="Drag to reorder">
         ⋮⋮
       </div>
+      <button
+        className="delete-button"
+        onClick={handleDelete}
+        title="Delete this image"
+        aria-label="Delete image"
+      >
+        ✕
+      </button>
       <div className={`image-thumbnail image-thumbnail--${size}`}>
         {image.base64 ? (
           <img

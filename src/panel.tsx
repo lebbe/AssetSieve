@@ -12,17 +12,16 @@ import { ImageItem } from './components/ImageItem'
 import { Export } from './components/Export'
 
 function Panel() {
-  const { requests, isListening, toggleListening, reloadPage, resetRequests } =
-    useRequestSniffing()
+  const {
+    requests,
+    isListening,
+    toggleListening,
+    reloadPage,
+    resetRequests,
+    removeRequest,
+  } = useRequestSniffing()
   const { images } = useImageSniffer(requests)
-  
-  // Debug function to wrap resetRequests
-  const handleClearImages = () => {
-    console.log('Clear Images button clicked!')
-    console.log('Current requests count:', requests.length)
-    console.log('Current images count:', images.length)
-    resetRequests()
-  }
+
   const {
     filteredImages,
     availableFileTypes,
@@ -61,7 +60,7 @@ function Panel() {
         <button onClick={reloadPage} className="btn btn-reload">
           Reload Page
         </button>
-        <button onClick={handleClearImages} className="btn btn-clear">
+        <button onClick={resetRequests} className="btn btn-clear">
           Clear Images
         </button>
         <span className="listening-status">
@@ -111,6 +110,7 @@ function Panel() {
                 onDragStart={handleDragStart}
                 onDragEnd={handleDragEnd}
                 onDragOver={handleDragOver}
+                onDelete={removeRequest}
                 isDragging={draggedIndex === index}
                 dragOverIndex={dragOverIndex}
               />
