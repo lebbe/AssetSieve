@@ -1,6 +1,7 @@
 import { createRoot } from 'react-dom/client'
 
 import './panel.css'
+import './components/Button.css'
 import { useRequestSniffing } from './hooks/useRequestSniffing'
 import { useImageSniffer } from './hooks/useImageSniffer'
 import { Filter } from './components/Filter'
@@ -60,20 +61,20 @@ function Panel() {
   } = useDragAndDrop(sortedImages, setImageOrder)
 
   return (
-    <div className="container">
+    <div>
       <h1>AssetSieve</h1>
       <PanelCard title="Network">
         <div className="controls">
           <button
             onClick={toggleListening}
-            className={`btn ${isListening ? 'btn-stop' : 'btn-start'}`}
+            className={`btn ${isListening ? 'btn-red' : 'btn-green'}`}
           >
             {isListening ? 'Stop Listening' : 'Start Listening'}
           </button>
-          <button onClick={reloadPage} className="btn btn-reload">
+          <button onClick={reloadPage} className="btn btn-blue">
             Reload Page
           </button>
-          <button onClick={resetRequests} className="btn btn-clear">
+          <button onClick={resetRequests} className="btn">
             Clear Images
           </button>
           <span className="listening-status">

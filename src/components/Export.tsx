@@ -1,4 +1,5 @@
 import { ImageData } from '../hooks/useImageSniffer'
+import './Button.css'
 
 interface ExportProps {
   sortedImages: ImageData[]
@@ -213,14 +214,14 @@ export function Export({ sortedImages }: ExportProps) {
         <div className="export-buttons">
           <button
             onClick={handleExportAll}
-            className="btn btn-export"
+            className="btn btn-green btn-lg"
             disabled={sortedImages.length === 0}
           >
             Download All Images ({sortedImages.length})
           </button>
           <button
             onClick={handleExportToPDF}
-            className="btn btn-export-pdf"
+            className="btn btn-red btn-lg"
             disabled={sortedImages.length === 0}
           >
             Export to PDF ({sortedImages.length})

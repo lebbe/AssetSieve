@@ -1,5 +1,6 @@
 import { ImageData } from '../hooks/useImageSniffer'
 import './ImageItem.css'
+import './Button.css'
 
 const formatFileSize = (bytes: number) => {
   if (bytes === 0) return '0 B'
@@ -78,12 +79,12 @@ export function ImageItem({
         ⋮⋮
       </div>
       <button
-        className="delete-button"
+        className="btn btn-icon btn-red"
         onClick={handleDelete}
         title="Delete this image"
         aria-label="Delete image"
       >
-        ✕
+        ×
       </button>
       <div className={`image-thumbnail image-thumbnail--${size}`}>
         {image.base64 ? (

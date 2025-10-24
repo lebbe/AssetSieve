@@ -1,0 +1,88 @@
+/* Base Button Styles */
+.btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #6c757d;
+  color: white;
+}
+
+.btn:hover:not(:disabled) {
+  background-color: #5a6268;
+}
+
+.btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* Button Colors */
+.btn-blue {
+  background-color: #007bff;
+}
+
+.btn-blue:hover:not(:disabled) {
+  background-color: #0056b3;
+}
+
+.btn-green {
+  background-color: #28a745;
+}
+
+.btn-green:hover:not(:disabled) {
+  background-color: #218838;
+}
+
+.btn-red {
+  background-color: #dc3545;
+}
+
+.btn-red:hover:not(:disabled) {
+  background-color: #c82333;
+}
+
+/* Button Sizes */
+.btn-sm {
+  padding: 6px 12px;
+  font-size: 12px;
+}
+
+.btn-lg {
+  padding: 10px 20px;
+  font-size: 16px;
+}
+
+/* Icon Buttons */
+.btn-icon {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  padding: 0;
+  font-size: 14px;
+  font-weight: bold;
+  line-height: 1;
+}
+
+.btn-icon:hover:not(:disabled) {
+  transform: scale(1.1);
+}
+
+/* Button Groups */
+.btn-group {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+/* Export Buttons Container */
+.export-buttons {
+  display: flex;
+  gap: 8px;
+}

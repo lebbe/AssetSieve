@@ -205,38 +205,19 @@
   }
 }
 
-/* Delete Button */
-.delete-button {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  width: 24px;
-  height: 24px;
-  border: none;
-  border-radius: 50%;
-  background-color: #dc3545;
-  color: white;
-  font-size: 14px;
-  font-weight: bold;
-  cursor: pointer;
-  display: none;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s ease;
-  z-index: 10;
-  padding: 0;
-  line-height: 1;
-}
-
-.delete-button:hover {
-  background-color: #c82333;
-  transform: scale(1.1);
-}
-
 .image-card {
   position: relative;
 }
 
-.image-card:hover .delete-button {
+/* Delete Button Positioning */
+.image-card .btn-icon {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: none;
+  z-index: 10;
+}
+
+.image-card:hover .btn-icon {
   display: flex;
 }

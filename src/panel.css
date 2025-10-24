@@ -2,15 +2,7 @@ body {
   font-family: Arial, sans-serif;
   padding: 20px;
   margin: 0;
-  background-color: #f5f5f5;
-}
-
-.container {
   background-color: white;
-  padding: 30px;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  text-align: center;
 }
 
 h1 {
@@ -24,15 +16,6 @@ h1 {
   display: flex;
   align-items: center;
   gap: 12px;
-}
-
-.btn-reload {
-  background-color: #17a2b8;
-  color: white;
-}
-
-.btn-reload:hover {
-  background-color: #138496;
 }
 
 .listening-status {
@@ -96,52 +79,6 @@ p {
   display: flex;
   gap: 8px;
   align-items: center;
-}
-
-.btn {
-  padding: 8px 16px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 14px;
-  font-weight: 500;
-  transition: all 0.2s ease;
-}
-
-.btn-start {
-  background-color: #28a745;
-  color: white;
-}
-
-.btn-start:hover {
-  background-color: #218838;
-}
-
-.btn-stop {
-  background-color: #dc3545;
-  color: white;
-}
-
-.btn-stop:hover {
-  background-color: #c82333;
-}
-
-.btn-clear {
-  background-color: #6c757d;
-  color: white;
-}
-
-.btn-clear:hover {
-  background-color: #5a6268;
-}
-
-.btn-check {
-  background-color: #007bff;
-  color: white;
-}
-
-.btn-check:hover {
-  background-color: #0056b3;
 }
 
 .status-indicator {
@@ -367,57 +304,6 @@ p {
   color: #333;
   font-size: 16px;
   font-weight: 600;
-}
-
-.export-buttons {
-  display: flex;
-  gap: 8px;
-}
-
-.btn-export {
-  background-color: #28a745;
-  color: white;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 14px;
-  font-weight: 500;
-  transition: all 0.2s ease;
-}
-
-.btn-export:hover:not(:disabled) {
-  background-color: #218838;
-  transform: translateY(-1px);
-}
-
-.btn-export:disabled {
-  background-color: #6c757d;
-  cursor: not-allowed;
-  opacity: 0.6;
-}
-
-.btn-export-pdf {
-  background-color: #dc3545;
-  color: white;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 14px;
-  font-weight: 500;
-  transition: all 0.2s ease;
-}
-
-.btn-export-pdf:hover:not(:disabled) {
-  background-color: #c82333;
-  transform: translateY(-1px);
-}
-
-.btn-export-pdf:disabled {
-  background-color: #6c757d;
-  cursor: not-allowed;
-  opacity: 0.6;
 }
 
 .export-info {

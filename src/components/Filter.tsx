@@ -2,6 +2,7 @@ import { FilterState } from '../hooks/useFilter'
 import { ImageData } from '../hooks/useImageSniffer'
 import { InputContainer } from './InputContainer'
 import './Filter.css'
+import './Button.css'
 
 interface FilterProps {
   filters: FilterState
@@ -93,7 +94,7 @@ export function Filter({
         )}
 
         <div className="filter-actions">
-          <button onClick={clearFilters} className="btn btn-clear">
+          <button onClick={clearFilters} className="btn">
             Clear Filters
           </button>
           <span className="filter-count">
