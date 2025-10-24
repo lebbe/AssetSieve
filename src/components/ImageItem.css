@@ -8,6 +8,42 @@
   font-size: 13px;
   background-color: #ffffff;
   transition: background-color 0.2s ease;
+  cursor: move;
+}
+
+.image-card--dragging {
+  opacity: 0.5;
+  background-color: #e3f2fd;
+}
+
+.image-card--drag-over {
+  border-top: 3px solid #007bff;
+}
+
+/* Drag Handle */
+.drag-handle {
+  color: #6c757d;
+  cursor: grab;
+  font-size: 16px;
+  line-height: 1;
+  padding: 4px;
+  flex-shrink: 0;
+  user-select: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+}
+
+.drag-handle:hover {
+  color: #495057;
+  background-color: #f8f9fa;
+  border-radius: 3px;
+}
+
+.drag-handle:active {
+  cursor: grabbing;
 }
 
 .image-card:hover {

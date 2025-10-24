@@ -7,6 +7,7 @@ import { Filter } from './components/Filter'
 import { useFilter } from './hooks/useFilter'
 import { Sorting } from './components/Sorting'
 import { useSorting } from './hooks/useSorting'
+import { useDragAndDrop } from './hooks/useDragAndDrop'
 import { ImageItem } from './components/ImageItem'
 
 function Panel() {
@@ -20,8 +21,22 @@ function Panel() {
     handleFileTypeToggle,
     handleInputChange,
   } = useFilter(images)
-  const { sortedImages, sortBy, setSortBy, reversed, setReversed } =
-    useSorting(filteredImages)
+  const {
+    sortedImages,
+    sortBy,
+    setSortBy,
+    reversed,
+    setReversed,
+    setImageOrder,
+  } = useSorting(filteredImages)
+
+  const {
+    draggedIndex,
+    dragOverIndex,
+    handleDragStart,
+    handleDragEnd,
+    handleDragOver,
+  } = useDragAndDrop(sortedImages, setImageOrder)
 
   return (
     <div className="container">
@@ -58,7 +73,17 @@ function Panel() {
         ) : (
           <div className="images-grid">
             {sortedImages.map((image, index) => (
-              <ImageItem key={index} image={image} size="small" />
+              <ImageItem
+                key={`${image.url}-${index}`}
+                image={image}
+                size="small"
+                index={index}
+                onDragStart={handleDragStart}
+                onDragEnd={handleDragEnd}
+                onDragOver={handleDragOver}
+                isDragging={draggedIndex === index}
+                dragOverIndex={dragOverIndex}
+              />
             ))}
           </div>
         )}

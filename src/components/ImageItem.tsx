@@ -16,11 +16,57 @@ const getImageTypeFromMime = (mimeType: string) => {
 type Props = {
   image: ImageData
   size: 'small' | 'medium' | 'large'
+  index: number
+  onDragStart?: (index: number) => void
+  onDragEnd?: () => void
+  onDragOver?: (index: number) => void
+  isDragging?: boolean
+  dragOverIndex?: number | null
 }
 
-export function ImageItem({ image, size }: Props) {
+export function ImageItem({
+  image,
+  size,
+  index,
+  onDragStart,
+  onDragEnd,
+  onDragOver,
+  isDragging,
+  dragOverIndex,
+}: Props) {
+  const handleDragStart = (e: React.DragEvent) => {
+    e.dataTransfer.effectAllowed = 'move'
+    onDragStart?.(index)
+  }
+
+  const handleDragEnd = () => {
+    onDragEnd?.()
+  }
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault()
+    e.dataTransfer.dropEffect = 'move'
+    onDragOver?.(index)
+  }
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault()
+  }
+
   return (
-    <div className="image-card">
+    <div
+      className={`image-card ${isDragging ? 'image-card--dragging' : ''} ${
+        dragOverIndex === index ? 'image-card--drag-over' : ''
+      }`}
+      draggable={true}
+      onDragStart={handleDragStart}
+      onDragEnd={handleDragEnd}
+      onDragOver={handleDragOver}
+      onDrop={handleDrop}
+    >
+      <div className="drag-handle" title="Drag to reorder">
+        ⋮⋮
+      </div>
       <div className={`image-thumbnail image-thumbnail--${size}`}>
         {image.base64 ? (
           <img

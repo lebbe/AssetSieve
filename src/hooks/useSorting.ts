@@ -21,6 +21,35 @@ export function useSorting(filteredImages: ImageData[]) {
     reversed: false,
   })
 
+  // Manual ordering state - keeps track of custom order when sortBy is 'manual'
+  const [manualOrder, setManualOrder] = useState<ImageData[]>([])
+
+  // Update manual order when filteredImages change
+  useMemo(() => {
+    // Always update manual order to include new images
+    // If we have existing manual order, preserve order of existing images and append new ones
+    if (manualOrder.length === 0) {
+      // First time or no manual order yet, just use filtered images
+      setManualOrder(filteredImages)
+    } else {
+      // Preserve existing order but add new images that aren't in manual order yet
+      const existingUrls = new Set(manualOrder.map((img) => img.url))
+      const newImages = filteredImages.filter(
+        (img) => !existingUrls.has(img.url)
+      )
+      const filteredExisting = manualOrder.filter((img) =>
+        filteredImages.some((filtered) => filtered.url === img.url)
+      )
+
+      if (
+        newImages.length > 0 ||
+        filteredExisting.length !== manualOrder.length
+      ) {
+        setManualOrder([...filteredExisting, ...newImages])
+      }
+    }
+  }, [filteredImages, manualOrder])
+
   // Extract path from URL (excluding domain and filename)
   const getPathFromUrl = (url: string) => {
     try {
@@ -47,8 +76,13 @@ export function useSorting(filteredImages: ImageData[]) {
   // Sort images based on current sorting state
   const sortedImages = useMemo(() => {
     if (sortingState.sortBy === 'manual') {
-      const result = [...filteredImages]
-      return sortingState.reversed ? result.reverse() : result
+      // Filter manualOrder to only include images that are in filteredImages
+      const filteredManualOrder = manualOrder.filter((image) =>
+        filteredImages.some((filtered) => filtered.url === image.url)
+      )
+      return sortingState.reversed
+        ? [...filteredManualOrder].reverse()
+        : filteredManualOrder
     }
 
     const sorted = [...filteredImages].sort((a, b) => {
@@ -104,7 +138,7 @@ export function useSorting(filteredImages: ImageData[]) {
     })
 
     return sorted
-  }, [filteredImages, sortingState.sortBy, sortingState.reversed])
+  }, [filteredImages, sortingState.sortBy, sortingState.reversed, manualOrder])
 
   const setSortBy = (sortBy: SortBy) => {
     setSortingState((prev) => ({
@@ -120,11 +154,23 @@ export function useSorting(filteredImages: ImageData[]) {
     }))
   }
 
+  const setImageOrder = (newOrder: ImageData[]) => {
+    setManualOrder(newOrder)
+    // Switch to manual mode if not already
+    if (sortingState.sortBy !== 'manual') {
+      setSortingState((prev) => ({
+        ...prev,
+        sortBy: 'manual',
+      }))
+    }
+  }
+
   return {
     sortedImages,
     sortBy: sortingState.sortBy,
     reversed: sortingState.reversed,
     setSortBy,
     setReversed,
+    setImageOrder,
   }
 }
