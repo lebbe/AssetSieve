@@ -6,6 +6,7 @@ export interface FilterState {
   filename: string
   minWidth: string
   minHeight: string
+  minFileSize: string
   fileTypes: Set<string>
 }
 
@@ -15,6 +16,7 @@ export function useFilter(images: ImageData[]) {
     filename: '',
     minWidth: '',
     minHeight: '',
+    minFileSize: '',
     fileTypes: new Set(),
   })
 
@@ -51,6 +53,19 @@ export function useFilter(images: ImageData[]) {
   // Filter images based on current filters
   const filteredImagesList = useMemo(() => {
     return images.filter((image) => {
+      // Remove images without essential data (filesize or dimensions)
+      if (!image.size || image.size <= 0) {
+        return false
+      }
+      if (
+        !image.width ||
+        !image.height ||
+        image.width <= 0 ||
+        image.height <= 0
+      ) {
+        return false
+      }
+
       // Path filter
       if (filters.path) {
         const imagePath = getPathFromUrl(image.url)
@@ -68,7 +83,7 @@ export function useFilter(images: ImageData[]) {
       }
 
       // Min width filter
-      if (filters.minWidth && image.width) {
+      if (filters.minWidth) {
         const minWidth = parseInt(filters.minWidth)
         if (!isNaN(minWidth) && image.width < minWidth) {
           return false
@@ -76,9 +91,17 @@ export function useFilter(images: ImageData[]) {
       }
 
       // Min height filter
-      if (filters.minHeight && image.height) {
+      if (filters.minHeight) {
         const minHeight = parseInt(filters.minHeight)
         if (!isNaN(minHeight) && image.height < minHeight) {
+          return false
+        }
+      }
+
+      // Min file size filter (user input in KB, image.size is in bytes)
+      if (filters.minFileSize) {
+        const minFileSizeKB = parseInt(filters.minFileSize)
+        if (!isNaN(minFileSizeKB) && image.size / 1024 < minFileSizeKB) {
           return false
         }
       }
@@ -123,6 +146,7 @@ export function useFilter(images: ImageData[]) {
       filename: '',
       minWidth: '',
       minHeight: '',
+      minFileSize: '',
       fileTypes: new Set(),
     })
   }

@@ -70,6 +70,19 @@ export function Filter({
               className="filter-input filter-number"
             />
           </InputContainer>
+          <InputContainer
+            label="Min File Size (KB)"
+            htmlFor="min-filesize-filter"
+          >
+            <input
+              id="min-filesize-filter"
+              type="number"
+              placeholder="e.g., 50"
+              value={filters.minFileSize}
+              onChange={(e) => handleInputChange('minFileSize', e.target.value)}
+              className="filter-input filter-number"
+            />
+          </InputContainer>
         </div>
 
         {availableFileTypes.length > 0 && (
