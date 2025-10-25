@@ -1,8 +1,8 @@
-import { FilterState } from '../hooks/useFilter'
-import { ImageData } from '../hooks/useImageSniffer'
-import { InputContainer } from './InputContainer'
+import { FilterState } from '../../../hooks/useFilter'
+import { ImageData } from '../../../hooks/useImageSniffer'
+import { InputContainer } from '../../../components/InputContainer'
 import './Filter.css'
-import './Button.css'
+import '../../../components/Button.css'
 
 interface FilterProps {
   filters: FilterState

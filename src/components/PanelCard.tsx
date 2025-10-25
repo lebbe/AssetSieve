@@ -1,5 +1,7 @@
 import React from 'react'
 
+import './PanelCard.css'
+
 interface PanelCardProps {
   children: React.ReactNode
   className?: string

@@ -1,6 +1,6 @@
-import { ImageData } from '../hooks/useImageSniffer'
+import { ImageData } from '../../../hooks/useImageSniffer'
 import './ImageItem.css'
-import './Button.css'
+import '../../../components/Button.css'
 
 const formatFileSize = (bytes: number) => {
   if (bytes === 0) return '0 B'
