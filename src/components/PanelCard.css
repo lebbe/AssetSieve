@@ -16,3 +16,20 @@
   border-bottom: 1px solid #dee2e6;
   padding-bottom: 8px;
 }
+
+/* Control Panels Layout */
+.control-panels {
+  display: flex;
+  gap: 20px;
+}
+
+.control-panels .panel-card {
+  margin-bottom: 0;
+}
+
+@media (max-width: 768px) {
+  .control-panels {
+    flex-direction: column;
+    gap: 16px;
+  }
+}

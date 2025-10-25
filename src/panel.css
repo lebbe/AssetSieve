@@ -209,13 +209,6 @@ p {
   margin-top: 2px;
 }
 
-@media (max-width: 768px) {
-  .control-panels {
-    flex-direction: column;
-    gap: 16px;
-  }
-}
-
 /* Preview Size Styles */
 .preview-size-container {
   min-width: 200px;

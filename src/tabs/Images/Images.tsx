@@ -10,6 +10,8 @@ import { useFilter } from '../../hooks/useFilter'
 import { NetworkRequest, useImageSniffer } from '../../hooks/useRequestSniffing'
 import { useSorting } from '../../hooks/useSorting'
 
+import './Images.css'
+
 type Props = {
   requests: NetworkRequest[]
   removeRequest: (url: string) => void

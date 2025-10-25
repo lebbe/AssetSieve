@@ -1,0 +1,31 @@
+.traffic-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 16px;
+}
+
+.traffic-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.traffic-results {
+  max-height: 600px;
+  overflow-y: auto;
+}
+
+.traffic-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.no-requests {
+  text-align: center;
+  color: #6c757d;
+  font-style: italic;
+  padding: 24px;
+  font-size: 14px;
+}

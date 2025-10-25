@@ -7,6 +7,7 @@ import { useRequestSniffing } from './hooks/useRequestSniffing'
 import { PanelCard } from './components/PanelCard'
 import { Images } from './tabs/Images/Images'
 import { Tabs } from './tabs/Tabs'
+import { Traffic } from './tabs/Traffic/Traffic'
 
 function Panel() {
   const {
@@ -26,8 +27,8 @@ function Panel() {
         content: <Images requests={requests} removeRequest={removeRequest} />,
       },
       {
-        name: 'dummy',
-        content: <div>Dummy tab content</div>,
+        name: 'Traffic',
+        content: <Traffic requests={requests} />,
       },
     ],
     [requests, removeRequest]
