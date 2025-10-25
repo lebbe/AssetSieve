@@ -1,19 +1,13 @@
 import { createRoot } from 'react-dom/client'
+import { useMemo } from 'react'
 
 import './panel.css'
 import './components/Button.css'
 import { useRequestSniffing } from './hooks/useRequestSniffing'
-import { useImageSniffer } from './hooks/useImageSniffer'
-import { Filter } from './components/Filter'
-import { useFilter } from './hooks/useFilter'
-import { Sorting } from './components/Sorting'
-import { useSorting } from './hooks/useSorting'
-import { useDragAndDrop } from './hooks/useDragAndDrop'
-import { ImageItem } from './components/ImageItem'
-import { Export } from './components/Export'
-import { Display } from './components/Display'
 import { PanelCard } from './components/PanelCard'
-import { useDisplayOptions } from './hooks/useDisplayOptions'
+import { Images } from './tabs/Images/Images'
+import { Tabs } from './tabs/Tabs'
+import { Traffic } from './tabs/Traffic/Traffic'
 
 function Panel() {
   const {
@@ -24,42 +18,21 @@ function Panel() {
     resetRequests,
     removeRequest,
   } = useRequestSniffing()
-  const { images } = useImageSniffer(requests)
 
-  const {
-    filteredImages,
-    availableFileTypes,
-    filters,
-    clearFilters,
-    handleFileTypeToggle,
-    handleInputChange,
-  } = useFilter(images)
-  const {
-    sortedImages,
-    sortBy,
-    setSortBy,
-    reversed,
-    setReversed,
-    setImageOrder,
-  } = useSorting(filteredImages)
-
-  const {
-    previewSize,
-    setPreviewSize,
-    density,
-    setDensity,
-    showDetails,
-    setShowDetails,
-  } = useDisplayOptions()
-
-  const {
-    draggedIndex,
-    dragOverIndex,
-    handleDragStart,
-    handleDragEnd,
-    handleDragOver,
-  } = useDragAndDrop(sortedImages, setImageOrder)
-
+  // Create stable tabs array with pre-rendered content to prevent remounting
+  const tabs = useMemo(
+    () => [
+      {
+        name: 'Images',
+        content: <Images requests={requests} removeRequest={removeRequest} />,
+      },
+      {
+        name: 'Traffic',
+        content: <Traffic requests={requests} />,
+      },
+    ],
+    [requests, removeRequest]
+  )
   return (
     <div>
       <h1>AssetSieve</h1>
@@ -84,76 +57,7 @@ function Panel() {
           </span>
         </div>
       </PanelCard>
-      <div className="image-analysis">
-        {images.length > 0 && (
-          <PanelCard title="Filters">
-            <Filter
-              availableFileTypes={availableFileTypes}
-              filters={filters}
-              handleInputChange={handleInputChange}
-              handleFileTypeToggle={handleFileTypeToggle}
-              clearFilters={clearFilters}
-              filteredImages={filteredImages}
-              totalImages={images.length}
-            />
-          </PanelCard>
-        )}
-        {filteredImages.length > 0 && (
-          <div className="control-panels">
-            <PanelCard title="Sorting">
-              <Sorting
-                sortBy={sortBy}
-                setSortBy={setSortBy}
-                reversed={reversed}
-                setReversed={setReversed}
-                totalImages={filteredImages.length}
-              />
-            </PanelCard>
-            <PanelCard title="Display">
-              <Display
-                previewSize={previewSize}
-                setPreviewSize={setPreviewSize}
-                density={density}
-                setDensity={setDensity}
-                showDetails={showDetails}
-                setShowDetails={setShowDetails}
-              />
-            </PanelCard>
-          </div>
-        )}
-        {sortedImages.length > 0 && (
-          <PanelCard className="export-panel-card" title="Export">
-            <Export sortedImages={sortedImages} />
-          </PanelCard>
-        )}
-        <h2>Detected Images ({sortedImages.length})</h2>
-        {images.length === 0 ? (
-          <div className="no-images">
-            <p>
-              No images detected yet. Browse to a website to see images being
-              captured.
-            </p>
-          </div>
-        ) : (
-          <div className={`images-grid images-grid--${density}`}>
-            {sortedImages.map((image, index) => (
-              <ImageItem
-                key={`${image.url}-${index}`}
-                image={image}
-                size={previewSize}
-                showDetails={showDetails}
-                index={index}
-                onDragStart={handleDragStart}
-                onDragEnd={handleDragEnd}
-                onDragOver={handleDragOver}
-                onDelete={removeRequest}
-                isDragging={draggedIndex === index}
-                dragOverIndex={dragOverIndex}
-              />
-            ))}
-          </div>
-        )}
-      </div>
+      <Tabs tabs={tabs} />
     </div>
   )
 }

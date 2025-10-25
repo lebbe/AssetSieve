@@ -1,5 +1,5 @@
-import { SortBy } from '../hooks/useSorting'
-import { InputContainer } from './InputContainer'
+import { SortBy } from '../../../hooks/useSorting'
+import { InputContainer } from '../../../components/InputContainer'
 
 interface SortingProps {
   sortBy: SortBy

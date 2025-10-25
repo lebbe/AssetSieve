@@ -1,0 +1,37 @@
+.traffic-export-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.export-info {
+  font-size: 12px;
+  color: #6c757d;
+  font-style: italic;
+}
+
+.export-buttons {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.export-btn {
+  padding: 8px 16px;
+  background: #007acc;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.export-btn:hover:not(:disabled) {
+  background: #005a9e;
+}
+
+.export-btn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}

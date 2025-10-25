@@ -1,0 +1,35 @@
+/* Panel Card Base Styles */
+.panel-card {
+  background-color: #ffffff;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 16px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.panel-card-title {
+  margin: 0 0 16px 0;
+  color: #333;
+  font-size: 16px;
+  font-weight: 600;
+  border-bottom: 1px solid #dee2e6;
+  padding-bottom: 8px;
+}
+
+/* Control Panels Layout */
+.control-panels {
+  display: flex;
+  gap: 20px;
+}
+
+.control-panels .panel-card {
+  margin-bottom: 0;
+}
+
+@media (max-width: 768px) {
+  .control-panels {
+    flex-direction: column;
+    gap: 16px;
+  }
+}

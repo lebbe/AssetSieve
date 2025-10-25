@@ -1,0 +1,41 @@
+.traffic-filter-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.traffic-filter-row {
+  display: flex;
+  align-items: end;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.filter-input,
+.filter-select {
+  padding: 6px 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 12px;
+  min-width: 120px;
+}
+
+.filter-input:focus,
+.filter-select:focus {
+  outline: none;
+  border-color: #007acc;
+}
+
+.clear-filters-btn {
+  padding: 6px 12px;
+  background: #f8f8f8;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.clear-filters-btn:hover {
+  background: #e8e8e8;
+}

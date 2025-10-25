@@ -1,0 +1,33 @@
+.traffic-sorting-container {
+  display: flex;
+  align-items: end;
+  gap: 12px;
+}
+
+.sort-select {
+  padding: 6px 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 12px;
+  min-width: 150px;
+}
+
+.sort-select:focus {
+  outline: none;
+  border-color: #007acc;
+}
+
+.sort-direction-btn {
+  padding: 6px 12px;
+  background: #f8f8f8;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.sort-direction-btn:hover {
+  background: #e8e8e8;
+}

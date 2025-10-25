@@ -1,5 +1,5 @@
-import { ImageData } from '../hooks/useImageSniffer'
-import './Button.css'
+import { ImageData } from '../../../hooks/useImageSniffer'
+import '../../../components/Button.css'
 
 interface ExportProps {
   sortedImages: ImageData[]
