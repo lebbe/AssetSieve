@@ -5,10 +5,23 @@ export interface ImageData {
   url: string
   mimeType: string
   size: number
-  width: number | null
-  height: number | null
+  width: number
+  height: number
   base64: string
 }
+
+const imageExtensions = [
+  '.jpg',
+  '.jpeg',
+  '.png',
+  '.gif',
+  '.webp',
+  '.bmp',
+  '.svg',
+  '.ico',
+  '.tiff',
+  '.tif',
+]
 
 // Helper function to detect if a request is likely an image
 function isLikelyImage(request: NetworkRequest): boolean {
@@ -17,21 +30,13 @@ function isLikelyImage(request: NetworkRequest): boolean {
     return true
   }
 
-  // Check for octet-stream with image file extensions
-  if (request.mimeType === 'application/octet-stream') {
+  if (
+    request.mimeType === 'application/octet-stream' ||
+    request.mimeType === 'application/binary' ||
+    request.mimeType === ''
+  ) {
     const url = request.url.toLowerCase()
-    const imageExtensions = [
-      '.jpg',
-      '.jpeg',
-      '.png',
-      '.gif',
-      '.webp',
-      '.bmp',
-      '.svg',
-      '.ico',
-      '.tiff',
-      '.tif',
-    ]
+
     const hasImageExtension = imageExtensions.some((ext) => url.includes(ext))
 
     if (hasImageExtension) {
@@ -41,33 +46,18 @@ function isLikelyImage(request: NetworkRequest): boolean {
     return hasImageExtension
   }
 
-  // Check for other generic MIME types that might contain images
-  if (request.mimeType === 'application/binary' || request.mimeType === '') {
-    const url = request.url.toLowerCase()
-    const imageExtensions = [
-      '.jpg',
-      '.jpeg',
-      '.png',
-      '.gif',
-      '.webp',
-      '.bmp',
-      '.svg',
-      '.ico',
-      '.tiff',
-      '.tif',
-    ]
-    const hasImageExtension = imageExtensions.some((ext) => url.includes(ext))
-
-    if (hasImageExtension) {
-      console.log(
-        `[AssetSieve] Detected binary/unknown type image: ${url} (${request.mimeType})`
-      )
-    }
-
-    return hasImageExtension
-  }
-
   return false
+}
+
+function detectMimeType(url: string) {
+  const urlLower = url.toLowerCase()
+  if (urlLower.includes('.png')) return 'image/png'
+  else if (urlLower.includes('.gif')) return 'image/gif'
+  else if (urlLower.includes('.webp')) return 'image/webp'
+  else if (urlLower.includes('.svg')) return 'image/svg+xml'
+  else if (urlLower.includes('.bmp')) return 'image/bmp'
+  else if (urlLower.includes('.tif')) return 'image/tiff'
+  return 'image/jpeg'
 }
 
 export function useImageSniffer(requests: NetworkRequest[]) {
@@ -107,30 +97,30 @@ export function useImageSniffer(requests: NetworkRequest[]) {
       if (!request.chromeRequest) return
 
       request.chromeRequest.getContent((content, encoding) => {
+        const addImageData = (
+          width: number | null,
+          height: number | null,
+          actualMimeType?: string
+        ) => {
+          const imageData: ImageData = {
+            url: request.url,
+            mimeType: actualMimeType || request.mimeType,
+            size: request.size,
+            width: width || 0,
+            height: height || 0,
+            base64: content,
+          }
+
+          setImages((prev) => {
+            if (prev.some((img) => img.url === request.url)) {
+              return prev
+            }
+            return [...prev, imageData]
+          })
+        }
+
         if (content && encoding === 'base64') {
           const img = new Image()
-
-          const addImageData = (
-            width: number | null,
-            height: number | null,
-            actualMimeType?: string
-          ) => {
-            const imageData: ImageData = {
-              url: request.url,
-              mimeType: actualMimeType || request.mimeType,
-              size: request.size,
-              width,
-              height,
-              base64: content,
-            }
-
-            setImages((prev) => {
-              if (prev.some((img) => img.url === request.url)) {
-                return prev
-              }
-              return [...prev, imageData]
-            })
-          }
 
           // For octet-stream or unknown types, try to detect the actual image format
           let dataSrc: string
@@ -139,51 +129,56 @@ export function useImageSniffer(requests: NetworkRequest[]) {
             request.mimeType === 'application/binary' ||
             request.mimeType === ''
           ) {
-            // Try common image formats - start with the most likely based on file extension
-            const url = request.url.toLowerCase()
-            let detectedMimeType = 'image/jpeg' // default fallback
-
-            if (url.includes('.png')) detectedMimeType = 'image/png'
-            else if (url.includes('.gif')) detectedMimeType = 'image/gif'
-            else if (url.includes('.webp')) detectedMimeType = 'image/webp'
-            else if (url.includes('.svg')) detectedMimeType = 'image/svg+xml'
-            else if (url.includes('.bmp')) detectedMimeType = 'image/bmp'
+            const detectedMimeType = detectMimeType(request.url)
 
             dataSrc = `data:${detectedMimeType};base64,${content}`
 
             img.onload = () =>
               addImageData(img.width, img.height, detectedMimeType)
-            img.onerror = () => {
-              // If the guessed MIME type fails, try generic image/jpeg
-              if (detectedMimeType !== 'image/jpeg') {
-                const fallbackImg = new Image()
-                fallbackImg.onload = () =>
-                  addImageData(
-                    fallbackImg.width,
-                    fallbackImg.height,
-                    'image/jpeg'
-                  )
-                fallbackImg.onerror = () =>
-                  addImageData(null, null, request.mimeType)
-                fallbackImg.src = `data:image/jpeg;base64,${content}`
-              } else {
-                addImageData(null, null, request.mimeType)
-              }
-            }
           } else {
             dataSrc = `data:${request.mimeType};base64,${content}`
             img.onload = () => addImageData(img.width, img.height)
-            img.onerror = () => addImageData(null, null)
           }
 
           img.src = dataSrc
+        }
+        if (
+          request.mimeType === 'application/octet-stream' ||
+          request.mimeType === 'application/binary' ||
+          request.mimeType === ''
+        ) {
+          chrome.runtime.sendMessage(
+            {
+              action: 'fetchAsDataURL',
+              url: request.url,
+            },
+            (dataUrl) => {
+              if (chrome.runtime.lastError) {
+                console.error(chrome.runtime.lastError.message)
+                return
+              }
+              if (dataUrl) {
+                const detectedMimeType = detectMimeType(request.url)
+
+                const dataSrc = `data:${detectedMimeType};base64,${content}`
+                const img = new Image()
+                img.onload = () =>
+                  addImageData(img.width, img.height, detectedMimeType)
+                img.src = dataSrc
+              } else {
+                console.error(
+                  'Failed to retrieve image content from background script.'
+                )
+              }
+            }
+          )
         } else {
           const imageData: ImageData = {
             url: request.url,
             mimeType: request.mimeType,
             size: request.size,
-            width: null,
-            height: null,
+            width: 0,
+            height: 0,
             base64: content || '',
           }
 

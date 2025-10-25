@@ -54,6 +54,7 @@ export function useFilter(images: ImageData[]) {
   const filteredImagesList = useMemo(() => {
     return images.filter((image) => {
       // Remove images without essential data (filesize or dimensions)
+      /*
       if (!image.size || image.size <= 0) {
         return false
       }
@@ -64,7 +65,7 @@ export function useFilter(images: ImageData[]) {
         image.height <= 0
       ) {
         return false
-      }
+      }*/
 
       // Path filter
       if (filters.path) {
