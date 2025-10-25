@@ -24,7 +24,13 @@ function Panel() {
     () => [
       {
         name: 'Images',
-        content: <Images requests={requests} removeRequest={removeRequest} />,
+        content: (
+          <Images
+            key={requests.length === 0 ? 'empty' : 'filled'}
+            requests={requests}
+            removeRequest={removeRequest}
+          />
+        ),
       },
       {
         name: 'Traffic',
