@@ -1,4 +1,5 @@
 import { FlippingBookPair } from '../hooks/useCombiner'
+import { downloadCombinedImage } from '../../../utils/combinedImageGenerator'
 import './FlippingbookItem.css'
 import '../../../components/Button.css'
 
@@ -52,75 +53,16 @@ export function FlippingbookItem({
 
   const handleClick = async () => {
     try {
-      await generateAndDownloadCombinedImage()
+      await downloadCombinedImage(flippingBook, {
+        format: 'png',
+        quality: 0.95,
+        filename: `${flippingBook.filename}_combined.png`,
+      })
     } catch (error) {
       console.error('Failed to generate combined FlippingBook image:', error)
       // Fallback: open WebP URL
       window.open(flippingBook.webp.url, '_blank')
     }
-  }
-
-  const generateAndDownloadCombinedImage = async (): Promise<void> => {
-    // Create canvas element
-    const canvas = document.createElement('canvas')
-    const ctx = canvas.getContext('2d')
-    if (!ctx) throw new Error('Could not get canvas context')
-
-    // Set canvas dimensions to WebP dimensions
-    canvas.width = flippingBook.width
-    canvas.height = flippingBook.height
-
-    // Load WebP image (background)
-    const webpImg = new Image()
-    webpImg.crossOrigin = 'anonymous'
-
-    const webpSrc = flippingBook.webp.base64
-      ? `data:${flippingBook.webp.mimeType};base64,${flippingBook.webp.base64}`
-      : flippingBook.webp.url
-
-    await new Promise((resolve, reject) => {
-      webpImg.onload = resolve
-      webpImg.onerror = reject
-      webpImg.src = webpSrc
-    })
-
-    // Draw WebP as background
-    ctx.drawImage(webpImg, 0, 0, canvas.width, canvas.height)
-
-    // Load SVG image (overlay)
-    const svgImg = new Image()
-    svgImg.crossOrigin = 'anonymous'
-
-    const svgSrc = flippingBook.svg.base64
-      ? `data:${flippingBook.svg.mimeType};base64,${flippingBook.svg.base64}`
-      : flippingBook.svg.url
-
-    await new Promise((resolve, reject) => {
-      svgImg.onload = resolve
-      svgImg.onerror = reject
-      svgImg.src = svgSrc
-    })
-
-    // Draw SVG as overlay on top
-    ctx.drawImage(svgImg, 0, 0, canvas.width, canvas.height)
-
-    // Convert canvas to blob and download
-    canvas.toBlob(
-      (blob) => {
-        if (!blob) throw new Error('Failed to create blob from canvas')
-
-        const url = URL.createObjectURL(blob)
-        const a = document.createElement('a')
-        a.href = url
-        a.download = `${flippingBook.filename}_combined.png`
-        document.body.appendChild(a)
-        a.click()
-        document.body.removeChild(a)
-        URL.revokeObjectURL(url)
-      },
-      'image/png',
-      0.95
-    )
   }
 
   const handleDelete = (e: React.MouseEvent) => {
