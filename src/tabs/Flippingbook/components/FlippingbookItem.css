@@ -1,0 +1,151 @@
+/* FlippingbookItem Component Styles - Based on ImageItem.css */
+.flippingbook-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 12px;
+  border-bottom: 1px solid #dee2e6;
+  font-size: 13px;
+  background-color: #ffffff;
+  transition: background-color 0.2s ease;
+  cursor: move;
+  position: relative;
+}
+
+.flippingbook-item--dragging {
+  opacity: 0.5;
+  background-color: #e3f2fd;
+}
+
+.flippingbook-item--drag-over {
+  border-top: 3px solid #007bff;
+}
+
+.flippingbook-item:hover {
+  background-color: #f8f9fa;
+}
+
+.flippingbook-item:last-child {
+  border-bottom: none;
+}
+
+/* Flippingbook Preview Container */
+.flippingbook-preview {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+/* Size variants for thumbnails */
+.flippingbook-item--small .flippingbook-preview {
+  width: 32px;
+  height: 32px;
+}
+
+.flippingbook-item--medium .flippingbook-preview {
+  width: 64px;
+  height: 64px;
+}
+
+.flippingbook-item--large .flippingbook-preview {
+  width: 128px;
+  height: 128px;
+}
+
+.flippingbook-thumbnail {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: cover;
+}
+
+.flippingbook-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+.flippingbook-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+}
+
+.flippingbook-error {
+  color: #6c757d;
+  font-size: 10px;
+  text-align: center;
+  padding: 2px;
+}
+
+/* Flippingbook Info Container */
+.flippingbook-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+  min-width: 0;
+}
+
+.flippingbook-url {
+  color: #495057;
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.flippingbook-details {
+  display: flex;
+  gap: 12px;
+  color: #6c757d;
+  font-size: 12px;
+}
+
+.flippingbook-type,
+.flippingbook-size,
+.flippingbook-dimensions {
+  white-space: nowrap;
+}
+
+.flippingbook-type {
+  color: #007bff;
+  font-weight: 500;
+}
+
+/* Delete Button */
+.flippingbook-delete {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border-radius: 50%;
+  font-size: 14px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.flippingbook-item:hover .flippingbook-delete {
+  opacity: 1;
+}
+
+.flippingbook-delete:hover {
+  transform: scale(1.1);
+}
