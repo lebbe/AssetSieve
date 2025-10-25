@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { ImageData } from './useImageSniffer'
+import { ImageData } from '../../../hooks/useImageSniffer'
 
 export interface FlippingBookPair {
   id: string

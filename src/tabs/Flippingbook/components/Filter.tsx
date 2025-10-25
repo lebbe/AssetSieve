@@ -1,5 +1,5 @@
-import { FlippingBookFilterState } from '../../../hooks/useFlippingBookFilter'
-import { FlippingBookPair } from '../../../hooks/useCombiner'
+import { FlippingBookFilterState } from '../hooks/useFlippingBookFilter'
+import { FlippingBookPair } from '../hooks/useCombiner'
 import { InputContainer } from '../../../components/InputContainer'
 import './Filter.css'
 import '../../../components/Button.css'

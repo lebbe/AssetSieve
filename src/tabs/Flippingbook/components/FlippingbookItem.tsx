@@ -1,4 +1,4 @@
-import { FlippingBookPair } from '../../../hooks/useCombiner'
+import { FlippingBookPair } from '../hooks/useCombiner'
 import './FlippingbookItem.css'
 import '../../../components/Button.css'
 

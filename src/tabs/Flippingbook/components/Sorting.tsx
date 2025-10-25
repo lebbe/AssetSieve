@@ -1,4 +1,4 @@
-import { FlippingBookSortBy } from '../../../hooks/useFlippingBookSorting'
+import { FlippingBookSortBy } from '../hooks/useFlippingBookSorting'
 import { InputContainer } from '../../../components/InputContainer'
 
 interface SortingProps {
