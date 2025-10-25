@@ -34,7 +34,7 @@ export function useTrafficFilter(requests: NetworkRequest[]) {
   const availableStatuses = useMemo(() => {
     const statuses = new Set<string>()
     requests.forEach((request) => {
-      if (request.status) {
+      if (request.status !== null && request.status !== undefined) {
         statuses.add(request.status.toString())
       }
     })
