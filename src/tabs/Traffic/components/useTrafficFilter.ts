@@ -69,7 +69,10 @@ export function useTrafficFilter(requests: NetworkRequest[]) {
       }
 
       // Status filter
-      if (filters.status && request.status.toString() !== filters.status) {
+      if (
+        filters.status &&
+        (request.status == null || request.status.toString() !== filters.status)
+      ) {
         return false
       }
 
