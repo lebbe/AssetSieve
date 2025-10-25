@@ -1,10 +1,12 @@
 import { createRoot } from 'react-dom/client'
+import { useMemo } from 'react'
 
 import './panel.css'
 import './components/Button.css'
 import { useRequestSniffing } from './hooks/useRequestSniffing'
 import { PanelCard } from './components/PanelCard'
 import { Images } from './tabs/Images/Images'
+import { Tabs } from './tabs/Tabs'
 
 function Panel() {
   const {
@@ -15,6 +17,21 @@ function Panel() {
     resetRequests,
     removeRequest,
   } = useRequestSniffing()
+
+  // Create stable tabs array with pre-rendered content to prevent remounting
+  const tabs = useMemo(
+    () => [
+      {
+        name: 'Images',
+        content: <Images requests={requests} removeRequest={removeRequest} />,
+      },
+      {
+        name: 'dummy',
+        content: <div>Dummy tab content</div>,
+      },
+    ],
+    [requests, removeRequest]
+  )
   return (
     <div>
       <h1>AssetSieve</h1>
@@ -39,7 +56,7 @@ function Panel() {
           </span>
         </div>
       </PanelCard>
-      <Images requests={requests} removeRequest={removeRequest} />
+      <Tabs tabs={tabs} />
     </div>
   )
 }
