@@ -93,6 +93,37 @@ No complicated software needed - it uses Chrome's built-in PDF creator!
 **Image handling**: Converts images to base64 for offline processing and PDF generation  
 **Export methods**: Chrome downloads API for individual files, print API for PDF generation
 
+### Traffic Analysis Tab
+
+![Network Traffic Analysis](network.png)
+
+AssetSieve includes a comprehensive **Traffic tab** for developers who need to analyze all network requests, not just images. This tab provides:
+
+**Advanced Filtering**:
+
+- Filter by URL fragments, HTTP methods (GET, POST, etc.)
+- Filter by status codes (200, 404, 500, etc.) and content types
+- Size-based filtering with min/max ranges in KB
+
+**Multi-criteria Sorting**:
+
+- Sort by timing, URL, method, status, size, or content type
+- Toggle ascending/descending with visual indicators
+
+**Export Capabilities**:
+
+- Export filtered data as JSON or CSV
+- Copy request summaries to clipboard for quick sharing
+- All exports work with already-captured data (no re-downloading)
+
+**Visual Request Display**:
+
+- Color-coded method badges and status indicators
+- Human-readable file sizes and timing information
+- Expandable request details with clickable URLs
+
+This makes AssetSieve useful not just for image collection, but also for network debugging, performance analysis, and API documentation.
+
 **Key APIs used**:
 
 - `chrome.devtools.network` - Network request monitoring
