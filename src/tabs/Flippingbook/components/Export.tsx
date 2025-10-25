@@ -6,8 +6,6 @@ interface ExportProps {
 }
 
 export function Export({ sortedImages }: ExportProps) {
-
-
   const generatePDFHTML = () => {
     const flippingBookPages = sortedImages
       .map((flippingBook, index) => {
@@ -16,20 +14,22 @@ export function Export({ sortedImages }: ExportProps) {
           ? `data:${flippingBook.webp.mimeType};base64,${flippingBook.webp.base64}`
           : flippingBook.webp.url
 
-        // SVG as overlay layer - handle both base64 and raw SVG content
-        let svgSrc: string
-        if (flippingBook.svg.base64) {
-          // Check if the "base64" field actually contains raw SVG text
-          if (flippingBook.svg.base64.trim().startsWith('<svg')) {
-            // Raw SVG content - encode it properly
-            const encodedSvg = btoa(flippingBook.svg.base64)
-            svgSrc = `data:${flippingBook.svg.mimeType};base64,${encodedSvg}`
+        // SVG as overlay layer - handle both base64 and raw SVG content (optional)
+        let svgSrc: string | null = null
+        if (flippingBook.svg) {
+          if (flippingBook.svg.base64) {
+            // Check if the "base64" field actually contains raw SVG text
+            if (flippingBook.svg.base64.trim().startsWith('<svg')) {
+              // Raw SVG content - encode it properly
+              const encodedSvg = btoa(flippingBook.svg.base64)
+              svgSrc = `data:${flippingBook.svg.mimeType};base64,${encodedSvg}`
+            } else {
+              // Actual base64 content
+              svgSrc = `data:${flippingBook.svg.mimeType};base64,${flippingBook.svg.base64}`
+            }
           } else {
-            // Actual base64 content
-            svgSrc = `data:${flippingBook.svg.mimeType};base64,${flippingBook.svg.base64}`
+            svgSrc = flippingBook.svg.url
           }
-        } else {
-          svgSrc = flippingBook.svg.url
         }
 
         return `
@@ -38,9 +38,13 @@ export function Export({ sortedImages }: ExportProps) {
             <img src="${webpSrc}" 
                  class="flippingbook-background"
                  alt="FlippingBook background ${index + 1}" />
-            <img src="${svgSrc}" 
+            ${
+              svgSrc
+                ? `<img src="${svgSrc}" 
                  class="flippingbook-overlay"
-                 alt="FlippingBook overlay ${index + 1}" />
+                 alt="FlippingBook overlay ${index + 1}" />`
+                : ''
+            }
           </div>
         </div>
       `
@@ -227,8 +231,9 @@ export function Export({ sortedImages }: ExportProps) {
 
       <div className="export-info">
         <p className="export-note">
-          FlippingBooks will be combined (WebP + SVG overlay) into a PDF document. 
-          Each page will contain one FlippingBook with properly layered images.
+          FlippingBooks will be combined (WebP + SVG overlay) into a PDF
+          document. Each page will contain one FlippingBook with properly
+          layered images.
         </p>
       </div>
     </div>

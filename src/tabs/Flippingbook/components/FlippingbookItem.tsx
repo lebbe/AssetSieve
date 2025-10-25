@@ -11,6 +11,17 @@ const formatFileSize = (bytes: number) => {
   return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
 }
 
+const getCleanFilename = (url: string): string => {
+  try {
+    const urlObj = new URL(url)
+    return urlObj.pathname.split('/').pop() || url
+  } catch {
+    // Fallback for relative URLs or malformed URLs
+    const filename = url.split('/').pop() || url
+    return filename.split('?')[0] // Remove query parameters
+  }
+}
+
 type Props = {
   flippingBook: FlippingBookPair
   size: 'small' | 'medium' | 'large'
@@ -75,10 +86,12 @@ export function FlippingbookItem({
     ? `data:${flippingBook.webp.mimeType};base64,${flippingBook.webp.base64}`
     : flippingBook.webp.url
 
-  // SVG as overlay layer
-  const svgSrc = flippingBook.svg.base64
-    ? `data:${flippingBook.svg.mimeType};base64,${flippingBook.svg.base64}`
-    : flippingBook.svg.url
+  // SVG as overlay layer (optional)
+  const svgSrc = flippingBook.svg
+    ? flippingBook.svg.base64
+      ? `data:${flippingBook.svg.mimeType};base64,${flippingBook.svg.base64}`
+      : flippingBook.svg.url
+    : null
 
   const itemClasses = [
     'flippingbook-item',
@@ -117,17 +130,19 @@ export function FlippingbookItem({
             target.style.display = 'none'
           }}
         />
-        {/* SVG overlay layer */}
-        <img
-          src={svgSrc}
-          alt={`FlippingBook overlay: ${flippingBook.filename}`}
-          className="flippingbook-thumbnail flippingbook-overlay"
-          loading="lazy"
-          onError={(e) => {
-            const target = e.target as HTMLImageElement
-            target.style.display = 'none'
-          }}
-        />
+        {/* SVG overlay layer (optional) */}
+        {svgSrc && (
+          <img
+            src={svgSrc}
+            alt={`FlippingBook overlay: ${flippingBook.filename}`}
+            className="flippingbook-thumbnail flippingbook-overlay"
+            loading="lazy"
+            onError={(e) => {
+              const target = e.target as HTMLImageElement
+              target.style.display = 'none'
+            }}
+          />
+        )}
       </div>
 
       {showDetails !== 'none' && (
@@ -136,7 +151,9 @@ export function FlippingbookItem({
 
           {showDetails === 'full' && (
             <div className="flippingbook-details">
-              <span className="flippingbook-type">COMBINED</span>
+              <span className="flippingbook-type">
+                {flippingBook.svg ? 'COMBINED' : 'WEBP-ONLY'}
+              </span>
               <span className="flippingbook-size">
                 {formatFileSize(flippingBook.size)}
               </span>
@@ -145,6 +162,22 @@ export function FlippingbookItem({
                   {flippingBook.width}×{flippingBook.height}
                 </span>
               )}
+              <div className="flippingbook-files">
+                <div className="flippingbook-file">
+                  <span className="flippingbook-file-label">WebP:</span>
+                  <span className="flippingbook-file-name">
+                    {getCleanFilename(flippingBook.webp.url)}
+                  </span>
+                </div>
+                {flippingBook.svg && (
+                  <div className="flippingbook-file">
+                    <span className="flippingbook-file-label">SVG:</span>
+                    <span className="flippingbook-file-name">
+                      {getCleanFilename(flippingBook.svg.url)}
+                    </span>
+                  </div>
+                )}
+              </div>
             </div>
           )}
         </div>

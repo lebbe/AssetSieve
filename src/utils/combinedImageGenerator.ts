@@ -69,29 +69,38 @@ export async function generateCombinedImage(
   )
 
   // Validate FlippingBook data before processing
-  if (!flippingBook.webp || !flippingBook.svg) {
-    throw new Error(`Missing webp or svg data for ${flippingBook.filename}`)
+  if (!flippingBook.webp) {
+    throw new Error(`Missing webp data for ${flippingBook.filename}`)
   }
 
   if (flippingBook.width <= 0 || flippingBook.height <= 0) {
-    throw new Error(`Invalid dimensions ${flippingBook.width}x${flippingBook.height} for ${flippingBook.filename}`)
+    throw new Error(
+      `Invalid dimensions ${flippingBook.width}x${flippingBook.height} for ${flippingBook.filename}`
+    )
   }
 
   if (!flippingBook.webp.url && !flippingBook.webp.base64) {
     throw new Error(`No webp URL or base64 data for ${flippingBook.filename}`)
   }
 
-  if (!flippingBook.svg.url && !flippingBook.svg.base64) {
-    throw new Error(`No svg URL or base64 data for ${flippingBook.filename}`)
+  // SVG is optional - validate only if present
+  if (flippingBook.svg && !flippingBook.svg.url && !flippingBook.svg.base64) {
+    throw new Error(
+      `SVG present but no URL or base64 data for ${flippingBook.filename}`
+    )
   }
 
-  console.log(`[FlippingBook] Validation passed for ${flippingBook.filename}:`, {
-    dimensions: `${flippingBook.width}x${flippingBook.height}`,
-    webpHasBase64: !!flippingBook.webp.base64,
-    svgHasBase64: !!flippingBook.svg.base64,
-    webpUrl: flippingBook.webp.url?.substring(0, 50),
-    svgUrl: flippingBook.svg.url?.substring(0, 50)
-  })
+  console.log(
+    `[FlippingBook] Validation passed for ${flippingBook.filename}:`,
+    {
+      dimensions: `${flippingBook.width}x${flippingBook.height}`,
+      webpHasBase64: !!flippingBook.webp.base64,
+      svgHasBase64: !!flippingBook.svg?.base64,
+      webpUrl: flippingBook.webp.url?.substring(0, 50),
+      svgUrl: flippingBook.svg?.url?.substring(0, 50),
+      hasSvg: !!flippingBook.svg,
+    }
+  )
 
   // Create canvas element
   const canvas = document.createElement('canvas')
@@ -114,10 +123,6 @@ export async function generateCombinedImage(
     ? `data:${flippingBook.webp.mimeType};base64,${flippingBook.webp.base64}`
     : flippingBook.webp.url
 
-  const svgSrc = flippingBook.svg.base64
-    ? `data:${flippingBook.svg.mimeType};base64,${flippingBook.svg.base64}`
-    : flippingBook.svg.url
-
   // Load WebP image (required)
   console.log('[FlippingBook] Loading WebP:', webpSrc.substring(0, 100) + '...')
   const webpImg = await loadImageSafely(webpSrc, 'WebP background')
@@ -126,17 +131,33 @@ export async function generateCombinedImage(
   ctx.drawImage(webpImg, 0, 0, canvas.width, canvas.height)
   console.log('[FlippingBook] Drew WebP background')
 
-  // Try to load and draw SVG overlay (optional - fallback to WebP-only if it fails)
-  try {
-    console.log('[FlippingBook] Loading SVG:', svgSrc.substring(0, 100) + '...')
-    const svgImg = await loadImageSafely(svgSrc, 'SVG overlay')
-    
-    // Draw SVG as overlay on top
-    ctx.drawImage(svgImg, 0, 0, canvas.width, canvas.height)
-    console.log('[FlippingBook] Drew SVG overlay')
-  } catch (svgError) {
-    console.warn(`[FlippingBook] ⚠️ SVG overlay failed to load for ${flippingBook.filename}, proceeding with WebP-only:`, svgError)
-    // Continue without SVG - we still have the WebP background
+  // Try to load and draw SVG overlay (optional)
+  if (flippingBook.svg) {
+    const svgSrc = flippingBook.svg.base64
+      ? `data:${flippingBook.svg.mimeType};base64,${flippingBook.svg.base64}`
+      : flippingBook.svg.url
+
+    try {
+      console.log(
+        '[FlippingBook] Loading SVG:',
+        svgSrc.substring(0, 100) + '...'
+      )
+      const svgImg = await loadImageSafely(svgSrc, 'SVG overlay')
+
+      // Draw SVG as overlay on top
+      ctx.drawImage(svgImg, 0, 0, canvas.width, canvas.height)
+      console.log('[FlippingBook] Drew SVG overlay')
+    } catch (svgError) {
+      console.warn(
+        `[FlippingBook] ⚠️ SVG overlay failed to load for ${flippingBook.filename}, proceeding with WebP-only:`,
+        svgError
+      )
+      // Continue without SVG - we still have the WebP background
+    }
+  } else {
+    console.log(
+      '[FlippingBook] No SVG overlay for this FlippingBook - WebP only'
+    )
   }
 
   // Convert canvas to blob

@@ -1,18 +1,18 @@
 import { Display } from '../../components/Display'
 import { Export } from './components/Export'
-import { Filter } from './components/Filter'
 import { FlippingbookItem } from './components/FlippingbookItem'
 import { PanelCard } from '../../components/PanelCard'
 import { Sorting } from './components/Sorting'
 import { useDisplayOptions } from '../../hooks/useDisplayOptions'
 import { useFlippingBookDragAndDrop } from './hooks/useFlippingBookDragAndDrop'
-import { useFlippingBookFilter } from './hooks/useFlippingBookFilter'
+
 import { NetworkRequest } from '../../hooks/useRequestSniffing'
 import { useImageSniffer } from '../../hooks/useImageSniffer'
 import { useCombiner } from './hooks/useCombiner'
 import { useFlippingBookSorting } from './hooks/useFlippingBookSorting'
 
 import './Flippingbook.css'
+import { InputContainer } from '../../components/InputContainer'
 
 type Props = {
   requests: NetworkRequest[]
@@ -21,16 +21,7 @@ type Props = {
 
 export function Flippingbook({ requests, removeRequest }: Props) {
   const { images } = useImageSniffer(requests)
-  const { flippingBookPairs } = useCombiner(images)
-
-  const {
-    filteredFlippingBooks,
-    availableFileTypes,
-    filters,
-    clearFilters,
-    handleFileTypeToggle,
-    handleInputChange,
-  } = useFlippingBookFilter(flippingBookPairs)
+  const { flippingBookPairs, pagePattern, setPagePattern } = useCombiner(images)
 
   const {
     sortedFlippingBooks,
@@ -39,7 +30,7 @@ export function Flippingbook({ requests, removeRequest }: Props) {
     reversed,
     setReversed,
     setFlippingBookOrder,
-  } = useFlippingBookSorting(filteredFlippingBooks)
+  } = useFlippingBookSorting(flippingBookPairs)
 
   const {
     previewSize,
@@ -60,20 +51,18 @@ export function Flippingbook({ requests, removeRequest }: Props) {
 
   return (
     <div className="flippingbook-analysis">
-      {flippingBookPairs.length > 0 && (
-        <PanelCard title="Filters">
-          <Filter
-            availableFileTypes={availableFileTypes}
-            filters={filters}
-            handleInputChange={handleInputChange}
-            handleFileTypeToggle={handleFileTypeToggle}
-            clearFilters={clearFilters}
-            filteredImages={filteredFlippingBooks}
-            totalImages={flippingBookPairs.length}
+      <PanelCard title="Filters">
+        <InputContainer label="Page identifier regex">
+          <input
+            type="text"
+            value={pagePattern}
+            onChange={(e) => setPagePattern(e.target.value)}
+            placeholder="page\\d{4}.*\\.webp"
+            title="Regex pattern to match WebP filenames (e.g., page\\d{4}.*\\.webp)"
           />
-        </PanelCard>
-      )}
-      {filteredFlippingBooks.length > 0 && (
+        </InputContainer>
+      </PanelCard>
+      {flippingBookPairs.length > 0 && (
         <div className="control-panels">
           <PanelCard title="Sorting">
             <Sorting
@@ -81,7 +70,7 @@ export function Flippingbook({ requests, removeRequest }: Props) {
               setSortBy={setSortBy}
               reversed={reversed}
               setReversed={setReversed}
-              totalImages={filteredFlippingBooks.length}
+              totalImages={flippingBookPairs.length}
             />
           </PanelCard>
           <PanelCard title="Display">

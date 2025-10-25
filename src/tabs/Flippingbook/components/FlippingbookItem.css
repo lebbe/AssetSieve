@@ -124,6 +124,34 @@
   font-weight: 500;
 }
 
+/* File Information Styles */
+.flippingbook-files {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 4px;
+}
+
+.flippingbook-file {
+  display: flex;
+  gap: 6px;
+  font-size: 11px;
+  line-height: 1.3;
+}
+
+.flippingbook-file-label {
+  color: #495057;
+  font-weight: 500;
+  min-width: 40px;
+  flex-shrink: 0;
+}
+
+.flippingbook-file-name {
+  color: #6c757d;
+  word-break: break-all;
+  font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+}
+
 /* Delete Button */
 .flippingbook-delete {
   position: absolute;

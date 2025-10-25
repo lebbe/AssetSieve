@@ -1,10 +1,10 @@
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { ImageData } from '../../../hooks/useImageSniffer'
 
 export interface FlippingBookPair {
   id: string
   webp: ImageData
-  svg: ImageData
+  svg: ImageData | null // SVG is now optional
   filename: string
   webppath: string
   svgpath: string
@@ -60,9 +60,29 @@ function getPathFromUrl(url: string): string {
 }
 
 export function useCombiner(images: ImageData[]) {
+  const [pagePattern, setPagePattern] = useState('page\\d{4}.*\\.webp')
+
   const flippingBookPairs = useMemo(() => {
-    // Separate WebP and SVG files
-    const webpFiles = images.filter((img) => img.mimeType === 'image/webp')
+    // Create regex from pattern
+    let pageRegex: RegExp
+    try {
+      pageRegex = new RegExp(pagePattern, 'i')
+    } catch (error) {
+      console.warn(
+        '[FlippingBook] Invalid regex pattern, using default:',
+        error
+      )
+      pageRegex = /page\d{4}.*\.webp/i
+    }
+
+    // Filter WebP files using the regex pattern
+    const webpFiles = images.filter((img) => {
+      if (img.mimeType !== 'image/webp') return false
+      const filename = img.url.split('/').pop() || ''
+      return pageRegex.test(filename)
+    })
+
+    // Get all SVG files for potential matching
     const svgFiles = images.filter(
       (img) =>
         img.mimeType === 'image/svg+xml' ||
@@ -72,62 +92,86 @@ export function useCombiner(images: ImageData[]) {
     const pairs: FlippingBookPair[] = []
     const usedSvgUrls = new Set<string>()
 
-    // Try to match WebP files with SVG files
+    console.log(`[FlippingBook] Starting pairing process:`)
+    console.log(`  Found ${webpFiles.length} WebP files matching pattern`)
+    console.log(`  Found ${svgFiles.length} SVG files available`)
+
+    // Log available SVG files for debugging
+    svgFiles.forEach((svg) => {
+      const svgBasename = getBaseFilename(svg.url)
+      const svgPageNumber = extractPageNumber(svgBasename)
+      console.log(
+        `  SVG available: ${svgBasename} (page ${
+          svgPageNumber || 'no-page-number'
+        })`
+      )
+    })
+
+    // Create FlippingBook pairs for each matching WebP (SVG is optional)
     webpFiles.forEach((webp) => {
       const webpBasename = getBaseFilename(webp.url)
       const webpPath = getPathFromUrl(webp.url)
       const webpPageNumber = extractPageNumber(webpBasename)
 
-      // Look for matching SVG file
+      // Look for matching SVG file (optional)
       const matchingSvg = svgFiles.find((svg) => {
         if (usedSvgUrls.has(svg.url)) return false
 
         const svgBasename = getBaseFilename(svg.url)
         const svgPageNumber = extractPageNumber(svgBasename)
 
-        // Match by page number (extracted from both filenames)
-        // This handles cases like:
-        // SVG: "0004.svg" -> page number "0004"
-        // WebP: "page0004_3.webp" -> page number "0004"
+        // STRICT matching: Only match if both files have extractable page numbers AND they match
         if (
           webpPageNumber &&
           svgPageNumber &&
           webpPageNumber === svgPageNumber
         ) {
-          console.log(`[FlippingBook] Found matching pair:`)
-          console.log(`  WebP: ${webp.url} -> page ${webpPageNumber}`)
-          console.log(`  SVG: ${svg.url} -> page ${svgPageNumber}`)
           return true
         }
+
+        // No fallback matching - we only pair files with matching page numbers
         return false
       })
 
       if (matchingSvg) {
         usedSvgUrls.add(matchingSvg.url)
-
-        const displayFilename = webpPageNumber
-          ? `page${webpPageNumber}`
-          : webpBasename
-
-        const pair: FlippingBookPair = {
-          id: `${displayFilename}-${webpPath}`,
-          webp,
-          svg: matchingSvg,
-          filename: displayFilename,
-          webppath: webpPath,
-          svgpath: getPathFromUrl(matchingSvg.url),
-          size: webp.size + matchingSvg.size,
-          width: webp.width,
-          height: webp.height,
-          mimeType: 'flippingbook/combined',
-        }
-
-        pairs.push(pair)
+        const svgBasename = getBaseFilename(matchingSvg.url)
+        const svgPageNumber = extractPageNumber(svgBasename)
+        console.log(`[FlippingBook] ✓ PAIRED:`)
+        console.log(`  WebP: ${webpBasename} (page ${webpPageNumber})`)
+        console.log(`  SVG:  ${svgBasename} (page ${svgPageNumber})`)
+      } else {
+        console.log(
+          `[FlippingBook] ○ SOLO WebP: ${webpBasename} (page ${
+            webpPageNumber || 'no-page-number'
+          }) - no matching SVG found`
+        )
       }
+
+      const displayFilename = webpPageNumber
+        ? `page${webpPageNumber}`
+        : webpBasename
+
+      const pair: FlippingBookPair = {
+        id: `${displayFilename}-${webpPath}`,
+        webp,
+        svg: matchingSvg || null,
+        filename: displayFilename,
+        webppath: webpPath,
+        svgpath: matchingSvg ? getPathFromUrl(matchingSvg.url) : '',
+        size: webp.size + (matchingSvg?.size || 0),
+        width: webp.width,
+        height: webp.height,
+        mimeType: matchingSvg
+          ? 'flippingbook/combined'
+          : 'flippingbook/webp-only',
+      }
+
+      pairs.push(pair)
     })
 
     return pairs
-  }, [images])
+  }, [images, pagePattern])
 
-  return { flippingBookPairs }
+  return { flippingBookPairs, pagePattern, setPagePattern }
 }
