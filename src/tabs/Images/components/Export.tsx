@@ -1,18 +1,15 @@
-import { useState } from 'react'
 import { ImageData } from '../../../hooks/useImageSniffer'
 import '../../../components/Button.css'
 import { jsPDF } from 'jspdf'
-import { InputContainer } from '../../../components/InputContainer'
+import { useMetadataExport } from '../../../hooks/useMetadataExport'
+import { MetadataExport } from '../../../components/MetadataExport'
 
 interface ExportProps {
   sortedImages: ImageData[]
 }
 
 export function Export({ sortedImages }: ExportProps) {
-  const [pdfTitle, setPdfTitle] = useState('AssetSieve Image Export')
-  const [filename, setFilename] = useState('images.pdf')
-  const [author, setAuthor] = useState('')
-  const [creator, setCreator] = useState('')
+  const { pdfTitle, filename, author, creator, setters } = useMetadataExport()
   const getFileExtension = (mimeType: string, url: string) => {
     // Try to get extension from MIME type first
     const mimeExtensions: { [key: string]: string } = {
@@ -189,51 +186,13 @@ export function Export({ sortedImages }: ExportProps) {
 
   return (
     <div className="export-container">
-      <div className="export-controls">
-        <InputContainer label="PDF Title">
-          <input
-            className="input"
-            type="text"
-            value={pdfTitle}
-            onChange={(e) => setPdfTitle(e.target.value)}
-            placeholder="AssetSieve Image Export"
-            title="Title that will be embedded in the PDF metadata"
-          />
-        </InputContainer>
-
-        <InputContainer label="Creator">
-          <input
-            className="input"
-            type="text"
-            value={creator}
-            onChange={(e) => setCreator(e.target.value)}
-            placeholder="Your name (optional)"
-            title="Creator name that will be embedded in the PDF metadata"
-          />
-        </InputContainer>
-
-        <InputContainer label="Author">
-          <input
-            className="input"
-            type="text"
-            value={author}
-            onChange={(e) => setAuthor(e.target.value)}
-            placeholder="Your name (optional)"
-            title="Author name that will be embedded in the PDF metadata"
-          />
-        </InputContainer>
-
-        <InputContainer label="Filename">
-          <input
-            className="input"
-            type="text"
-            value={filename}
-            onChange={(e) => setFilename(e.target.value)}
-            placeholder="images.pdf"
-            title="Name of the downloaded PDF file (extension will be added automatically)"
-          />
-        </InputContainer>
-      </div>
+      <MetadataExport
+        pdfTitle={pdfTitle}
+        filename={filename}
+        author={author}
+        creator={creator}
+        setters={setters}
+      />
       <div className="export-buttons">
         <button
           onClick={handleExportAll}

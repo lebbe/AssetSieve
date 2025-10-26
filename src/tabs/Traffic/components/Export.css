@@ -10,12 +10,6 @@
   font-style: italic;
 }
 
-.export-buttons {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
 .export-btn {
   padding: 8px 16px;
   background: #007acc;

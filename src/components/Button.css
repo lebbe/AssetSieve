@@ -80,9 +80,3 @@
   gap: 8px;
   align-items: center;
 }
-
-/* Export Buttons Container */
-.export-buttons {
-  display: flex;
-  gap: 8px;
-}
