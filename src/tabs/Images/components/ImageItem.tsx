@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { ImageData } from '../../../hooks/useImageSniffer'
 import './ImageItem.css'
 import '../../../components/Button.css'
@@ -39,6 +40,8 @@ export function ImageItem({
   isDragging,
   dragOverIndex,
 }: Props) {
+  const [isDragEnabled, setIsDragEnabled] = useState(false)
+
   const handleDragStart = (e: React.DragEvent) => {
     e.dataTransfer.effectAllowed = 'move'
     onDragStart?.(index)
@@ -69,13 +72,18 @@ export function ImageItem({
       className={`image-card ${isDragging ? 'image-card--dragging' : ''} ${
         dragOverIndex === index ? 'image-card--drag-over' : ''
       }`}
-      draggable={true}
+      draggable={isDragEnabled}
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
       onDragOver={handleDragOver}
       onDrop={handleDrop}
     >
-      <div className="drag-handle" title="Drag to reorder">
+      <div
+        className="drag-handle"
+        title="Drag to reorder"
+        onMouseEnter={() => setIsDragEnabled(true)}
+        onMouseLeave={() => setIsDragEnabled(false)}
+      >
         ⋮⋮
       </div>
       <button

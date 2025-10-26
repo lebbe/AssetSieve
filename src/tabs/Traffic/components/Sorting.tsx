@@ -37,10 +37,7 @@ export function Sorting({ sortBy, sortDirection, onSort }: SortingProps) {
           </select>
         </InputContainer>
 
-        <SortButton
-          direction={sortDirection}
-          onToggle={() => onSort(sortBy)}
-        />
+        <SortButton direction={sortDirection} onToggle={() => onSort(sortBy)} />
       </div>
     </PanelCard>
   )

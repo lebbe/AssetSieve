@@ -44,7 +44,7 @@ export function Sorting({
             ))}
           </select>
         </InputContainer>
-        
+
         <SortButton
           direction={reversed ? 'desc' : 'asc'}
           onToggle={() => setReversed(!reversed)}

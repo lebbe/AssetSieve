@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { FlippingBookPair } from '../hooks/useCombiner'
 import { downloadCombinedImage } from '../../../utils/combinedImageGenerator'
 import './FlippingbookItem.css'
@@ -47,6 +48,8 @@ export function FlippingbookItem({
   isDragging,
   dragOverIndex,
 }: Props) {
+  const [isDragEnabled, setIsDragEnabled] = useState(false)
+
   const handleDragStart = (e: React.DragEvent) => {
     e.dataTransfer.effectAllowed = 'move'
     onDragStart?.(index)
@@ -105,7 +108,7 @@ export function FlippingbookItem({
   return (
     <div
       className={itemClasses}
-      draggable
+      draggable={isDragEnabled}
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
       onDragOver={handleDragOver}
@@ -118,6 +121,14 @@ export function FlippingbookItem({
         }
       }}
     >
+      <div
+        className="drag-handle"
+        title="Drag to reorder"
+        onMouseEnter={() => setIsDragEnabled(true)}
+        onMouseLeave={() => setIsDragEnabled(false)}
+      >
+        ⋮⋮
+      </div>
       <div className="flippingbook-preview">
         {/* WebP background layer */}
         <img

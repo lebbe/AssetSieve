@@ -49,7 +49,7 @@ export function Sorting({
           direction={reversed ? 'desc' : 'asc'}
           onToggle={() => setReversed(!reversed)}
         />
-        
+
         <span className="sorting-info">
           {totalImages} item{totalImages !== 1 ? 's' : ''}
         </span>
