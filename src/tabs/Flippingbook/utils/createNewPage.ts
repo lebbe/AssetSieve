@@ -6,7 +6,7 @@ import { FlippingBookPair } from '../hooks/useCombiner'
  */
 async function loadImageSafely(
   src: string,
-  description: string
+  description: string,
 ): Promise<HTMLImageElement> {
   const img = new Image()
 
@@ -41,7 +41,7 @@ async function loadImageSafely(
     } catch (error) {
       console.warn(
         `Failed to load ${description} with CORS mode "${corsMode}":`,
-        error
+        error,
       )
       if (corsMode === '') {
         // Last attempt failed
@@ -59,7 +59,7 @@ async function loadImageSafely(
  */
 export async function createNewPage(
   pdf: jsPDF,
-  flippingBook: FlippingBookPair
+  flippingBook: FlippingBookPair,
 ): Promise<void> {
   // Original image dimensions in pixels
   const originalWidth = flippingBook.width
@@ -134,7 +134,7 @@ export async function createNewPage(
     } catch (error) {
       console.warn(
         'Failed to load SVG overlay, proceeding with WebP-only:',
-        error
+        error,
       )
     }
   }

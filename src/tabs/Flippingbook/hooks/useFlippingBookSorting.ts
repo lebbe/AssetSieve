@@ -37,26 +37,26 @@ export function useFlippingBookSorting(flippingBooks: FlippingBookPair[]) {
         // Add any new books that aren't in manual order yet
         const orderedUrls = new Set(sorted.map((book) => book.webp.url))
         const newBooks = flippingBooks.filter(
-          (book) => !orderedUrls.has(book.webp.url)
+          (book) => !orderedUrls.has(book.webp.url),
         )
         sorted = [...sorted, ...newBooks]
         break
 
       case 'filename':
         sorted = [...flippingBooks].sort((a, b) =>
-          a.filename.localeCompare(b.filename)
+          a.filename.localeCompare(b.filename),
         )
         break
 
       case 'path':
         sorted = [...flippingBooks].sort((a, b) =>
-          a.webppath.localeCompare(b.webppath)
+          a.webppath.localeCompare(b.webppath),
         )
         break
 
       case 'filetype':
         sorted = [...flippingBooks].sort((a, b) =>
-          a.mimeType.localeCompare(b.mimeType)
+          a.mimeType.localeCompare(b.mimeType),
         )
         break
 

@@ -1,4 +1,4 @@
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+chrome.runtime.onMessage.addListener((request, _sender, sendResponse) => {
   if (request.action === 'fetchAsDataURL') {
     fetch(request.url)
       .then((response) => {
@@ -24,4 +24,5 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
     return true // Required for asynchronous sendResponse
   }
+  return false
 })

@@ -35,13 +35,13 @@ function extractPageNumber(filename: string): string | null {
   // Match pattern like "0004" (4 digits)
   const directMatch = filename.match(/^(\d{4})$/)
   if (directMatch) {
-    return directMatch[1]
+    return directMatch[1] as string
   }
 
   // Match pattern like "page0004_3" -> extract "0004"
   const pageMatch = filename.match(/^page(\d{4})(?:_\d+)?$/)
   if (pageMatch) {
-    return pageMatch[1]
+    return pageMatch[1] as string
   }
 
   return null
@@ -72,7 +72,7 @@ export function useCombiner(images: ImageData[]) {
     } catch (error) {
       console.warn(
         '[FlippingBook] Invalid regex pattern, using default:',
-        error
+        error,
       )
       pageRegex = /page\d{4}.*\.webp/i
     }
@@ -88,7 +88,7 @@ export function useCombiner(images: ImageData[]) {
     const svgFiles = images.filter(
       (img) =>
         img.mimeType === 'image/svg+xml' ||
-        img.url.toLowerCase().includes('.svg')
+        img.url.toLowerCase().includes('.svg'),
     )
 
     const pairs: FlippingBookPair[] = []

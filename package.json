@@ -8,6 +8,9 @@
     "preview": "vite preview",
     "lint": "oxlint src",
     "type-check": "tsc --noEmit",
+    "prettier": "prettier --check .",
+    "qa": "npm run lint && npm run type-check && npm run prettier",
+    "prettier:fix": "prettier --write .",
     "pdf-from-pngs": "node --max-old-space-size=8192 --expose-gc scripts/createPDFFromPNGs.js",
     "pdf-from-webp-svg": "node --max-old-space-size=8192 --expose-gc scripts/createPDFFromwebpAndSvg.js"
   },
@@ -26,6 +29,7 @@
     "@vitejs/plugin-react": "^5.1.0",
     "canvas": "^3.2.0",
     "oxlint": "^1.24.0",
+    "prettier": "^3.6.2",
     "typescript": "^5.9.3",
     "vite": "^7.1.12"
   },

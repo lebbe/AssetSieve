@@ -1,18 +1,20 @@
 #!/usr/bin/env node
 
 /**
- * Create PDF from PNG files utility script
+ * Create PDF from WebP + SVG files utility script
  *
  * Dependencies required: npm install jspdf canvas
  *
  * Usage:
- *   node createPDFFromPNGs.js [folder-path]
+ *   node createPDFFromwebpAndSvg.js [folder-path]
  *
  * If no folder path is provided, the script will prompt for one.
- * The script finds all PNG files, sorts them by name, and creates a PDF.
+ * The script finds WebP files (e.g., page0015_3.webp) and overlays corresponding
+ * SVG files (e.g., 0015.svg) to create a combined PDF.
  *
  * Features:
- * - Automatic PNG discovery and alphabetical sorting
+ * - Automatic WebP and SVG discovery with smart pairing
+ * - SVG overlay on WebP background (SVG is optional)
  * - Smart scaling with aspect ratio preservation
  * - High-quality 2x pixel density rendering
  * - Interactive metadata input (title, filename, author, creator)
@@ -70,6 +72,7 @@ function askQuestion(rl, question) {
 
 /**
  * Gets folder path from command line args or prompts user
+ * @returns {Promise<string>}
  */
 async function getFolderPath() {
   const args = process.argv.slice(2)
@@ -82,7 +85,7 @@ async function getFolderPath() {
   try {
     const folderPath = await askQuestion(
       rl,
-      'Enter the path to the folder containing PNG files: ',
+      'Enter the path to the folder containing WebP and SVG files: ',
     )
     return path.resolve(folderPath)
   } finally {
@@ -91,19 +94,40 @@ async function getFolderPath() {
 }
 
 /**
- * Finds all PNG files in the specified folder
- * @param {string} folderPath - path to folder
- * @returns {Promise<string[]>}
+ * Extracts page number from WebP filename (e.g., page0015_3.webp -> 0015)
+ * @param {string} filename - WebP filename
+ * @returns {string | null}
  */
-async function findPngFiles(folderPath) {
+function extractPageNumber(filename) {
+  const match = filename.match(/page(\d+)_\d+\.webp$/i)
+  return match ? match[1] : null
+}
+
+/**
+ * Finds all WebP and SVG files in the specified folder
+ * @param {string} folderPath - path to folder
+ * @returns {Promise<{webpFiles: string[], svgFiles: Map<string, string>}>}
+ */
+async function findWebPAndSvgFiles(folderPath) {
   try {
     const files = await fs.readdir(folderPath)
-    const pngFiles = files
-      .filter((file) => path.extname(file).toLowerCase() === '.png')
-      .sort() // Sort alphabetically
+
+    // Find all WebP files and sort them
+    const webpFiles = files
+      .filter((file) => /page\d+_\d+\.webp$/i.test(file))
+      .sort()
       .map((file) => path.join(folderPath, file))
 
-    return pngFiles
+    // Find all SVG files and create a map by page number
+    const svgFiles = new Map()
+    files
+      .filter((file) => /^\d+\.svg$/i.test(file))
+      .forEach((file) => {
+        const pageNum = file.replace('.svg', '')
+        svgFiles.set(pageNum, path.join(folderPath, file))
+      })
+
+    return { webpFiles, svgFiles }
   } catch (error) {
     throw new Error(
       `Failed to read directory: ${
@@ -129,19 +153,15 @@ async function checkFileExists(filePath) {
 
 /**
  * Loads image and returns both the image object and its dimensions
- * This avoids loading the same image twice for dimensions and rendering
  * @param {string} imagePath - path to image file
  * @returns {Promise<{image: import('canvas').Image, width: number, height: number}>}
  */
 async function loadImageWithDimensions(imagePath) {
   try {
-    // Check if file exists first
     const exists = await checkFileExists(imagePath)
     if (!exists) {
       throw new Error(`File not accessible: ${imagePath}`)
     }
-
-    console.log(`Loading image: ${imagePath}`)
 
     // Try loading image directly first
     try {
@@ -152,18 +172,9 @@ async function loadImageWithDimensions(imagePath) {
         height: image.height,
       }
     } catch (directError) {
-      console.log(
-        `Direct load failed: ${
-          directError instanceof Error
-            ? directError.message
-            : String(directError)
-        }`,
-      )
-
       // Try reading file as buffer and loading from buffer (works better with Unicode paths)
       try {
         const imageBuffer = await fs.readFile(imagePath)
-        console.log(`Loaded buffer of size: ${imageBuffer.length} bytes`)
         const image = await loadImage(imageBuffer)
         return {
           image,
@@ -171,13 +182,6 @@ async function loadImageWithDimensions(imagePath) {
           height: image.height,
         }
       } catch (bufferError) {
-        console.error(
-          `Buffer load failed: ${
-            bufferError instanceof Error
-              ? bufferError.message
-              : String(bufferError)
-          }`,
-        )
         throw new Error(
           `Failed to load image ${imagePath}: Both direct and buffer methods failed`,
         )
@@ -194,7 +198,6 @@ async function loadImageWithDimensions(imagePath) {
 
 /**
  * Calculates PDF page dimensions with proper scaling
- * Based on the logic from createNewPage.ts
  * @param {number} originalWidth - original image width
  * @param {number} originalHeight - original image height
  * @returns {{pdfWidth: number, pdfHeight: number, scale: number}}
@@ -221,21 +224,22 @@ function calculatePdfDimensions(originalWidth, originalHeight) {
 }
 
 /**
- * Adds a PNG image to the PDF with proper scaling
- * Uses pre-loaded image to avoid loading the same file twice
+ * Adds a combined WebP+SVG page to the PDF
  * @param {import('jspdf').jsPDF} pdf - jsPDF instance
- * @param {string} imagePath - path to image file
+ * @param {string} webpPath - path to WebP file
+ * @param {string | null} svgPath - path to SVG file (optional)
  * @param {boolean} isFirstPage - whether this is the first page
  * @returns {Promise<void>}
  */
-async function addPngToPage(pdf, imagePath, isFirstPage = false) {
+async function addCombinedPage(pdf, webpPath, svgPath, isFirstPage = false) {
   try {
-    // Load image and get dimensions in one operation
+    // Load WebP image and get dimensions
+    console.log(`Loading WebP: ${path.basename(webpPath)}`)
     const {
-      image,
+      image: webpImage,
       width: originalWidth,
       height: originalHeight,
-    } = await loadImageWithDimensions(imagePath)
+    } = await loadImageWithDimensions(webpPath)
 
     // Calculate PDF dimensions
     const { pdfWidth, pdfHeight } = calculatePdfDimensions(
@@ -247,9 +251,9 @@ async function addPngToPage(pdf, imagePath, isFirstPage = false) {
     if (!isFirstPage) {
       pdf.addPage([pdfWidth, pdfHeight])
     } else {
-      // For first page, we need to set the initial page size
-      pdf.internal.pageSize.setWidth(pdfWidth)
-      pdf.internal.pageSize.setHeight(pdfHeight)
+      // For first page, delete default and create properly sized page
+      pdf.deletePage(1)
+      pdf.addPage([pdfWidth, pdfHeight])
     }
 
     // High-resolution canvas for better quality (2x pixel density)
@@ -264,23 +268,41 @@ async function addPngToPage(pdf, imagePath, isFirstPage = false) {
     // Scale context for high-resolution rendering
     ctx.scale(canvasScale, canvasScale)
 
-    // Draw the pre-loaded image (no need to load again)
-    ctx.drawImage(image, 0, 0, originalWidth, originalHeight)
+    // Draw white background
+    ctx.fillStyle = '#ffffff'
+    ctx.fillRect(0, 0, originalWidth, originalHeight)
+
+    // Draw WebP background
+    ctx.drawImage(webpImage, 0, 0, originalWidth, originalHeight)
+
+    // Draw SVG overlay if present
+    if (svgPath) {
+      try {
+        console.log(`  + Overlaying SVG: ${path.basename(svgPath)}`)
+        const { image: svgImage } = await loadImageWithDimensions(svgPath)
+        ctx.drawImage(svgImage, 0, 0, originalWidth, originalHeight)
+      } catch (svgError) {
+        console.warn(
+          `  ⚠ Failed to load SVG overlay, proceeding with WebP-only:`,
+          svgError instanceof Error ? svgError.message : String(svgError),
+        )
+      }
+    }
 
     // Convert canvas to JPEG for better compression
     const dataUrl = canvas.toDataURL('image/jpeg', 0.8)
     pdf.addImage(dataUrl, 'JPEG', 0, 0, pdfWidth, pdfHeight)
 
     console.log(
-      `Added: ${path.basename(
-        imagePath,
-      )} (${originalWidth}x${originalHeight} -> ${Math.round(
+      `Added: ${path.basename(webpPath)}${
+        svgPath ? ' + ' + path.basename(svgPath) : ''
+      } (${originalWidth}x${originalHeight} -> ${Math.round(
         pdfWidth,
       )}x${Math.round(pdfHeight)} pts)`,
     )
   } catch (error) {
     console.error(
-      `Failed to add ${imagePath}: ${
+      `Failed to add ${path.basename(webpPath)}: ${
         error instanceof Error ? error.message : String(error)
       }`,
     )
@@ -300,8 +322,8 @@ async function getPdfMetadata(defaultFilename) {
     console.log('\n--- PDF Metadata ---')
 
     const title =
-      (await askQuestion(rl, 'PDF Title (default: PNG Collection): ')) ||
-      'PNG Collection'
+      (await askQuestion(rl, 'PDF Title (default: WebP+SVG Collection): ')) ||
+      'WebP+SVG Collection'
 
     const filename =
       (await askQuestion(rl, `PDF Filename (default: ${defaultFilename}): `)) ||
@@ -314,8 +336,10 @@ async function getPdfMetadata(defaultFilename) {
       (await askQuestion(rl, 'Author (optional): ')) || 'AssetSieve User'
 
     const creator =
-      (await askQuestion(rl, 'Creator (default: AssetSieve PNG to PDF): ')) ||
-      'AssetSieve PNG to PDF'
+      (await askQuestion(
+        rl,
+        'Creator (default: AssetSieve WebP+SVG to PDF): ',
+      )) || 'AssetSieve WebP+SVG to PDF'
 
     return {
       title,
@@ -334,8 +358,8 @@ async function getPdfMetadata(defaultFilename) {
  */
 async function main() {
   try {
-    console.log('🔄 PNG to PDF Converter')
-    console.log('========================\n')
+    console.log('🔄 WebP + SVG to PDF Converter')
+    console.log('==============================\n')
 
     // Get folder path
     const folderPath = await getFolderPath()
@@ -348,46 +372,58 @@ async function main() {
       throw new Error(`Folder does not exist: ${folderPath}`)
     }
 
-    // Find PNG files
-    const pngFiles = await findPngFiles(folderPath)
+    // Find WebP and SVG files
+    const { webpFiles, svgFiles } = await findWebPAndSvgFiles(folderPath)
 
-    if (pngFiles.length === 0) {
-      throw new Error('No PNG files found in the specified folder')
+    if (webpFiles.length === 0) {
+      throw new Error('No WebP files found in the specified folder')
     }
 
-    console.log(`📸 Found ${pngFiles.length} PNG file(s):`)
-    pngFiles.forEach((file, index) => {
-      console.log(`  ${index + 1}. ${path.basename(file)}`)
+    console.log(`📸 Found ${webpFiles.length} WebP file(s)`)
+    console.log(`🎨 Found ${svgFiles.size} SVG file(s)`)
+
+    // Show file pairings
+    console.log('\nFile pairings:')
+    webpFiles.forEach((webpFile, index) => {
+      const pageNum = extractPageNumber(path.basename(webpFile))
+      const svgFile = pageNum ? svgFiles.get(pageNum) : null
+      const svgStatus = svgFile ? `✓ ${path.basename(svgFile)}` : '✗ no SVG'
+      console.log(`  ${index + 1}. ${path.basename(webpFile)} + ${svgStatus}`)
     })
 
     // Get PDF metadata
-    const defaultFilename = `${path.basename(folderPath)}_collection.pdf`
+    const defaultFilename = `${path.basename(folderPath)}_combined.pdf`
     const metadata = await getPdfMetadata(defaultFilename)
 
-    console.log('\n🔄 Creating PDF...')
+    console.log('\n🔄 Creating PDF...\n')
 
     // Create PDF
     const pdf = new jsPDF()
 
-    // Process each PNG file
-    for (let i = 0; i < pngFiles.length; i++) {
-      await addPngToPage(pdf, pngFiles[i], i === 0)
-      console.log(
-        `Added: ${path.basename(pngFiles[i])} (${i + 1}/${pngFiles.length})`,
-      )
+    // Process each WebP file with its corresponding SVG
+    for (let i = 0; i < webpFiles.length; i++) {
+      const webpFile = webpFiles[i]
+      const pageNum = extractPageNumber(path.basename(webpFile))
+      const svgFile = pageNum ? svgFiles.get(pageNum) || null : null
+
+      await addCombinedPage(pdf, webpFile, svgFile, i === 0)
+      console.log(`Progress: ${i + 1}/${webpFiles.length}\n`)
 
       // Force garbage collection every 50 images to manage memory
       if ((i + 1) % 50 === 0) {
         if (global.gc) {
-          console.log(`🧹 Running garbage collection after ${i + 1} images...`)
+          console.log(
+            `🧹 Running garbage collection after ${i + 1} images...\n`,
+          )
           global.gc()
         }
       }
     }
 
-    // Remove the initial blank page that jsPDF creates automatically
-    if (pdf.getNumberOfPages() > pngFiles.length) {
-      pdf.deletePage(1)
+    // Remove any extra pages if needed
+    const expectedPages = webpFiles.length
+    while (pdf.getNumberOfPages() > expectedPages) {
+      pdf.deletePage(pdf.getNumberOfPages())
     }
 
     // Set PDF metadata
@@ -395,7 +431,7 @@ async function main() {
       title: metadata.title,
       author: metadata.author,
       creator: metadata.creator,
-      subject: `PDF created from ${pngFiles.length} PNG files`,
+      subject: `PDF created from ${webpFiles.length} WebP+SVG pairs`,
     })
 
     // Save PDF
@@ -403,10 +439,15 @@ async function main() {
     const pdfBuffer = Buffer.from(pdf.output('arraybuffer'))
     await fs.writeFile(outputPath, pdfBuffer)
 
-    console.log('\n✅ PDF created successfully!')
+    console.log('✅ PDF created successfully!')
     console.log(`📄 File: ${outputPath}`)
-    console.log(`📊 Pages: ${pngFiles.length}`)
-    console.log(`📏 Size: ${Math.round(pdfBuffer.length / 1024)} KB`)
+    console.log(`📊 Pages: ${webpFiles.length}`)
+    console.log(
+      `📏 Size: ${Math.round(pdfBuffer.length / 1024)} KB (${(
+        pdfBuffer.length /
+        (1024 * 1024)
+      ).toFixed(2)} MB)`,
+    )
   } catch (error) {
     console.error(
       '\n❌ Error:',

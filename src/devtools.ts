@@ -7,5 +7,5 @@ chrome.devtools.panels.create(
   'panel.html', // Panel HTML file
   function (_panel: chrome.devtools.panels.ExtensionPanel) {
     // Panel created
-  }
+  },
 )

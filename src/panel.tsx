@@ -49,7 +49,7 @@ function Panel() {
         content: <Traffic requests={requests} />,
       },
     ],
-    [requests, removeRequest]
+    [requests, removeRequest],
   )
   return (
     <div>

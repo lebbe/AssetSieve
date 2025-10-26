@@ -1,0 +1,11 @@
+{
+  "rules": {
+    "correctness": "error",
+    "suspicious": "error",
+    "pedantic": "error",
+    "style": "error",
+    "nursery": "error",
+    "restriction": "error",
+    "perf": "error"
+  }
+}

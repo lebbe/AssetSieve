@@ -46,7 +46,9 @@ export function useTrafficFilter(requests: NetworkRequest[]) {
     requests.forEach((request) => {
       if (request.mimeType) {
         const baseType = request.mimeType.split('/')[0]
-        types.add(baseType)
+        if (baseType) {
+          types.add(baseType)
+        }
       }
     })
     return Array.from(types).sort()
@@ -102,7 +104,7 @@ export function useTrafficFilter(requests: NetworkRequest[]) {
 
   const handleInputChange = (
     field: keyof TrafficFilterState,
-    value: string
+    value: string,
   ) => {
     setFilters((prev) => ({
       ...prev,
