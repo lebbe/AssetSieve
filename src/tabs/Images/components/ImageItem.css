@@ -8,7 +8,6 @@
   font-size: 13px;
   background-color: #ffffff;
   transition: background-color 0.2s ease;
-  cursor: move;
 }
 
 .image-card--dragging {

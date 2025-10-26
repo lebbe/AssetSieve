@@ -88,11 +88,6 @@ export function Export({ requests }: ExportProps) {
   return (
     <PanelCard title="Export Traffic Data">
       <div className="traffic-export-container">
-        <div className="export-info">
-          {requests.length} request{requests.length !== 1 ? 's' : ''} ready for
-          export
-        </div>
-
         <div className="export-buttons">
           <button
             onClick={exportAsJSON}

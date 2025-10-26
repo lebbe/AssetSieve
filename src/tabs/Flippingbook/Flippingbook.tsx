@@ -60,6 +60,7 @@ export function Flippingbook({ requests, removeRequest }: Props) {
       <PanelCard title="Filters">
         <InputContainer label="Page identifier regex">
           <input
+            className="input"
             type="text"
             value={pagePattern}
             onChange={(e) => setPagePattern(e.target.value)}
@@ -71,7 +72,7 @@ export function Flippingbook({ requests, removeRequest }: Props) {
         <label className="checkbox-label">
           <input
             type="checkbox"
-            className="checkbox-input"
+            className="input"
             checked={removeDuplicates}
             onChange={(e) => setRemoveDuplicates(e.target.checked)}
             title="Remove duplicate FlippingBooks with identical WebP paths"
@@ -107,15 +108,7 @@ export function Flippingbook({ requests, removeRequest }: Props) {
           <Export sortedImages={sortedFlippingBooks} />
         </PanelCard>
       )}
-      <h2>
-        Detected FlippingBooks ({sortedFlippingBooks.length})
-        {removeDuplicates && (
-          <span style={{ color: '#007bff', fontSize: '14px' }}>
-            {' '}
-            • Duplicates removed
-          </span>
-        )}
-      </h2>
+      <h2>Detected FlippingBooks ({sortedFlippingBooks.length})</h2>
       {flippingBookPairs.length === 0 ? (
         <div className="no-flippingbooks">
           <p>

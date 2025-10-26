@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { FlippingBookPair } from '../hooks/useCombiner'
 import { downloadCombinedImage } from '../../../utils/combinedImageGenerator'
 import './FlippingbookItem.css'
@@ -47,6 +48,8 @@ export function FlippingbookItem({
   isDragging,
   dragOverIndex,
 }: Props) {
+  const [isDragEnabled, setIsDragEnabled] = useState(false)
+
   const handleDragStart = (e: React.DragEvent) => {
     e.dataTransfer.effectAllowed = 'move'
     onDragStart?.(index)
@@ -105,19 +108,19 @@ export function FlippingbookItem({
   return (
     <div
       className={itemClasses}
-      draggable
+      draggable={isDragEnabled}
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
       onDragOver={handleDragOver}
-      onClick={handleClick}
-      role="button"
-      tabIndex={0}
-      onKeyDown={(e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          handleClick()
-        }
-      }}
     >
+      <div
+        className="drag-handle"
+        title="Drag to reorder"
+        onMouseEnter={() => setIsDragEnabled(true)}
+        onMouseLeave={() => setIsDragEnabled(false)}
+      >
+        ⋮⋮
+      </div>
       <div className="flippingbook-preview">
         {/* WebP background layer */}
         <img
@@ -151,7 +154,23 @@ export function FlippingbookItem({
 
           {showDetails === 'full' && (
             <div className="flippingbook-details">
-              <span className="flippingbook-type">
+              <span
+                className="flippingbook-type flippingbook-type--clickable"
+                onClick={handleClick}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault()
+                    handleClick()
+                  }
+                }}
+                title={
+                  flippingBook.svg
+                    ? 'Click to download combined image'
+                    : 'Click to open WebP image'
+                }
+              >
                 {flippingBook.svg ? 'COMBINED' : 'WEBP-ONLY'}
               </span>
               <span className="flippingbook-size">

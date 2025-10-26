@@ -8,7 +8,6 @@
   font-size: 13px;
   background-color: #ffffff;
   transition: background-color 0.2s ease;
-  cursor: move;
   position: relative;
 }
 
@@ -19,6 +18,32 @@
 
 .flippingbook-item--drag-over {
   border-top: 3px solid #007bff;
+}
+
+/* Drag Handle */
+.drag-handle {
+  color: #6c757d;
+  cursor: grab;
+  font-size: 16px;
+  line-height: 1;
+  padding: 4px;
+  flex-shrink: 0;
+  user-select: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+}
+
+.drag-handle:hover {
+  color: #495057;
+  background-color: #f8f9fa;
+  border-radius: 3px;
+}
+
+.drag-handle:active {
+  cursor: grabbing;
 }
 
 .flippingbook-item:hover {
@@ -122,6 +147,21 @@
 .flippingbook-type {
   color: #007bff;
   font-weight: 500;
+}
+
+.flippingbook-type--clickable {
+  cursor: pointer;
+  text-decoration: underline;
+  transition: color 0.2s ease;
+}
+
+.flippingbook-type--clickable:hover {
+  color: #0056b3;
+  text-decoration: none;
+}
+
+.flippingbook-type--clickable:active {
+  color: #004085;
 }
 
 /* File Information Styles */

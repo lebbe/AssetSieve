@@ -1,5 +1,6 @@
 import { FlippingBookSortBy } from '../hooks/useFlippingBookSorting'
 import { InputContainer } from '../../../components/InputContainer'
+import { SortButton } from '../../../components/SortButton'
 
 interface SortingProps {
   sortBy: FlippingBookSortBy
@@ -34,7 +35,7 @@ export function Sorting({
             id="sort-select"
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value as FlippingBookSortBy)}
-            className="sorting-select"
+            className="input"
           >
             {sortOptions.map((option) => (
               <option key={option.value} value={option.value}>
@@ -44,14 +45,14 @@ export function Sorting({
           </select>
         </InputContainer>
 
-        <label className="reverse-checkbox">
-          <input
-            type="checkbox"
-            checked={reversed}
-            onChange={(e) => setReversed(e.target.checked)}
-          />
-          Reverse Order
-        </label>
+        <SortButton
+          direction={reversed ? 'desc' : 'asc'}
+          onToggle={() => setReversed(!reversed)}
+        />
+
+        <span className="sorting-info">
+          {totalImages} item{totalImages !== 1 ? 's' : ''}
+        </span>
       </div>
     </div>
   )

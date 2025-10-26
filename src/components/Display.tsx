@@ -38,7 +38,7 @@ export function Display({
             id="size-select"
             value={previewSize}
             onChange={handleSizeChange}
-            className="display-select"
+            className="input"
           >
             <option value="small">Small</option>
             <option value="medium">Medium</option>
@@ -51,7 +51,7 @@ export function Display({
             id="density-select"
             value={density}
             onChange={handleDensityChange}
-            className="display-select"
+            className="input"
           >
             <option value="compact">Compact</option>
             <option value="comfortable">Comfortable</option>
@@ -64,7 +64,7 @@ export function Display({
             id="details-select"
             value={showDetails}
             onChange={handleDetailsChange}
-            className="display-select"
+            className="input"
           >
             <option value="full">Full Info</option>
             <option value="minimal">Basic Info</option>

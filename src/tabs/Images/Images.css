@@ -31,7 +31,7 @@
 /* Sorting Component Styles */
 .sorting-controls {
   display: flex;
-  align-items: center;
+  align-items: end;
   gap: 12px;
 }
 
