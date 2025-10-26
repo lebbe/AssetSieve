@@ -3,6 +3,10 @@ import '../../../components/Button.css'
 import { jsPDF } from 'jspdf'
 import { useMetadataExport } from '../../../hooks/useMetadataExport'
 import { MetadataExport } from '../../../components/MetadataExport'
+import {
+  savePDFWithMetadata,
+  handlePDFExportError,
+} from '../../../utils/pdfExport'
 
 interface ExportProps {
   sortedImages: ImageData[]
@@ -160,27 +164,14 @@ export function Export({ sortedImages }: ExportProps) {
 
     try {
       const pdf = await generatePDF()
-
-      // Set PDF metadata
-      pdf.setProperties({
-        title: pdfTitle,
-        author: author || 'AssetSieve User',
-        creator: creator || 'AssetSieve Image Exporter',
-      })
-
-      // Ensure filename has .pdf extension
-      const finalFilename = filename.endsWith('.pdf')
-        ? filename
-        : `${filename}.pdf`
-
-      pdf.save(finalFilename)
-    } catch (error) {
-      console.error('PDF export failed:', error)
-      alert(
-        `PDF export failed: ${
-          error instanceof Error ? error.message : 'Unknown error'
-        }`,
+      savePDFWithMetadata(
+        pdf,
+        filename,
+        { title: pdfTitle, author, creator },
+        'AssetSieve Image Exporter',
       )
+    } catch (error) {
+      handlePDFExportError(error)
     }
   }
 

@@ -9,6 +9,10 @@ import { createNewPage } from '../utils/createNewPage'
 import JSZip from 'jszip'
 import { useMetadataExport } from '../../../hooks/useMetadataExport'
 import { MetadataExport } from '../../../components/MetadataExport'
+import {
+  savePDFWithMetadata,
+  handlePDFExportError,
+} from '../../../utils/pdfExport'
 
 interface ExportProps {
   sortedImages: FlippingBookPair[]
@@ -53,32 +57,16 @@ export function Export({ sortedImages }: ExportProps) {
     setIsExporting(true)
     try {
       const pdf = await createPDF(sortedImages)
-
-      // Set PDF metadata
-      pdf.setProperties({
-        title: pdfTitle,
-        author: author || 'AssetSieve User',
-        creator: creator || 'AssetSieve FlippingBook Exporter',
-      })
-
-      // Ensure filename has .pdf extension
-      const finalFilename = filename.endsWith('.pdf')
-        ? filename
-        : `${filename}.pdf`
-
-      pdf.save(finalFilename)
+      savePDFWithMetadata(
+        pdf,
+        filename,
+        { title: pdfTitle, author, creator },
+        'AssetSieve FlippingBook Exporter',
+      )
       setIsExporting(false)
     } catch (error) {
-      alert(`PDF export failed, check console for more.`)
-      console.error('PDF export failed:', {
-        message:
-          error instanceof Error
-            ? error.message
-            : error instanceof String
-              ? error
-              : 'Unknown error',
-        stack: error instanceof Error ? error.stack : 'No stack available',
-      })
+      handlePDFExportError(error)
+      setIsExporting(false)
     }
   }
 
