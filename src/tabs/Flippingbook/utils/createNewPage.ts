@@ -140,6 +140,6 @@ export async function createNewPage(
   }
 
   // Convert canvas to blob and add to PDF at the calculated dimensions
-  const canvasDataUrl = canvas.toDataURL('image/png', 0.95)
-  pdf.addImage(canvasDataUrl, 'PNG', 0, 0, pdfWidth, pdfHeight)
+  const canvasDataUrl = canvas.toDataURL('image/jpeg', 0.8)
+  pdf.addImage(canvasDataUrl, 'JPEG', 0, 0, pdfWidth, pdfHeight)
 }
