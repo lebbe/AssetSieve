@@ -75,7 +75,9 @@ export function TrafficItem({ request }: TrafficItemProps) {
             <div className="detail-row">
               <span className="detail-name">Time:</span>
               <span className="detail-value">
-                {typeof request.time === 'number' ? `${request.time.toFixed(2)}ms` : 'N/A'}
+                {typeof request.time === 'number'
+                  ? `${request.time.toFixed(2)}ms`
+                  : 'N/A'}
               </span>
             </div>
             {request.chromeRequest.request?.url && (

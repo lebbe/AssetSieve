@@ -8,7 +8,9 @@
     "preview": "vite preview",
     "lint": "oxlint src",
     "type-check": "tsc --noEmit",
-    "qa": "npm run lint && npm run type-check",
+    "prettier": "prettier --check .",
+    "qa": "npm run lint && npm run type-check && npm run prettier",
+    "prettier:fix": "prettier --write .",
     "pdf-from-pngs": "node --max-old-space-size=8192 --expose-gc scripts/createPDFFromPNGs.js",
     "pdf-from-webp-svg": "node --max-old-space-size=8192 --expose-gc scripts/createPDFFromwebpAndSvg.js"
   },
