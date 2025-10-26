@@ -1,0 +1,131 @@
+/* Unified Input Component Styles */
+
+/* Base input styling for all input types */
+.input {
+  padding: 6px 8px;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  font-size: 13px;
+  font-family: inherit;
+  background-color: #ffffff;
+  color: #495057;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+/* Focus state */
+.input:focus {
+  outline: none;
+  border-color: #80bdff;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.15);
+}
+
+/* Disabled state */
+.input:disabled {
+  background-color: #e9ecef;
+  border-color: #dee2e6;
+  color: #6c757d;
+  cursor: not-allowed;
+}
+
+/* Placeholder styling */
+.input::placeholder {
+  color: #6c757d;
+  opacity: 1;
+}
+
+/* Specific input types */
+
+/* Text inputs inherit base styling by default */
+
+/* Number inputs */
+.input[type='number'] {
+  max-width: 120px;
+}
+
+/* Select elements */
+.input[type='select'],
+select.input {
+  cursor: pointer;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236c757d' stroke-linecap='round' stroke-linejoin='round' stroke-width='2.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+  background-position: right 8px center;
+  background-repeat: no-repeat;
+  background-size: 20px 16px;
+  padding-right: 32px;
+}
+
+/* Checkbox inputs */
+.input[type='checkbox'] {
+  width: auto;
+  height: auto;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+}
+
+/* Size variants */
+
+/* Small inputs for compact areas */
+.input--small {
+  padding: 4px 6px;
+  font-size: 12px;
+}
+
+/* Large inputs for prominent areas */
+.input--large {
+  padding: 8px 12px;
+  font-size: 14px;
+}
+
+/* Width variants */
+
+/* Full width inputs */
+.input--full {
+  width: 100%;
+}
+
+/* Compact number inputs */
+.input--number {
+  max-width: 100px;
+}
+
+/* URL inputs that need more space */
+.input--url {
+  min-width: 200px;
+  flex: 1;
+}
+
+/* State variants */
+
+/* Error state */
+.input--error {
+  border-color: #dc3545;
+}
+
+.input--error:focus {
+  border-color: #dc3545;
+  box-shadow: 0 0 0 2px rgba(220, 53, 69, 0.15);
+}
+
+/* Success state */
+.input--success {
+  border-color: #28a745;
+}
+
+.input--success:focus {
+  border-color: #28a745;
+  box-shadow: 0 0 0 2px rgba(40, 167, 69, 0.15);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .input {
+    font-size: 14px; /* Slightly larger on mobile */
+  }
+
+  .input--url {
+    min-width: 150px;
+  }
+}

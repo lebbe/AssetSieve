@@ -34,7 +34,7 @@ export function Filter({
               placeholder="e.g., images/gallery"
               value={filters.path}
               onChange={(e) => handleInputChange('path', e.target.value)}
-              className="filter-input"
+              className="input"
             />
           </InputContainer>
           <InputContainer label="Filename" htmlFor="filename-filter">
@@ -44,7 +44,7 @@ export function Filter({
               placeholder="e.g., logo.png"
               value={filters.filename}
               onChange={(e) => handleInputChange('filename', e.target.value)}
-              className="filter-input"
+              className="input"
             />
           </InputContainer>
         </div>
@@ -57,7 +57,7 @@ export function Filter({
               placeholder="px"
               value={filters.minWidth}
               onChange={(e) => handleInputChange('minWidth', e.target.value)}
-              className="filter-input filter-number"
+              className="input input--number"
             />
           </InputContainer>
           <InputContainer label="Min Height" htmlFor="min-height-filter">
@@ -67,7 +67,7 @@ export function Filter({
               placeholder="px"
               value={filters.minHeight}
               onChange={(e) => handleInputChange('minHeight', e.target.value)}
-              className="filter-input filter-number"
+              className="input input--number"
             />
           </InputContainer>
           <InputContainer

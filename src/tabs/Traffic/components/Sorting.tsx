@@ -26,7 +26,7 @@ export function Sorting({ sortBy, sortDirection, onSort }: SortingProps) {
           <select
             value={sortBy}
             onChange={(e) => onSort(e.target.value as TrafficSortBy)}
-            className="sort-select"
+            className="input"
           >
             {sortOptions.map((option) => (
               <option key={option.value} value={option.value}>

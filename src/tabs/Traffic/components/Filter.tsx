@@ -30,7 +30,7 @@ export function Filter({
               value={filters.url}
               onChange={(e) => onFilterChange('url', e.target.value)}
               placeholder="Enter URL fragment"
-              className="filter-input"
+              className="input"
             />
           </InputContainer>
 
@@ -38,7 +38,7 @@ export function Filter({
             <select
               value={filters.method}
               onChange={(e) => onFilterChange('method', e.target.value)}
-              className="filter-select"
+              className="input"
             >
               <option value="">All Methods</option>
               {availableMethods.map((method) => (
@@ -53,7 +53,7 @@ export function Filter({
             <select
               value={filters.status}
               onChange={(e) => onFilterChange('status', e.target.value)}
-              className="filter-select"
+              className="input"
             >
               <option value="">All Status</option>
               {availableStatuses.map((status) => (
@@ -70,7 +70,7 @@ export function Filter({
             <select
               value={filters.mimeType}
               onChange={(e) => onFilterChange('mimeType', e.target.value)}
-              className="filter-select"
+              className="input"
             >
               <option value="">All Types</option>
               {availableMimeTypes.map((type) => (
@@ -88,7 +88,7 @@ export function Filter({
               onChange={(e) => onFilterChange('minSize', e.target.value)}
               placeholder="0"
               min="0"
-              className="filter-input"
+              className="input input--number"
             />
           </InputContainer>
 
@@ -99,7 +99,7 @@ export function Filter({
               onChange={(e) => onFilterChange('maxSize', e.target.value)}
               placeholder="∞"
               min="0"
-              className="filter-input"
+              className="input input--number"
             />
           </InputContainer>
 

@@ -34,7 +34,7 @@ export function Sorting({
             id="sort-select"
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value as FlippingBookSortBy)}
-            className="sorting-select"
+            className="input"
           >
             {sortOptions.map((option) => (
               <option key={option.value} value={option.value}>
@@ -47,6 +47,7 @@ export function Sorting({
         <label className="reverse-checkbox">
           <input
             type="checkbox"
+            className="input"
             checked={reversed}
             onChange={(e) => setReversed(e.target.checked)}
           />

@@ -34,7 +34,7 @@ export function Sorting({
             id="sort-select"
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value as SortBy)}
-            className="sorting-select"
+            className="input"
           >
             {sortOptions.map((option) => (
               <option key={option.value} value={option.value}>
@@ -48,7 +48,7 @@ export function Sorting({
             type="checkbox"
             checked={reversed}
             onChange={(e) => setReversed(e.target.checked)}
-            className="reverse-checkbox"
+            className="input"
           />
           <span className="reverse-checkbox-text">Reverse</span>
         </label>

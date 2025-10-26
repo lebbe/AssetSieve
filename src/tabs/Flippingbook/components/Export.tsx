@@ -83,6 +83,7 @@ export function Export({ sortedImages }: ExportProps) {
       <div className="export-metadata">
         <InputContainer label="PDF Title">
           <input
+            className="input"
             type="text"
             value={pdfTitle}
             onChange={(e) => setPdfTitle(e.target.value)}
@@ -93,6 +94,7 @@ export function Export({ sortedImages }: ExportProps) {
 
         <InputContainer label="Creator">
           <input
+            className="input"
             type="text"
             value={creator}
             onChange={(e) => setCreator(e.target.value)}
@@ -103,6 +105,7 @@ export function Export({ sortedImages }: ExportProps) {
 
         <InputContainer label="Author">
           <input
+            className="input"
             type="text"
             value={author}
             onChange={(e) => setAuthor(e.target.value)}
@@ -113,6 +116,7 @@ export function Export({ sortedImages }: ExportProps) {
 
         <InputContainer label="Filename">
           <input
+            className="input"
             type="text"
             value={filename}
             onChange={(e) => setFilename(e.target.value)}

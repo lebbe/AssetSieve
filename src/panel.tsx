@@ -3,6 +3,7 @@ import { useMemo } from 'react'
 
 import './panel.css'
 import './components/Button.css'
+import './components/Input.css'
 import { useRequestSniffing } from './hooks/useRequestSniffing'
 import { PanelCard } from './components/PanelCard'
 import { Images } from './tabs/Images/Images'
