@@ -1,11 +1,18 @@
+import { useState } from 'react'
 import { ImageData } from '../../../hooks/useImageSniffer'
 import '../../../components/Button.css'
+import { jsPDF } from 'jspdf'
+import { InputContainer } from '../../../components/InputContainer'
 
 interface ExportProps {
   sortedImages: ImageData[]
 }
 
 export function Export({ sortedImages }: ExportProps) {
+  const [pdfTitle, setPdfTitle] = useState('AssetSieve Image Export')
+  const [filename, setFilename] = useState('images.pdf')
+  const [author, setAuthor] = useState('')
+  const [creator, setCreator] = useState('')
   const getFileExtension = (mimeType: string, url: string) => {
     // Try to get extension from MIME type first
     const mimeExtensions: { [key: string]: string } = {
@@ -92,64 +99,60 @@ export function Export({ sortedImages }: ExportProps) {
     }
   }
 
-  const generatePDFHTML = () => {
-    const imageElements = sortedImages
-      .map((image, index) => {
-        return `
-        <div class="image-page">
-          <img src="data:${image.mimeType};base64,${image.base64}" 
-               style="max-width: 100%; max-height: 100vh; object-fit: contain;" 
-               alt="Image ${index + 1}" />
-        </div>
-      `
-      })
-      .join('')
+  const generatePDF = async () => {
+    if (sortedImages.length === 0) {
+      throw new Error('No images to export')
+    }
 
-    return `
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <title>AssetSieve Export</title>
-        <style>
-          @page {
-            margin: 0;
-            size: A4;
+    const pdf = new jsPDF({
+      orientation: 'portrait',
+      unit: 'px',
+      format: [100, 100], // Will be updated for each page
+      compress: true,
+    })
+
+    let isFirstPage = true
+
+    for (const image of sortedImages) {
+      if (!image.base64) {
+        console.warn(`Skipping image without base64 data: ${image.url}`)
+        continue
+      }
+
+      // Load image to get dimensions
+      const img = new Image()
+      const dataUrl = `data:${image.mimeType};base64,${image.base64}`
+
+      await new Promise<void>((resolve, reject) => {
+        img.onload = () => {
+          const width = img.width
+          const height = img.height
+
+          if (isFirstPage) {
+            // For first page, delete the default page and create one with correct size
+            pdf.deletePage(1)
+            pdf.addPage([width, height])
+            isFirstPage = false
+          } else {
+            // Add new page with image dimensions
+            pdf.addPage([width, height])
           }
-          body {
-            margin: 0;
-            padding: 0;
-            background: white;
-          }
-          .image-page {
-            page-break-after: always;
-            page-break-inside: avoid;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 100vw;
-            height: 100vh;
-          }
-          .image-page:last-child {
-            page-break-after: avoid;
-          }
-          img {
-            max-width: 100%;
-            max-height: 100%;
-            object-fit: contain;
-          }
-          @media print {
-            body {
-              -webkit-print-color-adjust: exact;
-              color-adjust: exact;
-            }
-          }
-        </style>
-      </head>
-      <body>
-        ${imageElements}
-      </body>
-      </html>
-    `
+
+          // Add image to fill the entire page
+          pdf.addImage(dataUrl, 'JPEG', 0, 0, width, height)
+          resolve()
+        }
+
+        img.onerror = () => {
+          console.error(`Failed to load image: ${image.url}`)
+          reject(new Error(`Failed to load image: ${image.url}`))
+        }
+
+        img.src = dataUrl
+      })
+    }
+
+    return pdf
   }
 
   const handleExportToPDF = async () => {
@@ -159,42 +162,21 @@ export function Export({ sortedImages }: ExportProps) {
     }
 
     try {
-      // Generate HTML content
-      const htmlContent = generatePDFHTML()
+      const pdf = await generatePDF()
 
-      // Use chrome.devtools.inspectedWindow.eval to open a new window with the content
-      const script = `
-        (function() {
-          const newWindow = window.open('', '_blank', 'width=800,height=600');
-          if (!newWindow) {
-            throw new Error('Pop-up blocked. Please allow pop-ups for this site.');
-          }
-          
-          newWindow.document.open();
-          newWindow.document.write(\`${htmlContent
-            .replace(/`/g, '\\`')
-            .replace(/\$/g, '\\$')}\`);
-          newWindow.document.close();
-          
-          // Wait for images to load then trigger print
-          newWindow.addEventListener('load', function() {
-            setTimeout(function() {
-              newWindow.print();
-            }, 1000);
-          });
-          
-          return 'PDF export initiated';
-        })()
-      `
-
-      chrome.devtools.inspectedWindow.eval(script, (_, isException) => {
-        if (isException) {
-          console.error('PDF export failed:', isException)
-          alert(`PDF export failed: ${isException.value || 'Unknown error'}`)
-        } else {
-          // PDF export successful
-        }
+      // Set PDF metadata
+      pdf.setProperties({
+        title: pdfTitle,
+        author: author || 'AssetSieve User',
+        creator: creator || 'AssetSieve Image Exporter',
       })
+
+      // Ensure filename has .pdf extension
+      const finalFilename = filename.endsWith('.pdf')
+        ? filename
+        : `${filename}.pdf`
+
+      pdf.save(finalFilename)
     } catch (error) {
       console.error('PDF export failed:', error)
       alert(
@@ -208,31 +190,74 @@ export function Export({ sortedImages }: ExportProps) {
   return (
     <div className="export-container">
       <div className="export-controls">
-        <div className="export-buttons">
-          <button
-            onClick={handleExportAll}
-            className="btn btn-green btn-lg"
-            disabled={sortedImages.length === 0}
-          >
-            Download All Images ({sortedImages.length})
-          </button>
-          <button
-            onClick={handleExportToPDF}
-            className="btn btn-red btn-lg"
-            disabled={sortedImages.length === 0}
-          >
-            Export to PDF ({sortedImages.length})
-          </button>
-        </div>
-        <span className="export-info">
-          Images will be numbered{' '}
-          {sortedImages.length > 0
-            ? `01-${sortedImages.length
-                .toString()
-                .padStart(getZeroPadding(sortedImages.length), '0')}`
-            : ''}
-        </span>
+        <InputContainer label="PDF Title">
+          <input
+            className="input"
+            type="text"
+            value={pdfTitle}
+            onChange={(e) => setPdfTitle(e.target.value)}
+            placeholder="AssetSieve Image Export"
+            title="Title that will be embedded in the PDF metadata"
+          />
+        </InputContainer>
+
+        <InputContainer label="Creator">
+          <input
+            className="input"
+            type="text"
+            value={creator}
+            onChange={(e) => setCreator(e.target.value)}
+            placeholder="Your name (optional)"
+            title="Creator name that will be embedded in the PDF metadata"
+          />
+        </InputContainer>
+
+        <InputContainer label="Author">
+          <input
+            className="input"
+            type="text"
+            value={author}
+            onChange={(e) => setAuthor(e.target.value)}
+            placeholder="Your name (optional)"
+            title="Author name that will be embedded in the PDF metadata"
+          />
+        </InputContainer>
+
+        <InputContainer label="Filename">
+          <input
+            className="input"
+            type="text"
+            value={filename}
+            onChange={(e) => setFilename(e.target.value)}
+            placeholder="images.pdf"
+            title="Name of the downloaded PDF file (extension will be added automatically)"
+          />
+        </InputContainer>
       </div>
+      <div className="export-buttons">
+        <button
+          onClick={handleExportAll}
+          className="btn btn-green btn-lg"
+          disabled={sortedImages.length === 0}
+        >
+          Download All Images ({sortedImages.length})
+        </button>
+        <button
+          onClick={handleExportToPDF}
+          className="btn btn-red btn-lg"
+          disabled={sortedImages.length === 0}
+        >
+          Export to PDF ({sortedImages.length})
+        </button>
+      </div>
+      <span className="export-info">
+        Images will be numbered{' '}
+        {sortedImages.length > 0
+          ? `01-${sortedImages.length
+              .toString()
+              .padStart(getZeroPadding(sortedImages.length), '0')}`
+          : ''}
+      </span>
     </div>
   )
 }
