@@ -23,7 +23,7 @@ _AssetSieve in action: The extension interface shows captured Pokémon images wi
 
 ---
 
-## How to Use AssetSieve
+## How to Use AssetSieve Images
 
 ### Step 1: Install and Open
 
@@ -54,26 +54,87 @@ _AssetSieve in action: The extension interface shows captured Pokémon images wi
 
 ---
 
-## Perfect For These Use Cases
+## How to Use AssetSieve Flippingbook
 
-- **Digital Magazine Collections**: Save issues of magazines you've purchased digitally
-- **Comic Book Archives**: Create PDF backups of comics you own
-- **Art Galleries**: Collect artwork from museum or gallery websites
-- **Educational Materials**: Archive diagrams, charts, and illustrations for study
-- **Product Catalogs**: Save product images from shopping sites for comparison
+AssetSieve's **FlippingBook feature** is specifically designed for digital magazines and publications created using the FlippingBook.com platform. When you're browsing these interactive publications, AssetSieve automatically detects and captures the underlying WebP images and SVG overlays that make up each page.
 
----
+### What It Does
 
-## How the PDF Feature Works
+FlippingBook publications typically consist of:
 
-When you click "Export to PDF", AssetSieve does something clever:
+- **WebP images**: High-quality background page images
+- **SVG overlays**: Vector graphics containing text, links, and interactive elements
 
-1. **Opens a new tab** with all your images arranged in order
-2. **Formats everything for printing** (each image gets its own page)
-3. **Opens the print dialog** automatically
-4. **You choose "Save as PDF"** and pick where to save it
+AssetSieve intelligently pairs these assets together and enables you to export your legally accessed content as a consolidated PDF document.
 
-No complicated software needed - it uses Chrome's built-in PDF creator!
+### Step-by-Step Usage
+
+#### Step 1: Access Your FlippingBook Publication
+
+1. Navigate to a magazine or publication created with FlippingBook.com
+2. Ensure you have legitimate access (subscription, purchase, or permission)
+3. Open Chrome DevTools (F12) and click the **"AssetSieve"** tab
+4. Switch to the **"FlippingBook"** tab within AssetSieve
+
+#### Step 2: Configure Detection Settings
+
+1. **Page Pattern**: Adjust the regex pattern if needed (default: `page\\d{4}_3\\.webp`)
+   - This helps AssetSieve identify which images are magazine pages
+   - Most FlippingBook publications use the default pattern
+2. **Remove Duplicates**: Check this option to avoid duplicate pages with identical paths
+   - Useful when the same page loads multiple times during browsing
+
+#### Step 3: Browse and Capture
+
+1. Click **"Start Listening"** in AssetSieve
+2. Browse through the FlippingBook publication normally
+3. Turn pages, zoom, and navigate as you would typically read
+4. AssetSieve automatically captures page assets in the background
+5. Watch the FlippingBook counter increase as pages are detected
+
+#### Step 4: Review and Organize
+
+- **View captured pages**: See thumbnails of all detected FlippingBook pages
+- **Sort pages**: Use sorting options to arrange pages in the correct reading order
+- **Remove unwanted pages**: Delete any accidentally captured non-page images
+- **Verify completeness**: Ensure all desired pages have been captured
+
+#### Step 5: Export Your PDF
+
+1. **Set PDF metadata**: Enter a title, author name, and filename for your PDF
+2. **Export to PDF**: Click the export button to generate your consolidated document
+3. **Additional options**:
+   - Download URLs as text file for reference
+   - Copy URLs to clipboard for other uses
+
+### Key Features
+
+- **Smart Asset Pairing**: Automatically matches WebP backgrounds with their corresponding SVG overlays
+- **Flexible Filtering**: Customizable regex patterns to match different FlippingBook implementations
+- **Duplicate Detection**: Removes duplicate pages based on file paths (not full URLs)
+- **PDF Customization**: Add metadata like title, author, and custom filenames
+- **Quality Preservation**: Maintains original image quality in the final PDF
+- **Batch Processing**: Handles entire publications efficiently
+
+### Legal and Ethical Use
+
+**This feature is intended exclusively for legitimate use cases:**
+
+**Appropriate Use:**
+
+- Creating personal backups of magazines you have purchased or subscribed to
+- Archiving content you legally own or have licensing rights to access
+- Educational use within fair use guidelines and institutional licenses
+- Research purposes where you have appropriate academic or professional access
+
+**Prohibited Use:**
+
+- Circumventing paywalls or subscription requirements
+- Creating unauthorized copies for redistribution or commercial purposes
+- Sharing copyrighted content without proper licensing
+- Any use that violates the publisher's terms of service or applicable copyright law
+
+**Important**: AssetSieve is a tool for organizing and preserving content you already have legitimate access to. Users are solely responsible for ensuring their use complies with all applicable laws, terms of service, and licensing agreements. Always respect intellectual property rights and publisher policies.
 
 ---
 

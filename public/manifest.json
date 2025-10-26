@@ -3,6 +3,10 @@
   "name": "DevTools Hello World Panel",
   "version": "1.0",
   "description": "A Chrome extension that adds a Hello World panel to DevTools",
+  "background": {
+    "service_worker": "background.js"
+  },
+  "host_permissions": ["<all_urls>"],
   "permissions": [],
   "devtools_page": "devtools.html"
 }

@@ -6,6 +6,7 @@ export default defineConfig({
   build: {
     rollupOptions: {
       input: {
+        background: './src/background.ts',
         devtools: './src/devtools.ts',
         panel: './src/panel.tsx',
       },

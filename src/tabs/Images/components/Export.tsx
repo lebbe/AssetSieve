@@ -190,12 +190,12 @@ export function Export({ sortedImages }: ExportProps) {
         })()
       `
 
-      chrome.devtools.inspectedWindow.eval(script, (result, isException) => {
+      chrome.devtools.inspectedWindow.eval(script, (_, isException) => {
         if (isException) {
           console.error('PDF export failed:', isException)
           alert(`PDF export failed: ${isException.value || 'Unknown error'}`)
         } else {
-          console.log('PDF export result:', result)
+          // PDF export successful
         }
       })
     } catch (error) {

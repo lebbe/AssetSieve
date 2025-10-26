@@ -6,6 +6,7 @@ import './components/Button.css'
 import { useRequestSniffing } from './hooks/useRequestSniffing'
 import { PanelCard } from './components/PanelCard'
 import { Images } from './tabs/Images/Images'
+import { Flippingbook } from './tabs/Flippingbook/Flippingbook'
 import { Tabs } from './tabs/Tabs'
 import { Traffic } from './tabs/Traffic/Traffic'
 
@@ -26,6 +27,16 @@ function Panel() {
         name: 'Images',
         content: (
           <Images
+            key={requests.length === 0 ? 'empty' : 'filled'}
+            requests={requests}
+            removeRequest={removeRequest}
+          />
+        ),
+      },
+      {
+        name: 'Flippingbook',
+        content: (
+          <Flippingbook
             key={requests.length === 0 ? 'empty' : 'filled'}
             requests={requests}
             removeRequest={removeRequest}
