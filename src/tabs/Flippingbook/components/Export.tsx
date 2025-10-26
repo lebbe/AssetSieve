@@ -97,15 +97,26 @@ export function Export({ sortedImages }: ExportProps) {
     URL.revokeObjectURL(url)
   }
 
-  const handleCopyUrls = async () => {
-    const urls = sortedImages
-      .map((flippingBook) => flippingBook.webp.url)
-      .join('\n')
-    try {
-      await navigator.clipboard.writeText(urls)
-      // You might want to show a toast notification here
-    } catch (error) {
-      console.error('Failed to copy URLs to clipboard:', error)
+  async function handleDownloadEverything() {
+    const allButtons = Array.from(
+      document.querySelectorAll('button[data-testid="download-all-button"]')
+    )
+
+    for (const button of allButtons) {
+      ;(button as HTMLButtonElement).click()
+      await new Promise((resolve) => setTimeout(resolve, 50))
+    }
+  }
+
+  async function handleDownloadAllCombined() {
+    const allButtons = Array.from(
+      document.querySelectorAll(
+        'button[data-testid="download-combined-button"]'
+      )
+    )
+    for (const button of allButtons) {
+      ;(button as HTMLButtonElement).click()
+      await new Promise((resolve) => setTimeout(resolve, 100))
     }
   }
 
@@ -184,12 +195,20 @@ export function Export({ sortedImages }: ExportProps) {
         </button>
 
         <button
-          onClick={handleCopyUrls}
-          className="btn"
+          onClick={handleDownloadEverything}
+          className="btn btn-grey"
           disabled={sortedImages.length === 0}
-          title="Copy FlippingBook URLs to clipboard"
+          title="Download all webp, svg and the combined pngs"
         >
-          Copy URLs
+          Download everything
+        </button>
+        <button
+          onClick={handleDownloadAllCombined}
+          className="btn btn-red"
+          disabled={sortedImages.length === 0}
+          title="Download all combined pngs"
+        >
+          Download all combined pngs
         </button>
       </div>
     </div>

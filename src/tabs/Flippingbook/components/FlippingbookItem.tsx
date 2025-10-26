@@ -225,6 +225,7 @@ export function FlippingbookItem({
       <div className="downloadButtons">
         <button
           className="btn btn-sm btn-blue"
+          data-testid="download-combined-button"
           onClick={handleClick}
           aria-label="Download WebP file"
           title="Download WebP file"
@@ -263,6 +264,7 @@ export function FlippingbookItem({
 
         <button
           className="btn btn-sm btn-green"
+          data-testid="download-all-button"
           onClick={handleAllDownloads}
           aria-label="Download both WebP, SVG and combined png"
           title="Download both WebP, SVG and combined png"
