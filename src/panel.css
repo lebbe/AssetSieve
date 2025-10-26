@@ -240,3 +240,8 @@ p {
 .preview-size-select:hover {
   border-color: #adb5bd;
 }
+
+.export-buttons {
+  display: flex;
+  gap: 8px;
+}

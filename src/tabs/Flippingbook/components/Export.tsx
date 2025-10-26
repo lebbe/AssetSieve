@@ -2,22 +2,24 @@ import { useState } from 'react'
 import { FlippingBookPair } from '../hooks/useCombiner'
 import '../../../components/Button.css'
 
-import { InputContainer } from '../../../components/InputContainer'
 import './Export.css'
 import { Spinner } from './Spinner'
 import jsPDF from 'jspdf'
 import { createNewPage } from '../utils/createNewPage'
 import JSZip from 'jszip'
+import { useMetadataExport } from '../../../hooks/useMetadataExport'
+import { MetadataExport } from '../../../components/MetadataExport'
+import {
+  savePDFWithMetadata,
+  handlePDFExportError,
+} from '../../../utils/pdfExport'
 
 interface ExportProps {
   sortedImages: FlippingBookPair[]
 }
 
 export function Export({ sortedImages }: ExportProps) {
-  const [pdfTitle, setPdfTitle] = useState('FlippingBook Export')
-  const [filename, setFilename] = useState('flippingbook.pdf')
-  const [author, setAuthor] = useState('')
-  const [creator, setCreator] = useState('')
+  const { pdfTitle, filename, author, creator, setters } = useMetadataExport()
   const [exportedPages, setExportedPages] = useState(0)
   const [isExporting, setIsExporting] = useState(false)
   const [downloadProgress, setDownloadProgress] = useState(0)
@@ -55,32 +57,16 @@ export function Export({ sortedImages }: ExportProps) {
     setIsExporting(true)
     try {
       const pdf = await createPDF(sortedImages)
-
-      // Set PDF metadata
-      pdf.setProperties({
-        title: pdfTitle,
-        author: author || 'AssetSieve User',
-        creator: creator || 'AssetSieve FlippingBook Exporter',
-      })
-
-      // Ensure filename has .pdf extension
-      const finalFilename = filename.endsWith('.pdf')
-        ? filename
-        : `${filename}.pdf`
-
-      pdf.save(finalFilename)
+      savePDFWithMetadata(
+        pdf,
+        filename,
+        { title: pdfTitle, author, creator },
+        'AssetSieve FlippingBook Exporter',
+      )
       setIsExporting(false)
     } catch (error) {
-      alert(`PDF export failed, check console for more.`)
-      console.error('PDF export failed:', {
-        message:
-          error instanceof Error
-            ? error.message
-            : error instanceof String
-              ? error
-              : 'Unknown error',
-        stack: error instanceof Error ? error.stack : 'No stack available',
-      })
+      handlePDFExportError(error)
+      setIsExporting(false)
     }
   }
 
@@ -364,51 +350,13 @@ export function Export({ sortedImages }: ExportProps) {
 
   return (
     <div className="export-container">
-      <div className="export-metadata">
-        <InputContainer label="PDF Title">
-          <input
-            className="input"
-            type="text"
-            value={pdfTitle}
-            onChange={(e) => setPdfTitle(e.target.value)}
-            placeholder="FlippingBook Export"
-            title="Title that will be embedded in the PDF metadata"
-          />
-        </InputContainer>
-
-        <InputContainer label="Creator">
-          <input
-            className="input"
-            type="text"
-            value={creator}
-            onChange={(e) => setCreator(e.target.value)}
-            placeholder="Your name (optional)"
-            title="Creator name that will be embedded in the PDF metadata"
-          />
-        </InputContainer>
-
-        <InputContainer label="Author">
-          <input
-            className="input"
-            type="text"
-            value={author}
-            onChange={(e) => setAuthor(e.target.value)}
-            placeholder="Your name (optional)"
-            title="Author name that will be embedded in the PDF metadata"
-          />
-        </InputContainer>
-
-        <InputContainer label="Filename">
-          <input
-            className="input"
-            type="text"
-            value={filename}
-            onChange={(e) => setFilename(e.target.value)}
-            placeholder="flippingbook.pdf"
-            title="Name of the downloaded PDF file (extension will be added automatically)"
-          />
-        </InputContainer>
-      </div>
+      <MetadataExport
+        pdfTitle={pdfTitle}
+        filename={filename}
+        author={author}
+        creator={creator}
+        setters={setters}
+      />
 
       <div className="export-actions">
         <button

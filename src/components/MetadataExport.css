@@ -1,0 +1,12 @@
+.export-metadata {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+  border-radius: 6px;
+}
+
+@media (max-width: 768px) {
+  .export-metadata {
+    grid-template-columns: 1fr;
+  }
+}
