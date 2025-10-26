@@ -57,7 +57,7 @@ async function loadImageSafely(
  * Adds a new page to an existing jsPDF document by combining a WebP background image
  * and an SVG overlay using canvas rendering.
  */
-async function createNewPage(
+export async function createNewPage(
   pdf: jsPDF,
   flippingBook: FlippingBookPair
 ): Promise<void> {
@@ -121,28 +121,4 @@ async function createNewPage(
   // Convert canvas to blob and add to PDF
   const canvasDataUrl = canvas.toDataURL('image/png', 0.95)
   pdf.addImage(canvasDataUrl, 'PNG', 0, 0, width, height)
-}
-
-export async function createPDF(
-  flippingBookPages: FlippingBookPair[]
-): Promise<jsPDF> {
-  const pdf = new jsPDF()
-
-  // Process each page in the flipping book sequentially
-  for (const flippingBook of flippingBookPages) {
-    // Skip pages without WebP data
-    if (!flippingBook.webp.base64 && !flippingBook.webp.url) {
-      console.warn(`Skipping page ${flippingBook.filename}: missing WebP data`)
-      continue
-    }
-
-    await createNewPage(pdf, flippingBook)
-  }
-
-  // Remove the initial blank page that jsPDF creates automatically
-  if (pdf.getNumberOfPages() > 0) {
-    pdf.deletePage(1) // Delete the first (blank) page
-  }
-
-  return pdf
 }

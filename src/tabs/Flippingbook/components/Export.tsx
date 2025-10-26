@@ -1,10 +1,12 @@
 import { useState } from 'react'
 import { FlippingBookPair } from '../hooks/useCombiner'
 import '../../../components/Button.css'
-import { createPDF } from '../utils/createNewPage'
+
 import { InputContainer } from '../../../components/InputContainer'
 import './Export.css'
 import { Spinner } from './Spinner'
+import jsPDF from 'jspdf'
+import { createNewPage } from '../utils/createNewPage'
 
 interface ExportProps {
   sortedImages: FlippingBookPair[]
@@ -15,7 +17,36 @@ export function Export({ sortedImages }: ExportProps) {
   const [filename, setFilename] = useState('flippingbook.pdf')
   const [author, setAuthor] = useState('')
   const [creator, setCreator] = useState('')
+  const [exportedPages, setExportedPages] = useState(0)
   const [isExporting, setIsExporting] = useState(false)
+
+  async function createPDF(
+    flippingBookPages: FlippingBookPair[]
+  ): Promise<jsPDF> {
+    const pdf = new jsPDF()
+    setExportedPages(0)
+
+    // Process each page in the flipping book sequentially
+    for (const flippingBook of flippingBookPages) {
+      // Skip pages without WebP data
+      if (!flippingBook.webp.base64 && !flippingBook.webp.url) {
+        console.warn(
+          `Skipping page ${flippingBook.filename}: missing WebP data`
+        )
+        continue
+      }
+
+      await createNewPage(pdf, flippingBook)
+      setExportedPages((prev) => prev + 1)
+    }
+
+    // Remove the initial blank page that jsPDF creates automatically
+    if (pdf.getNumberOfPages() > 0) {
+      pdf.deletePage(1) // Delete the first (blank) page
+    }
+
+    return pdf
+  }
 
   async function handleExportToPDF() {
     setIsExporting(true)
@@ -133,7 +164,14 @@ export function Export({ sortedImages }: ExportProps) {
           disabled={sortedImages.length === 0}
           title={`Export all ${sortedImages.length} FlippingBooks to PDF`}
         >
-          {isExporting ? <Spinner /> : 'Export PDF'}
+          {isExporting ? (
+            <>
+              {exportedPages} / {sortedImages.length}
+              <Spinner />
+            </>
+          ) : (
+            'Export PDF'
+          )}
         </button>
 
         <button
