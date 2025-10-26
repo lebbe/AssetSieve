@@ -61,26 +61,47 @@ export async function createNewPage(
   pdf: jsPDF,
   flippingBook: FlippingBookPair
 ): Promise<void> {
-  // Use the WebP dimensions for the page
-  const width = flippingBook.width
-  const height = flippingBook.height
+  // Original image dimensions in pixels
+  const originalWidth = flippingBook.width
+  const originalHeight = flippingBook.height
 
-  // Add a new page with the FlippingBook dimensions
-  pdf.addPage([width, height])
+  // Calculate PDF page dimensions (fit within A4 landscape: 297x210mm = ~842x595 points at 72 DPI)
+  const maxPdfWidth = 800 // points
+  const maxPdfHeight = 600 // points
 
-  // Create canvas for rendering
+  // Calculate scaling to fit within max dimensions while maintaining aspect ratio
+  const scaleX = maxPdfWidth / originalWidth
+  const scaleY = maxPdfHeight / originalHeight
+  const scale = Math.min(scaleX, scaleY)
+
+  // Final PDF dimensions
+  const pdfWidth = originalWidth * scale
+  const pdfHeight = originalHeight * scale
+
+  // High-resolution canvas for better quality (2x pixel density)
+  const canvasScale = 2
+  const canvasWidth = originalWidth * canvasScale
+  const canvasHeight = originalHeight * canvasScale
+
+  // Add a new page with the calculated PDF dimensions
+  pdf.addPage([pdfWidth, pdfHeight])
+
+  // Create high-resolution canvas for rendering
   const canvas = document.createElement('canvas')
-  canvas.width = width
-  canvas.height = height
+  canvas.width = canvasWidth
+  canvas.height = canvasHeight
   const ctx = canvas.getContext('2d')
 
   if (!ctx) {
     throw new Error('Failed to get canvas 2D context')
   }
 
+  // Scale context for high-resolution rendering
+  ctx.scale(canvasScale, canvasScale)
+
   // Clear canvas with white background
   ctx.fillStyle = '#ffffff'
-  ctx.fillRect(0, 0, width, height)
+  ctx.fillRect(0, 0, originalWidth, originalHeight)
 
   // Load and draw WebP background
   const webpSrc = flippingBook.webp.base64
@@ -88,7 +109,7 @@ export async function createNewPage(
     : flippingBook.webp.url
 
   const webpImg = await loadImageSafely(webpSrc, 'WebP background')
-  ctx.drawImage(webpImg, 0, 0, width, height)
+  ctx.drawImage(webpImg, 0, 0, originalWidth, originalHeight)
 
   // Load and draw SVG overlay if present
   if (flippingBook.svg) {
@@ -109,7 +130,7 @@ export async function createNewPage(
       }
 
       const svgImg = await loadImageSafely(svgSrc, 'SVG overlay')
-      ctx.drawImage(svgImg, 0, 0, width, height)
+      ctx.drawImage(svgImg, 0, 0, originalWidth, originalHeight)
     } catch (error) {
       console.warn(
         'Failed to load SVG overlay, proceeding with WebP-only:',
@@ -118,7 +139,7 @@ export async function createNewPage(
     }
   }
 
-  // Convert canvas to blob and add to PDF
+  // Convert canvas to blob and add to PDF at the calculated dimensions
   const canvasDataUrl = canvas.toDataURL('image/png', 0.95)
-  pdf.addImage(canvasDataUrl, 'PNG', 0, 0, width, height)
+  pdf.addImage(canvasDataUrl, 'PNG', 0, 0, pdfWidth, pdfHeight)
 }
