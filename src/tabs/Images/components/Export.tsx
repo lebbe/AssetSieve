@@ -40,11 +40,7 @@ export function Export({ sortedImages }: ExportProps) {
     try {
       // Convert base64 to blob
       const byteCharacters = atob(image.base64)
-      const byteNumbers = new Array(byteCharacters.length)
-
-      for (let i = 0; i < byteCharacters.length; i++) {
-        byteNumbers[i] = byteCharacters.charCodeAt(i)
-      }
+      const byteNumbers = Array.from(byteCharacters, (c) => c.charCodeAt(0))
 
       const byteArray = new Uint8Array(byteNumbers)
       const blob = new Blob([byteArray], { type: image.mimeType })
