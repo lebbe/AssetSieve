@@ -67,11 +67,6 @@
   cursor: pointer;
 }
 
-.reverse-checkbox input {
-  margin: 0;
-  cursor: pointer;
-}
-
 /* Control Panels Layout */
 .control-panels {
   display: flex;
@@ -109,11 +104,6 @@
   cursor: pointer;
   font-size: 13px;
   margin-top: 4px;
-}
-
-.flippingbook-analysis .checkbox-input {
-  cursor: pointer;
-  margin: 0;
 }
 
 .flippingbook-analysis .checkbox-text {

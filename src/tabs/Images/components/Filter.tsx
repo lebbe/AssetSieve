@@ -96,7 +96,6 @@ export function Filter({
                       type="checkbox"
                       checked={filters.fileTypes.has(fileType)}
                       onChange={() => handleFileTypeToggle(fileType)}
-                      className="checkbox-input"
                     />
                     <span className="checkbox-text">{fileType}</span>
                   </label>
