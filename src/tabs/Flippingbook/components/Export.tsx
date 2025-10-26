@@ -4,6 +4,7 @@ import '../../../components/Button.css'
 import { createPDF } from '../utils/createNewPage'
 import { InputContainer } from '../../../components/InputContainer'
 import './Export.css'
+import { Spinner } from './Spinner'
 
 interface ExportProps {
   sortedImages: FlippingBookPair[]
@@ -14,7 +15,10 @@ export function Export({ sortedImages }: ExportProps) {
   const [filename, setFilename] = useState('flippingbook.pdf')
   const [author, setAuthor] = useState('')
   const [creator, setCreator] = useState('')
+  const [isExporting, setIsExporting] = useState(false)
+
   async function handleExportToPDF() {
+    setIsExporting(true)
     try {
       const pdf = await createPDF(sortedImages)
 
@@ -31,6 +35,7 @@ export function Export({ sortedImages }: ExportProps) {
         : `${filename}.pdf`
 
       pdf.save(finalFilename)
+      setIsExporting(false)
     } catch (error) {
       alert(`PDF export failed, check console for more.`)
       console.error('PDF export failed:', {
@@ -124,7 +129,7 @@ export function Export({ sortedImages }: ExportProps) {
           disabled={sortedImages.length === 0}
           title={`Export all ${sortedImages.length} FlippingBooks to PDF`}
         >
-          Export PDF
+          {isExporting ? <Spinner /> : 'Export PDF'}
         </button>
 
         <button
