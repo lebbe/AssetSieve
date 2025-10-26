@@ -24,7 +24,7 @@ export function Export({ sortedImages }: ExportProps) {
   const [isDownloading, setIsDownloading] = useState(false)
 
   async function createPDF(
-    flippingBookPages: FlippingBookPair[]
+    flippingBookPages: FlippingBookPair[],
   ): Promise<jsPDF> {
     const pdf = new jsPDF()
     setExportedPages(0)
@@ -34,7 +34,7 @@ export function Export({ sortedImages }: ExportProps) {
       // Skip pages without WebP data
       if (!flippingBook.webp.base64 && !flippingBook.webp.url) {
         console.warn(
-          `Skipping page ${flippingBook.filename}: missing WebP data`
+          `Skipping page ${flippingBook.filename}: missing WebP data`,
         )
         continue
       }
@@ -77,8 +77,8 @@ export function Export({ sortedImages }: ExportProps) {
           error instanceof Error
             ? error.message
             : error instanceof String
-            ? error
-            : 'Unknown error',
+              ? error
+              : 'Unknown error',
         stack: error instanceof Error ? error.stack : 'No stack available',
       })
     }
@@ -114,7 +114,7 @@ export function Export({ sortedImages }: ExportProps) {
       console.error(
         `Failed to decode base64 string: ${
           e instanceof Error ? e.message : JSON.stringify(e)
-        }`
+        }`,
       )
       return '' // Return empty string on failure
     }
@@ -236,7 +236,7 @@ export function Export({ sortedImages }: ExportProps) {
 
           if (!ctx) {
             console.warn(
-              `Failed to get canvas context for ${flippingBook.filename}`
+              `Failed to get canvas context for ${flippingBook.filename}`,
             )
             continue
           }
@@ -287,12 +287,12 @@ export function Export({ sortedImages }: ExportProps) {
                 0,
                 0,
                 flippingBook.width,
-                flippingBook.height
+                flippingBook.height,
               )
             } catch (svgError) {
               console.warn(
                 `Failed to overlay SVG for ${flippingBook.filename}:`,
-                svgError
+                svgError,
               )
             }
           }
@@ -311,7 +311,7 @@ export function Export({ sortedImages }: ExportProps) {
           // Add to ZIP
           const pngFilename = `${flippingBook.filename.replace(
             /\.[^/.]+$/,
-            ''
+            '',
           )}_combined.png`
           zip.file(pngFilename, pngBlob)
 
@@ -320,7 +320,7 @@ export function Export({ sortedImages }: ExportProps) {
         } catch (error) {
           console.error(
             `Failed to create combined image for ${flippingBook.filename}:`,
-            error
+            error,
           )
         }
       }

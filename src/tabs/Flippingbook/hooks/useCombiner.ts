@@ -72,7 +72,7 @@ export function useCombiner(images: ImageData[]) {
     } catch (error) {
       console.warn(
         '[FlippingBook] Invalid regex pattern, using default:',
-        error
+        error,
       )
       pageRegex = /page\d{4}.*\.webp/i
     }
@@ -88,7 +88,7 @@ export function useCombiner(images: ImageData[]) {
     const svgFiles = images.filter(
       (img) =>
         img.mimeType === 'image/svg+xml' ||
-        img.url.toLowerCase().includes('.svg')
+        img.url.toLowerCase().includes('.svg'),
     )
 
     const pairs: FlippingBookPair[] = []

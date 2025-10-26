@@ -200,7 +200,7 @@ export function Export({ sortedImages }: ExportProps) {
       alert(
         `PDF export failed: ${
           error instanceof Error ? error.message : 'Unknown error'
-        }`
+        }`,
       )
     }
   }

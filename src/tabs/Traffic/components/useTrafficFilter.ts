@@ -104,7 +104,7 @@ export function useTrafficFilter(requests: NetworkRequest[]) {
 
   const handleInputChange = (
     field: keyof TrafficFilterState,
-    value: string
+    value: string,
   ) => {
     setFilters((prev) => ({
       ...prev,

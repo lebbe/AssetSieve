@@ -8,7 +8,7 @@ export interface CombineImageOptions {
 
 async function loadImageSafely(
   src: string,
-  description: string
+  description: string,
 ): Promise<HTMLImageElement> {
   const img = new Image()
 
@@ -43,7 +43,7 @@ async function loadImageSafely(
     } catch (error) {
       console.warn(
         `[FlippingBook] Failed to load ${description} with CORS ${corsMode}:`,
-        error
+        error,
       )
       // Try next CORS setting
     }
@@ -54,7 +54,7 @@ async function loadImageSafely(
 
 export async function generateCombinedImage(
   flippingBook: FlippingBookPair,
-  options: CombineImageOptions = {}
+  options: CombineImageOptions = {},
 ): Promise<Blob> {
   const { format = 'png', quality = 0.95 } = options
 
@@ -65,7 +65,7 @@ export async function generateCombinedImage(
 
   if (flippingBook.width <= 0 || flippingBook.height <= 0) {
     throw new Error(
-      `Invalid dimensions ${flippingBook.width}x${flippingBook.height} for ${flippingBook.filename}`
+      `Invalid dimensions ${flippingBook.width}x${flippingBook.height} for ${flippingBook.filename}`,
     )
   }
 
@@ -76,7 +76,7 @@ export async function generateCombinedImage(
   // SVG is optional - validate only if present
   if (flippingBook.svg && !flippingBook.svg.url && !flippingBook.svg.base64) {
     throw new Error(
-      `SVG present but no URL or base64 data for ${flippingBook.filename}`
+      `SVG present but no URL or base64 data for ${flippingBook.filename}`,
     )
   }
 
@@ -116,7 +116,7 @@ export async function generateCombinedImage(
     } catch (svgError) {
       console.warn(
         `[FlippingBook] ⚠️ SVG overlay failed to load for ${flippingBook.filename}, proceeding with WebP-only:`,
-        svgError
+        svgError,
       )
       // Continue without SVG - we still have the WebP background
     }
@@ -134,14 +134,14 @@ export async function generateCombinedImage(
         }
       },
       mimeType,
-      quality
+      quality,
     )
   })
 }
 
 export async function downloadCombinedImage(
   flippingBook: FlippingBookPair,
-  options: CombineImageOptions = {}
+  options: CombineImageOptions = {},
 ): Promise<void> {
   const { filename, format = 'png' } = options
 

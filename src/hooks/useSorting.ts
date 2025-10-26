@@ -35,10 +35,10 @@ export function useSorting(filteredImages: ImageData[]) {
       // Preserve existing order but add new images that aren't in manual order yet
       const existingUrls = new Set(manualOrder.map((img) => img.url))
       const newImages = filteredImages.filter(
-        (img) => !existingUrls.has(img.url)
+        (img) => !existingUrls.has(img.url),
       )
       const filteredExisting = manualOrder.filter((img) =>
-        filteredImages.some((filtered) => filtered.url === img.url)
+        filteredImages.some((filtered) => filtered.url === img.url),
       )
 
       if (
@@ -78,7 +78,7 @@ export function useSorting(filteredImages: ImageData[]) {
     if (sortingState.sortBy === 'manual') {
       // Filter manualOrder to only include images that are in filteredImages
       const filteredManualOrder = manualOrder.filter((image) =>
-        filteredImages.some((filtered) => filtered.url === image.url)
+        filteredImages.some((filtered) => filtered.url === image.url),
       )
       return sortingState.reversed
         ? [...filteredManualOrder].reverse()

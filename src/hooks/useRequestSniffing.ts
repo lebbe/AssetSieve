@@ -51,7 +51,7 @@ export function useRequestSniffing() {
     // Cleanup function to remove the listener
     return () => {
       chrome.devtools.network.onRequestFinished.removeListener(
-        onRequestFinished
+        onRequestFinished,
       )
     }
   }, [isListening])

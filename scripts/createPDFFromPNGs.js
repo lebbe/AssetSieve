@@ -82,7 +82,7 @@ async function getFolderPath() {
   try {
     const folderPath = await askQuestion(
       rl,
-      'Enter the path to the folder containing PNG files: '
+      'Enter the path to the folder containing PNG files: ',
     )
     return path.resolve(folderPath)
   } finally {
@@ -108,7 +108,7 @@ async function findPngFiles(folderPath) {
     throw new Error(
       `Failed to read directory: ${
         error instanceof Error ? error.message : String(error)
-      }`
+      }`,
     )
   }
 }
@@ -157,7 +157,7 @@ async function loadImageWithDimensions(imagePath) {
           directError instanceof Error
             ? directError.message
             : String(directError)
-        }`
+        }`,
       )
 
       // Try reading file as buffer and loading from buffer (works better with Unicode paths)
@@ -176,10 +176,10 @@ async function loadImageWithDimensions(imagePath) {
             bufferError instanceof Error
               ? bufferError.message
               : String(bufferError)
-          }`
+          }`,
         )
         throw new Error(
-          `Failed to load image ${imagePath}: Both direct and buffer methods failed`
+          `Failed to load image ${imagePath}: Both direct and buffer methods failed`,
         )
       }
     }
@@ -187,7 +187,7 @@ async function loadImageWithDimensions(imagePath) {
     throw new Error(
       `Failed to load image ${imagePath}: ${
         error instanceof Error ? error.message : String(error)
-      }`
+      }`,
     )
   }
 }
@@ -240,7 +240,7 @@ async function addPngToPage(pdf, imagePath, isFirstPage = false) {
     // Calculate PDF dimensions
     const { pdfWidth, pdfHeight } = calculatePdfDimensions(
       originalWidth,
-      originalHeight
+      originalHeight,
     )
 
     // Add new page (except for the first page)
@@ -273,16 +273,16 @@ async function addPngToPage(pdf, imagePath, isFirstPage = false) {
 
     console.log(
       `Added: ${path.basename(
-        imagePath
+        imagePath,
       )} (${originalWidth}x${originalHeight} -> ${Math.round(
-        pdfWidth
-      )}x${Math.round(pdfHeight)} pts)`
+        pdfWidth,
+      )}x${Math.round(pdfHeight)} pts)`,
     )
   } catch (error) {
     console.error(
       `Failed to add ${imagePath}: ${
         error instanceof Error ? error.message : String(error)
-      }`
+      }`,
     )
     throw error
   }
@@ -373,7 +373,7 @@ async function main() {
     for (let i = 0; i < pngFiles.length; i++) {
       await addPngToPage(pdf, pngFiles[i], i === 0)
       console.log(
-        `Added: ${path.basename(pngFiles[i])} (${i + 1}/${pngFiles.length})`
+        `Added: ${path.basename(pngFiles[i])} (${i + 1}/${pngFiles.length})`,
       )
 
       // Force garbage collection every 50 images to manage memory
@@ -410,7 +410,7 @@ async function main() {
   } catch (error) {
     console.error(
       '\n❌ Error:',
-      error instanceof Error ? error.message : String(error)
+      error instanceof Error ? error.message : String(error),
     )
     process.exit(1)
   }

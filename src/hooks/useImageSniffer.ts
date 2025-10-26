@@ -69,7 +69,7 @@ export function useImageSniffer(requests: NetworkRequest[]) {
     const imageRequestUrls = new Set(
       requests
         .filter((request) => isLikelyImage(request))
-        .map((request) => request.url)
+        .map((request) => request.url),
     )
 
     setImages((prev) => prev.filter((img) => imageRequestUrls.has(img.url)))
@@ -80,11 +80,11 @@ export function useImageSniffer(requests: NetworkRequest[]) {
     if (requests.length === 0) return
 
     const imageRequests = requests.filter(
-      (request) => isLikelyImage(request) && request.chromeRequest
+      (request) => isLikelyImage(request) && request.chromeRequest,
     )
 
     const newImageRequests = imageRequests.filter(
-      (request) => !images.some((img) => img.url === request.url)
+      (request) => !images.some((img) => img.url === request.url),
     )
 
     if (newImageRequests.length === 0) return
@@ -96,7 +96,7 @@ export function useImageSniffer(requests: NetworkRequest[]) {
         const addImageData = (
           width: number | null,
           height: number | null,
-          actualMimeType?: string
+          actualMimeType?: string,
         ) => {
           const imageData: ImageData = {
             url: request.url,
@@ -162,10 +162,10 @@ export function useImageSniffer(requests: NetworkRequest[]) {
                 img.src = dataSrc
               } else {
                 console.error(
-                  'Failed to retrieve image content from background script.'
+                  'Failed to retrieve image content from background script.',
                 )
               }
-            }
+            },
           )
         } else {
           const imageData: ImageData = {

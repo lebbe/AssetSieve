@@ -52,7 +52,7 @@ export function Export({ requests }: ExportProps) {
           `"${request.mimeType.replace(/"/g, '""')}"`,
           request.size,
           request.time.toFixed(2),
-        ].join(',')
+        ].join(','),
       ),
     ].join('\n')
 
@@ -74,7 +74,7 @@ export function Export({ requests }: ExportProps) {
     const data = requests
       .map(
         (request) =>
-          `${request.method} ${request.status} ${request.url} (${request.mimeType}, ${request.size} bytes)`
+          `${request.method} ${request.status} ${request.url} (${request.mimeType}, ${request.size} bytes)`,
       )
       .join('\n')
 

@@ -3,7 +3,7 @@ import { ImageData } from './useImageSniffer'
 
 export function useDragAndDrop(
   sortedImages: ImageData[],
-  setImageOrder: (newOrder: ImageData[]) => void
+  setImageOrder: (newOrder: ImageData[]) => void,
 ) {
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null)
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null)

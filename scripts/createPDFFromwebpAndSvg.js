@@ -85,7 +85,7 @@ async function getFolderPath() {
   try {
     const folderPath = await askQuestion(
       rl,
-      'Enter the path to the folder containing WebP and SVG files: '
+      'Enter the path to the folder containing WebP and SVG files: ',
     )
     return path.resolve(folderPath)
   } finally {
@@ -132,7 +132,7 @@ async function findWebPAndSvgFiles(folderPath) {
     throw new Error(
       `Failed to read directory: ${
         error instanceof Error ? error.message : String(error)
-      }`
+      }`,
     )
   }
 }
@@ -183,7 +183,7 @@ async function loadImageWithDimensions(imagePath) {
         }
       } catch (bufferError) {
         throw new Error(
-          `Failed to load image ${imagePath}: Both direct and buffer methods failed`
+          `Failed to load image ${imagePath}: Both direct and buffer methods failed`,
         )
       }
     }
@@ -191,7 +191,7 @@ async function loadImageWithDimensions(imagePath) {
     throw new Error(
       `Failed to load image ${imagePath}: ${
         error instanceof Error ? error.message : String(error)
-      }`
+      }`,
     )
   }
 }
@@ -244,7 +244,7 @@ async function addCombinedPage(pdf, webpPath, svgPath, isFirstPage = false) {
     // Calculate PDF dimensions
     const { pdfWidth, pdfHeight } = calculatePdfDimensions(
       originalWidth,
-      originalHeight
+      originalHeight,
     )
 
     // Add new page (except for the first page)
@@ -284,7 +284,7 @@ async function addCombinedPage(pdf, webpPath, svgPath, isFirstPage = false) {
       } catch (svgError) {
         console.warn(
           `  ⚠ Failed to load SVG overlay, proceeding with WebP-only:`,
-          svgError instanceof Error ? svgError.message : String(svgError)
+          svgError instanceof Error ? svgError.message : String(svgError),
         )
       }
     }
@@ -297,14 +297,14 @@ async function addCombinedPage(pdf, webpPath, svgPath, isFirstPage = false) {
       `Added: ${path.basename(webpPath)}${
         svgPath ? ' + ' + path.basename(svgPath) : ''
       } (${originalWidth}x${originalHeight} -> ${Math.round(
-        pdfWidth
-      )}x${Math.round(pdfHeight)} pts)`
+        pdfWidth,
+      )}x${Math.round(pdfHeight)} pts)`,
     )
   } catch (error) {
     console.error(
       `Failed to add ${path.basename(webpPath)}: ${
         error instanceof Error ? error.message : String(error)
-      }`
+      }`,
     )
     throw error
   }
@@ -338,7 +338,7 @@ async function getPdfMetadata(defaultFilename) {
     const creator =
       (await askQuestion(
         rl,
-        'Creator (default: AssetSieve WebP+SVG to PDF): '
+        'Creator (default: AssetSieve WebP+SVG to PDF): ',
       )) || 'AssetSieve WebP+SVG to PDF'
 
     return {
@@ -413,7 +413,7 @@ async function main() {
       if ((i + 1) % 50 === 0) {
         if (global.gc) {
           console.log(
-            `🧹 Running garbage collection after ${i + 1} images...\n`
+            `🧹 Running garbage collection after ${i + 1} images...\n`,
           )
           global.gc()
         }
@@ -446,12 +446,12 @@ async function main() {
       `📏 Size: ${Math.round(pdfBuffer.length / 1024)} KB (${(
         pdfBuffer.length /
         (1024 * 1024)
-      ).toFixed(2)} MB)`
+      ).toFixed(2)} MB)`,
     )
   } catch (error) {
     console.error(
       '\n❌ Error:',
-      error instanceof Error ? error.message : String(error)
+      error instanceof Error ? error.message : String(error),
     )
     process.exit(1)
   }
