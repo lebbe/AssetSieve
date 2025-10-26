@@ -1,5 +1,6 @@
 import { PanelCard } from '../../../components/PanelCard'
 import { InputContainer } from '../../../components/InputContainer'
+import { SortButton } from '../../../components/SortButton'
 import { TrafficSortBy, SortDirection } from './useTrafficSorting'
 import './Sorting.css'
 
@@ -36,15 +37,10 @@ export function Sorting({ sortBy, sortDirection, onSort }: SortingProps) {
           </select>
         </InputContainer>
 
-        <button
-          onClick={() => onSort(sortBy)}
-          className="sort-direction-btn"
-          title={`Currently sorting ${
-            sortDirection === 'asc' ? 'ascending' : 'descending'
-          }`}
-        >
-          {sortDirection === 'asc' ? '↑' : '↓'} {sortDirection.toUpperCase()}
-        </button>
+        <SortButton
+          direction={sortDirection}
+          onToggle={() => onSort(sortBy)}
+        />
       </div>
     </PanelCard>
   )

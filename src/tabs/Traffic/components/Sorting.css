@@ -17,17 +17,4 @@
   border-color: #007acc;
 }
 
-.sort-direction-btn {
-  padding: 6px 12px;
-  background: #f8f8f8;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 12px;
-  font-weight: 600;
-  white-space: nowrap;
-}
 
-.sort-direction-btn:hover {
-  background: #e8e8e8;
-}

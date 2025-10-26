@@ -1,5 +1,6 @@
 import { SortBy } from '../../../hooks/useSorting'
 import { InputContainer } from '../../../components/InputContainer'
+import { SortButton } from '../../../components/SortButton'
 
 interface SortingProps {
   sortBy: SortBy
@@ -43,15 +44,11 @@ export function Sorting({
             ))}
           </select>
         </InputContainer>
-        <label className="reverse-checkbox-label">
-          <input
-            type="checkbox"
-            checked={reversed}
-            onChange={(e) => setReversed(e.target.checked)}
-            className="input"
-          />
-          <span className="reverse-checkbox-text">Reverse</span>
-        </label>
+        
+        <SortButton
+          direction={reversed ? 'desc' : 'asc'}
+          onToggle={() => setReversed(!reversed)}
+        />
         <span className="sorting-info">
           {totalImages} image{totalImages !== 1 ? 's' : ''}
         </span>
