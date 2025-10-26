@@ -28,11 +28,6 @@ async function loadImageSafely(
 
         img.onload = () => {
           clearTimeout(timeout)
-          console.log(
-            `[FlippingBook] ${description} loaded with CORS: ${
-              corsMode || 'none'
-            }`
-          )
           resolve()
         }
 
@@ -63,11 +58,6 @@ export async function generateCombinedImage(
 ): Promise<Blob> {
   const { format = 'png', quality = 0.95 } = options
 
-  console.log(
-    '[FlippingBook] Starting combined image generation for:',
-    flippingBook.filename
-  )
-
   // Validate FlippingBook data before processing
   if (!flippingBook.webp) {
     throw new Error(`Missing webp data for ${flippingBook.filename}`)
@@ -90,18 +80,6 @@ export async function generateCombinedImage(
     )
   }
 
-  console.log(
-    `[FlippingBook] Validation passed for ${flippingBook.filename}:`,
-    {
-      dimensions: `${flippingBook.width}x${flippingBook.height}`,
-      webpHasBase64: !!flippingBook.webp.base64,
-      svgHasBase64: !!flippingBook.svg?.base64,
-      webpUrl: flippingBook.webp.url?.substring(0, 50),
-      svgUrl: flippingBook.svg?.url?.substring(0, 50),
-      hasSvg: !!flippingBook.svg,
-    }
-  )
-
   // Create canvas element
   const canvas = document.createElement('canvas')
   const ctx = canvas.getContext('2d')
@@ -111,12 +89,7 @@ export async function generateCombinedImage(
   canvas.width = flippingBook.width
   canvas.height = flippingBook.height
 
-  console.log(
-    '[FlippingBook] Canvas dimensions:',
-    canvas.width,
-    'x',
-    canvas.height
-  )
+  // Canvas ready
 
   // Prepare image sources
   const webpSrc = flippingBook.webp.base64
@@ -124,12 +97,10 @@ export async function generateCombinedImage(
     : flippingBook.webp.url
 
   // Load WebP image (required)
-  console.log('[FlippingBook] Loading WebP:', webpSrc.substring(0, 100) + '...')
   const webpImg = await loadImageSafely(webpSrc, 'WebP background')
 
   // Draw WebP as background
   ctx.drawImage(webpImg, 0, 0, canvas.width, canvas.height)
-  console.log('[FlippingBook] Drew WebP background')
 
   // Try to load and draw SVG overlay (optional)
   if (flippingBook.svg) {
@@ -138,15 +109,10 @@ export async function generateCombinedImage(
       : flippingBook.svg.url
 
     try {
-      console.log(
-        '[FlippingBook] Loading SVG:',
-        svgSrc.substring(0, 100) + '...'
-      )
       const svgImg = await loadImageSafely(svgSrc, 'SVG overlay')
 
       // Draw SVG as overlay on top
       ctx.drawImage(svgImg, 0, 0, canvas.width, canvas.height)
-      console.log('[FlippingBook] Drew SVG overlay')
     } catch (svgError) {
       console.warn(
         `[FlippingBook] ⚠️ SVG overlay failed to load for ${flippingBook.filename}, proceeding with WebP-only:`,
@@ -154,10 +120,6 @@ export async function generateCombinedImage(
       )
       // Continue without SVG - we still have the WebP background
     }
-  } else {
-    console.log(
-      '[FlippingBook] No SVG overlay for this FlippingBook - WebP only'
-    )
   }
 
   // Convert canvas to blob

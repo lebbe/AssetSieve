@@ -61,15 +61,12 @@ async function createNewPage(
   pdf: jsPDF,
   flippingBook: FlippingBookPair
 ): Promise<void> {
-  console.log(`Creating PDF page for: ${flippingBook.filename}`)
-
   // Use the WebP dimensions for the page
   const width = flippingBook.width
   const height = flippingBook.height
 
   // Add a new page with the FlippingBook dimensions
   pdf.addPage([width, height])
-  console.log(`Added page with dimensions: ${width}x${height}`)
 
   // Create canvas for rendering
   const canvas = document.createElement('canvas')
@@ -90,10 +87,8 @@ async function createNewPage(
     ? `data:${flippingBook.webp.mimeType};base64,${flippingBook.webp.base64}`
     : flippingBook.webp.url
 
-  console.log('Loading WebP background...')
   const webpImg = await loadImageSafely(webpSrc, 'WebP background')
   ctx.drawImage(webpImg, 0, 0, width, height)
-  console.log('Drew WebP background')
 
   // Load and draw SVG overlay if present
   if (flippingBook.svg) {
@@ -113,24 +108,19 @@ async function createNewPage(
         svgSrc = flippingBook.svg.url
       }
 
-      console.log('Loading SVG overlay...')
       const svgImg = await loadImageSafely(svgSrc, 'SVG overlay')
       ctx.drawImage(svgImg, 0, 0, width, height)
-      console.log('Drew SVG overlay')
     } catch (error) {
       console.warn(
         'Failed to load SVG overlay, proceeding with WebP-only:',
         error
       )
     }
-  } else {
-    console.log('No SVG overlay for this page')
   }
 
   // Convert canvas to blob and add to PDF
   const canvasDataUrl = canvas.toDataURL('image/png', 0.95)
   pdf.addImage(canvasDataUrl, 'PNG', 0, 0, width, height)
-  console.log('Added combined image to PDF')
 }
 
 export async function createPDF(
@@ -152,9 +142,6 @@ export async function createPDF(
   // Remove the initial blank page that jsPDF creates automatically
   if (pdf.getNumberOfPages() > 0) {
     pdf.deletePage(1) // Delete the first (blank) page
-    console.log(
-      `Removed initial blank page. PDF now has ${pdf.getNumberOfPages()} pages.`
-    )
   }
 
   return pdf

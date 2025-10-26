@@ -6,6 +6,6 @@ chrome.devtools.panels.create(
   'icon16.png', // Icon (optional, using placeholder name)
   'panel.html', // Panel HTML file
   function (_panel: chrome.devtools.panels.ExtensionPanel) {
-    console.log('AssetSieve panel created')
+    // Panel created
   }
 )

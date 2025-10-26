@@ -21,7 +21,13 @@ type Props = {
 
 export function Flippingbook({ requests, removeRequest }: Props) {
   const { images } = useImageSniffer(requests)
-  const { flippingBookPairs, pagePattern, setPagePattern } = useCombiner(images)
+  const {
+    flippingBookPairs,
+    pagePattern,
+    setPagePattern,
+    removeDuplicates,
+    setRemoveDuplicates,
+  } = useCombiner(images)
 
   const {
     sortedFlippingBooks,
@@ -61,6 +67,17 @@ export function Flippingbook({ requests, removeRequest }: Props) {
             title="Regex pattern to match WebP filenames (e.g., page\\d{4}.*\\.webp)"
           />
         </InputContainer>
+
+        <label className="checkbox-label">
+          <input
+            type="checkbox"
+            className="checkbox-input"
+            checked={removeDuplicates}
+            onChange={(e) => setRemoveDuplicates(e.target.checked)}
+            title="Remove duplicate FlippingBooks with identical WebP paths"
+          />
+          <span className="checkbox-text">Remove duplicates</span>
+        </label>
       </PanelCard>
       {flippingBookPairs.length > 0 && (
         <div className="control-panels">
@@ -90,7 +107,15 @@ export function Flippingbook({ requests, removeRequest }: Props) {
           <Export sortedImages={sortedFlippingBooks} />
         </PanelCard>
       )}
-      <h2>Detected FlippingBooks ({sortedFlippingBooks.length})</h2>
+      <h2>
+        Detected FlippingBooks ({sortedFlippingBooks.length})
+        {removeDuplicates && (
+          <span style={{ color: '#007bff', fontSize: '14px' }}>
+            {' '}
+            • Duplicates removed
+          </span>
+        )}
+      </h2>
       {flippingBookPairs.length === 0 ? (
         <div className="no-flippingbooks">
           <p>

@@ -61,8 +61,10 @@ function getPathFromUrl(url: string): string {
 
 export function useCombiner(images: ImageData[]) {
   const [pagePattern, setPagePattern] = useState('page\\d{4}_3\\.webp')
+  const [removeDuplicates, setRemoveDuplicates] = useState(false)
 
-  const flippingBookPairs = useMemo(() => {
+  // First, create all pairs without deduplication
+  const allFlippingBookPairs = useMemo(() => {
     // Create regex from pattern
     let pageRegex: RegExp
     try {
@@ -92,20 +94,7 @@ export function useCombiner(images: ImageData[]) {
     const pairs: FlippingBookPair[] = []
     const usedSvgUrls = new Set<string>()
 
-    console.log(`[FlippingBook] Starting pairing process:`)
-    console.log(`  Found ${webpFiles.length} WebP files matching pattern`)
-    console.log(`  Found ${svgFiles.length} SVG files available`)
-
-    // Log available SVG files for debugging
-    svgFiles.forEach((svg) => {
-      const svgBasename = getBaseFilename(svg.url)
-      const svgPageNumber = extractPageNumber(svgBasename)
-      console.log(
-        `  SVG available: ${svgBasename} (page ${
-          svgPageNumber || 'no-page-number'
-        })`
-      )
-    })
+    // Pairing process starts
 
     // Create FlippingBook pairs for each matching WebP (SVG is optional)
     webpFiles.forEach((webp) => {
@@ -135,17 +124,6 @@ export function useCombiner(images: ImageData[]) {
 
       if (matchingSvg) {
         usedSvgUrls.add(matchingSvg.url)
-        const svgBasename = getBaseFilename(matchingSvg.url)
-        const svgPageNumber = extractPageNumber(svgBasename)
-        console.log(`[FlippingBook] ✓ PAIRED:`)
-        console.log(`  WebP: ${webpBasename} (page ${webpPageNumber})`)
-        console.log(`  SVG:  ${svgBasename} (page ${svgPageNumber})`)
-      } else {
-        console.log(
-          `[FlippingBook] ○ SOLO WebP: ${webpBasename} (page ${
-            webpPageNumber || 'no-page-number'
-          }) - no matching SVG found`
-        )
       }
 
       const displayFilename = webpPageNumber
@@ -173,5 +151,32 @@ export function useCombiner(images: ImageData[]) {
     return pairs
   }, [images, pagePattern])
 
-  return { flippingBookPairs, pagePattern, setPagePattern }
+  // Then, apply deduplication separately so it reacts to checkbox changes
+  const flippingBookPairs = useMemo(() => {
+    if (removeDuplicates) {
+      const seenWebpPaths = new Set<string>()
+      const uniquePairs: FlippingBookPair[] = []
+
+      for (const pair of allFlippingBookPairs) {
+        // Use the full pathname (including filename) for deduplication, but without domain/query
+        const fullPath = new URL(pair.webp.url).pathname
+        if (!seenWebpPaths.has(fullPath)) {
+          seenWebpPaths.add(fullPath)
+          uniquePairs.push(pair)
+        }
+      }
+
+      return uniquePairs
+    }
+
+    return allFlippingBookPairs
+  }, [allFlippingBookPairs, removeDuplicates])
+
+  return {
+    flippingBookPairs,
+    pagePattern,
+    setPagePattern,
+    removeDuplicates,
+    setRemoveDuplicates,
+  }
 }

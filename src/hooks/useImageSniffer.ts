@@ -39,10 +39,6 @@ function isLikelyImage(request: NetworkRequest): boolean {
 
     const hasImageExtension = imageExtensions.some((ext) => url.includes(ext))
 
-    if (hasImageExtension) {
-      console.log(`[AssetSieve] Detected octet-stream image: ${url}`)
-    }
-
     return hasImageExtension
   }
 
