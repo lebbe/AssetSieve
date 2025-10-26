@@ -19,7 +19,7 @@ const getCleanFilename = (url: string): string => {
   } catch {
     // Fallback for relative URLs or malformed URLs
     const filename = url.split('/').pop() || url
-    return filename.split('?')[0] || '' // Remove query parameters
+    return filename.split('?')[0] as string // Remove query parameters
   }
 }
 

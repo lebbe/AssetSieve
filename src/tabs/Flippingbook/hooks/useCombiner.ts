@@ -35,13 +35,13 @@ function extractPageNumber(filename: string): string | null {
   // Match pattern like "0004" (4 digits)
   const directMatch = filename.match(/^(\d{4})$/)
   if (directMatch) {
-    return directMatch[1] || null
+    return directMatch[1] as string
   }
 
   // Match pattern like "page0004_3" -> extract "0004"
   const pageMatch = filename.match(/^page(\d{4})(?:_\d+)?$/)
   if (pageMatch) {
-    return pageMatch[1] || null
+    return pageMatch[1] as string
   }
 
   return null
