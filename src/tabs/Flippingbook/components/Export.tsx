@@ -1,16 +1,36 @@
+import { useState } from 'react'
 import { FlippingBookPair } from '../hooks/useCombiner'
 import '../../../components/Button.css'
 import { createPDF } from '../utils/createNewPage'
+import { InputContainer } from '../../../components/InputContainer'
+import './Export.css'
 
 interface ExportProps {
   sortedImages: FlippingBookPair[]
 }
 
 export function Export({ sortedImages }: ExportProps) {
+  const [pdfTitle, setPdfTitle] = useState('FlippingBook Export')
+  const [filename, setFilename] = useState('flippingbook.pdf')
+  const [author, setAuthor] = useState('')
+  const [creator, setCreator] = useState('')
   async function handleExportToPDF() {
     try {
       const pdf = await createPDF(sortedImages)
-      pdf.save('flippingbook.pdf')
+
+      // Set PDF metadata
+      pdf.setProperties({
+        title: pdfTitle,
+        author: author || 'AssetSieve User',
+        creator: creator || 'AssetSieve FlippingBook Exporter',
+      })
+
+      // Ensure filename has .pdf extension
+      const finalFilename = filename.endsWith('.pdf')
+        ? filename
+        : `${filename}.pdf`
+
+      pdf.save(finalFilename)
     } catch (error) {
       alert(`PDF export failed, check console for more.`)
       console.error('PDF export failed:', {
@@ -55,6 +75,48 @@ export function Export({ sortedImages }: ExportProps) {
 
   return (
     <div className="export-container">
+      <div className="export-metadata">
+        <InputContainer label="PDF Title">
+          <input
+            type="text"
+            value={pdfTitle}
+            onChange={(e) => setPdfTitle(e.target.value)}
+            placeholder="FlippingBook Export"
+            title="Title that will be embedded in the PDF metadata"
+          />
+        </InputContainer>
+
+        <InputContainer label="Creator">
+          <input
+            type="text"
+            value={creator}
+            onChange={(e) => setCreator(e.target.value)}
+            placeholder="Your name (optional)"
+            title="Creator name that will be embedded in the PDF metadata"
+          />
+        </InputContainer>
+
+        <InputContainer label="Author">
+          <input
+            type="text"
+            value={author}
+            onChange={(e) => setAuthor(e.target.value)}
+            placeholder="Your name (optional)"
+            title="Author name that will be embedded in the PDF metadata"
+          />
+        </InputContainer>
+
+        <InputContainer label="Filename">
+          <input
+            type="text"
+            value={filename}
+            onChange={(e) => setFilename(e.target.value)}
+            placeholder="flippingbook.pdf"
+            title="Name of the downloaded PDF file (extension will be added automatically)"
+          />
+        </InputContainer>
+      </div>
+
       <div className="export-actions">
         <button
           onClick={handleExportToPDF}
@@ -82,14 +144,6 @@ export function Export({ sortedImages }: ExportProps) {
         >
           Copy URLs
         </button>
-      </div>
-
-      <div className="export-info">
-        <p className="export-note">
-          FlippingBooks will be combined (WebP + SVG overlay) into a PDF
-          document. Each page will contain one FlippingBook with properly
-          layered images.
-        </p>
       </div>
     </div>
   )
