@@ -53,12 +53,6 @@ export function Sorting({
           Reverse Order
         </label>
       </div>
-
-      <div className="sorting-info">
-        <span className="total-count">
-          {totalImages} FlippingBook{totalImages !== 1 ? 's' : ''}
-        </span>
-      </div>
     </div>
   )
 }
