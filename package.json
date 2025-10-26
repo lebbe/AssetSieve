@@ -8,7 +8,8 @@
     "preview": "vite preview",
     "lint": "oxlint src",
     "type-check": "tsc --noEmit",
-    "pdf-from-pngs": "node --max-old-space-size=8192 --expose-gc scripts/createPDFFromPNGs.js"
+    "pdf-from-pngs": "node --max-old-space-size=8192 --expose-gc scripts/createPDFFromPNGs.js",
+    "pdf-from-webp-svg": "node --max-old-space-size=8192 --expose-gc scripts/createPDFFromwebpAndSvg.js"
   },
   "dependencies": {
     "@types/jszip": "^3.4.0",
