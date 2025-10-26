@@ -149,6 +149,21 @@
   font-weight: 500;
 }
 
+.flippingbook-type--clickable {
+  cursor: pointer;
+  text-decoration: underline;
+  transition: color 0.2s ease;
+}
+
+.flippingbook-type--clickable:hover {
+  color: #0056b3;
+  text-decoration: none;
+}
+
+.flippingbook-type--clickable:active {
+  color: #004085;
+}
+
 /* File Information Styles */
 .flippingbook-files {
   display: flex;
