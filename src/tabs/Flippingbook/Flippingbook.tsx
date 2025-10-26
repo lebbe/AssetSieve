@@ -108,15 +108,7 @@ export function Flippingbook({ requests, removeRequest }: Props) {
           <Export sortedImages={sortedFlippingBooks} />
         </PanelCard>
       )}
-      <h2>
-        Detected FlippingBooks ({sortedFlippingBooks.length})
-        {removeDuplicates && (
-          <span style={{ color: '#007bff', fontSize: '14px' }}>
-            {' '}
-            • Duplicates removed
-          </span>
-        )}
-      </h2>
+      <h2>Detected FlippingBooks ({sortedFlippingBooks.length})</h2>
       {flippingBookPairs.length === 0 ? (
         <div className="no-flippingbooks">
           <p>

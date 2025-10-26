@@ -61,7 +61,7 @@ function getPathFromUrl(url: string): string {
 
 export function useCombiner(images: ImageData[]) {
   const [pagePattern, setPagePattern] = useState('page\\d{4}_3\\.webp')
-  const [removeDuplicates, setRemoveDuplicates] = useState(false)
+  const [removeDuplicates, setRemoveDuplicates] = useState(true)
 
   // First, create all pairs without deduplication
   const allFlippingBookPairs = useMemo(() => {
