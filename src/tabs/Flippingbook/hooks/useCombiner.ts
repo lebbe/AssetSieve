@@ -60,7 +60,7 @@ function getPathFromUrl(url: string): string {
 }
 
 export function useCombiner(images: ImageData[]) {
-  const [pagePattern, setPagePattern] = useState('page\\d{4}.*\\.webp')
+  const [pagePattern, setPagePattern] = useState('page\\d{4}_3\\.webp')
 
   const flippingBookPairs = useMemo(() => {
     // Create regex from pattern
