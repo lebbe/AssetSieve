@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { FlippingBookPair } from './useCombiner'
 
 export type FlippingBookSortBy =
@@ -16,7 +16,7 @@ export function useFlippingBookSorting(flippingBooks: FlippingBookPair[]) {
   const [manualOrder, setManualOrder] = useState<FlippingBookPair[]>([])
 
   // Update manual order when flippingBooks changes
-  useMemo(() => {
+  useEffect(() => {
     if (
       manualOrder.length === 0 ||
       manualOrder.length !== flippingBooks.length

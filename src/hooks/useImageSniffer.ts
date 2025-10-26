@@ -137,8 +137,7 @@ export function useImageSniffer(requests: NetworkRequest[]) {
           }
 
           img.src = dataSrc
-        }
-        if (
+        } else if (
           request.mimeType === 'application/octet-stream' ||
           request.mimeType === 'application/binary' ||
           request.mimeType === ''
@@ -156,7 +155,7 @@ export function useImageSniffer(requests: NetworkRequest[]) {
               if (dataUrl) {
                 const detectedMimeType = detectMimeType(request.url)
 
-                const dataSrc = `data:${detectedMimeType};base64,${content}`
+                const dataSrc = `data:${detectedMimeType};base64,${dataUrl}`
                 const img = new Image()
                 img.onload = () =>
                   addImageData(img.width, img.height, detectedMimeType)
