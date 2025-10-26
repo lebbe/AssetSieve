@@ -121,35 +121,96 @@ export function Export({ sortedImages }: ExportProps) {
         continue
       }
 
+      console.log(`Processing image: ${image.url}`, {
+        mimeType: image.mimeType,
+        hasBase64: !!image.base64,
+        base64Length: image.base64?.length,
+        base64Preview: image.base64?.substring(0, 50),
+      })
+
       // Load image to get dimensions
       const img = new Image()
-      const dataUrl = `data:${image.mimeType};base64,${image.base64}`
+      img.crossOrigin = 'anonymous'
+
+      // Special handling for SVG - check if base64 is actually raw SVG/XML text
+      let dataUrl = `data:${image.mimeType};base64,${image.base64}`
+      if (
+        image.mimeType === 'image/svg+xml' &&
+        (image.base64.trim().startsWith('<svg') ||
+          image.base64.trim().startsWith('<?xml'))
+      ) {
+        // Raw SVG/XML text, need to encode it properly
+        // Use TextEncoder to handle Unicode characters
+        console.log('SVG detected as raw text, encoding...')
+        const encoder = new TextEncoder()
+        const uint8Array = encoder.encode(image.base64)
+        const binaryString = Array.from(uint8Array, (byte) =>
+          String.fromCharCode(byte),
+        ).join('')
+        const encodedSvg = btoa(binaryString)
+        dataUrl = `data:${image.mimeType};base64,${encodedSvg}`
+      }
 
       await new Promise<void>((resolve, reject) => {
-        img.onload = () => {
-          const width = img.width
-          const height = img.height
+        img.onload = async () => {
+          try {
+            const width = img.width || img.naturalWidth
+            const height = img.height || img.naturalHeight
 
-          if (isFirstPage) {
-            // For first page, delete the default page and create one with correct size
-            pdf.deletePage(1)
-            pdf.addPage([width, height])
-            isFirstPage = false
-          } else {
-            // Add new page with image dimensions
-            pdf.addPage([width, height])
+            if (!width || !height) {
+              throw new Error(
+                `Invalid image dimensions: ${width}x${height} for ${image.url}`,
+              )
+            }
+
+            if (isFirstPage) {
+              // For first page, delete the default page and create one with correct size
+              pdf.deletePage(1)
+              pdf.addPage([width, height])
+              isFirstPage = false
+            } else {
+              // Add new page with image dimensions
+              pdf.addPage([width, height])
+            }
+
+            // Convert SVG to PNG via canvas
+            let imageDataUrl = dataUrl
+            let format = getImageFormatForPDF(image.mimeType)
+
+            if (image.mimeType === 'image/svg+xml') {
+              try {
+                // Create canvas and draw SVG on it
+                const canvas = document.createElement('canvas')
+                canvas.width = width
+                canvas.height = height
+                const ctx = canvas.getContext('2d')
+
+                if (!ctx) {
+                  throw new Error('Failed to get canvas context')
+                }
+
+                ctx.drawImage(img, 0, 0, width, height)
+
+                // Convert canvas to PNG data URL
+                imageDataUrl = canvas.toDataURL('image/png')
+                format = 'PNG'
+              } catch (svgError) {
+                console.error('Failed to convert SVG:', svgError)
+                reject(new Error(`Failed to convert SVG: ${image.url}`))
+                return
+              }
+            }
+
+            // Add image to fill the entire page
+            pdf.addImage(imageDataUrl, format, 0, 0, width, height)
+            resolve()
+          } catch (error) {
+            reject(error)
           }
-
-          // Determine image format from MIME type
-          const format = getImageFormatForPDF(image.mimeType)
-
-          // Add image to fill the entire page
-          pdf.addImage(dataUrl, format, 0, 0, width, height)
-          resolve()
         }
 
-        img.onerror = () => {
-          console.error(`Failed to load image: ${image.url}`)
+        img.onerror = (error) => {
+          console.error(`Failed to load image: ${image.url}`, error)
           reject(new Error(`Failed to load image: ${image.url}`))
         }
 
