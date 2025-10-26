@@ -9,7 +9,7 @@
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx",
-    
+
     /* Strict Type-Checking Options */
     "strict": true,
     "noImplicitAny": true,
@@ -19,7 +19,7 @@
     "strictPropertyInitialization": true,
     "noImplicitThis": true,
     "alwaysStrict": true,
-    
+
     /* Additional Checks */
     "noUnusedLocals": true,
     "noUnusedParameters": true,
@@ -31,7 +31,7 @@
     "allowUnusedLabels": false,
     "allowUnreachableCode": false,
     "exactOptionalPropertyTypes": true,
-    
+
     /* Module Resolution */
     "skipLibCheck": true,
     "esModuleInterop": true,
