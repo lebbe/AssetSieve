@@ -114,7 +114,7 @@ export function FlippingbookItem({
 
   async function handleAllDownloads(e: React.MouseEvent) {
     await handleDownloadBoth(e)
-    await new Promise((resolve) => setTimeout(resolve, 100)) // Small delay
+    await new Promise((resolve) => setTimeout(resolve, 150)) // Small delay
     handleClick()
   }
 

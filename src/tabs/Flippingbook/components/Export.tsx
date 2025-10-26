@@ -104,7 +104,7 @@ export function Export({ sortedImages }: ExportProps) {
 
     for (const button of allButtons) {
       ;(button as HTMLButtonElement).click()
-      await new Promise((resolve) => setTimeout(resolve, 50))
+      await new Promise((resolve) => setTimeout(resolve, 200))
     }
   }
 
@@ -116,7 +116,7 @@ export function Export({ sortedImages }: ExportProps) {
     )
     for (const button of allButtons) {
       ;(button as HTMLButtonElement).click()
-      await new Promise((resolve) => setTimeout(resolve, 100))
+      await new Promise((resolve) => setTimeout(resolve, 200))
     }
   }
 
