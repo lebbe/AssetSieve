@@ -76,6 +76,7 @@ export function Export({ sortedImages }: ExportProps) {
     // Add a small delay between downloads to avoid overwhelming the browser
     for (let i = 0; i < sortedImages.length; i++) {
       const image = sortedImages[i]
+      if (image === undefined) continue
       const sequenceNumber = (i + 1).toString().padStart(padding, '0')
       const extension = getFileExtension(image.mimeType, image.url)
       const originalFilename =

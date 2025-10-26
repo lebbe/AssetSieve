@@ -21,6 +21,12 @@ export function useDragAndDrop(
       const newOrder = [...sortedImages]
       const draggedItem = newOrder[draggedIndex]
 
+      if (!draggedItem) {
+        setDraggedIndex(null)
+        setDragOverIndex(null)
+        return
+      }
+
       // Remove the dragged item
       newOrder.splice(draggedIndex, 1)
 

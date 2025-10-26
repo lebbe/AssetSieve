@@ -9,10 +9,30 @@
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx",
+    
+    /* Strict Type-Checking Options */
     "strict": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "strictFunctionTypes": true,
+    "strictBindCallApply": true,
+    "strictPropertyInitialization": true,
+    "noImplicitThis": true,
+    "alwaysStrict": true,
+    
+    /* Additional Checks */
     "noUnusedLocals": true,
     "noUnusedParameters": true,
+    "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
+    "noUncheckedIndexedAccess": true,
+    "noImplicitOverride": true,
+    "noPropertyAccessFromIndexSignature": true,
+    "allowUnusedLabels": false,
+    "allowUnreachableCode": false,
+    "exactOptionalPropertyTypes": true,
+    
+    /* Module Resolution */
     "skipLibCheck": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
