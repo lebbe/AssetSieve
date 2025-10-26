@@ -56,3 +56,26 @@ export function handlePDFExportError(error: unknown): void {
     }`,
   )
 }
+
+type ImageFormat = 'JPEG' | 'PNG' | 'WEBP' | 'GIF'
+export function getImageFormatForPDF(mimeType: string): ImageFormat {
+  const formats: { [key: string]: ImageFormat } = {
+    'image/jpeg': 'JPEG',
+    'image/jpg': 'JPEG',
+    'image/png': 'PNG',
+    'image/webp': 'WEBP',
+    'image/gif': 'GIF',
+  }
+
+  const format = formats[mimeType.toLowerCase()]
+
+  if (!format) {
+    console.error(
+      'Unsupported image MIME type for PDF:',
+      mimeType,
+      '. Falling back to JPEG.',
+    )
+  }
+
+  return format || 'JPEG'
+}

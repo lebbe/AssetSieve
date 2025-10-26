@@ -6,6 +6,7 @@ import { MetadataExport } from '../../../components/MetadataExport'
 import {
   savePDFWithMetadata,
   handlePDFExportError,
+  getImageFormatForPDF,
 } from '../../../utils/pdfExport'
 
 interface ExportProps {
@@ -139,8 +140,11 @@ export function Export({ sortedImages }: ExportProps) {
             pdf.addPage([width, height])
           }
 
+          // Determine image format from MIME type
+          const format = getImageFormatForPDF(image.mimeType)
+
           // Add image to fill the entire page
-          pdf.addImage(dataUrl, 'JPEG', 0, 0, width, height)
+          pdf.addImage(dataUrl, format, 0, 0, width, height)
           resolve()
         }
 
