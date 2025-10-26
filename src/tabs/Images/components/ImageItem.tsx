@@ -42,6 +42,34 @@ export function ImageItem({
 }: Props) {
   const [isDragEnabled, setIsDragEnabled] = useState(false)
 
+  // Handle SVG encoding for preview
+  const getImageDataUrl = () => {
+    if (!image.base64) return ''
+
+    // Check if SVG is raw text that needs encoding
+    if (
+      image.mimeType === 'image/svg+xml' &&
+      (image.base64.trim().startsWith('<svg') ||
+        image.base64.trim().startsWith('<?xml'))
+    ) {
+      try {
+        // Raw SVG/XML text, encode it properly
+        const encoder = new TextEncoder()
+        const uint8Array = encoder.encode(image.base64)
+        const binaryString = Array.from(uint8Array, (byte) =>
+          String.fromCharCode(byte),
+        ).join('')
+        const encodedSvg = btoa(binaryString)
+        return `data:${image.mimeType};base64,${encodedSvg}`
+      } catch (error) {
+        console.error('Failed to encode SVG:', error)
+        return ''
+      }
+    }
+
+    return `data:${image.mimeType};base64,${image.base64}`
+  }
+
   const handleDragStart = (e: React.DragEvent) => {
     e.dataTransfer.effectAllowed = 'move'
     onDragStart?.(index)
@@ -97,7 +125,7 @@ export function ImageItem({
       <div className={`image-thumbnail image-thumbnail--${size}`}>
         {image.base64 ? (
           <img
-            src={`data:${image.mimeType};base64,${image.base64}`}
+            src={getImageDataUrl()}
             alt="Captured image"
             className="thumbnail-img"
           />

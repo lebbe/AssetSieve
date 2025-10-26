@@ -155,7 +155,12 @@ export function useImageSniffer(requests: NetworkRequest[]) {
               if (dataUrl) {
                 const detectedMimeType = detectMimeType(request.url)
 
-                const dataSrc = `data:${detectedMimeType};base64,${dataUrl}`
+                // dataUrl is already a complete data URL, extract just the base64 part
+                const base64Content = dataUrl.includes('base64,')
+                  ? dataUrl.split('base64,')[1]
+                  : dataUrl
+
+                const dataSrc = `data:${detectedMimeType};base64,${base64Content}`
                 const img = new Image()
                 img.onload = () =>
                   addImageData(img.width, img.height, detectedMimeType)
