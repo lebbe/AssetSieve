@@ -79,6 +79,45 @@ export function FlippingbookItem({
     }
   }
 
+  const handleDownloadWebP = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    const link = document.createElement('a')
+    link.href = flippingBook.webp.url
+    link.download = `${flippingBook.filename}.webp`
+    link.target = '_blank'
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+  }
+
+  const handleDownloadSVG = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    if (!flippingBook.svg) return
+
+    const link = document.createElement('a')
+    link.href = flippingBook.svg.url
+    link.download = `${flippingBook.filename}.svg`
+    link.target = '_blank'
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+  }
+
+  async function handleDownloadBoth(e: React.MouseEvent) {
+    handleDownloadWebP(e)
+    // Download SVG if available
+    if (flippingBook.svg) {
+      await new Promise((resolve) => setTimeout(resolve, 100)) // Small delay to avoid browser blocking multiple downloads
+      handleDownloadSVG(e)
+    }
+  }
+
+  async function handleAllDownloads(e: React.MouseEvent) {
+    await handleDownloadBoth(e)
+    await new Promise((resolve) => setTimeout(resolve, 100)) // Small delay
+    handleClick()
+  }
+
   const handleDelete = (e: React.MouseEvent) => {
     e.stopPropagation()
     onDelete?.(flippingBook.webp.url)
@@ -148,40 +187,21 @@ export function FlippingbookItem({
         )}
       </div>
 
-      {showDetails !== 'none' && (
-        <div className="flippingbook-info">
-          <div className="flippingbook-url">{flippingBook.filename}</div>
+      <div className="flippingbook-info">
+        {showDetails !== 'none' && (
+          <>
+            <div className="flippingbook-url">{flippingBook.filename}</div>
 
-          {showDetails === 'full' && (
-            <div className="flippingbook-details">
-              <span
-                className="flippingbook-type flippingbook-type--clickable"
-                onClick={handleClick}
-                role="button"
-                tabIndex={0}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault()
-                    handleClick()
-                  }
-                }}
-                title={
-                  flippingBook.svg
-                    ? 'Click to download combined image'
-                    : 'Click to open WebP image'
-                }
-              >
-                {flippingBook.svg ? 'COMBINED' : 'WEBP-ONLY'}
-              </span>
-              <span className="flippingbook-size">
-                {formatFileSize(flippingBook.size)}
-              </span>
-              {flippingBook.width && flippingBook.height && (
-                <span className="flippingbook-dimensions">
-                  {flippingBook.width}×{flippingBook.height}
+            {showDetails === 'full' && (
+              <>
+                <span className="flippingbook-size">
+                  {formatFileSize(flippingBook.size)}
                 </span>
-              )}
-              <div className="flippingbook-files">
+                {flippingBook.width && flippingBook.height && (
+                  <span className="flippingbook-dimensions">
+                    {flippingBook.width}×{flippingBook.height}
+                  </span>
+                )}
                 <div className="flippingbook-file">
                   <span className="flippingbook-file-label">WebP:</span>
                   <span className="flippingbook-file-name">
@@ -196,20 +216,71 @@ export function FlippingbookItem({
                     </span>
                   </div>
                 )}
-              </div>
-            </div>
-          )}
-        </div>
-      )}
+              </>
+            )}
+          </>
+        )}
+      </div>
 
-      <button
-        className="flippingbook-delete btn btn-red btn--small"
-        onClick={handleDelete}
-        aria-label="Remove flippingbook"
-        title="Remove flippingbook"
-      >
-        ×
-      </button>
+      <div className="downloadButtons">
+        <button
+          className="btn btn-sm btn-blue"
+          onClick={handleClick}
+          aria-label="Download WebP file"
+          title="Download WebP file"
+        >
+          Combined
+        </button>
+        <button
+          className="btn btn-sm btn-blue"
+          onClick={handleDownloadWebP}
+          aria-label="Download WebP file"
+          title="Download WebP file"
+        >
+          WebP
+        </button>
+
+        {flippingBook.svg && (
+          <>
+            <button
+              className="btn btn-sm btn-green"
+              onClick={handleDownloadSVG}
+              aria-label="Download SVG file"
+              title="Download SVG file"
+            >
+              SVG
+            </button>
+            <button
+              className="btn btn-sm"
+              onClick={handleDownloadBoth}
+              aria-label="Download both WebP and SVG files"
+              title="Download both WebP and SVG files"
+            >
+              Both
+            </button>
+          </>
+        )}
+
+        <button
+          className="btn btn-sm btn-green"
+          onClick={handleAllDownloads}
+          aria-label="Download both WebP, SVG and combined png"
+          title="Download both WebP, SVG and combined png"
+        >
+          All
+        </button>
+      </div>
+
+      <div className="flippingbook-actions">
+        <button
+          className="flippingbook-delete btn btn-red btn-sm"
+          onClick={handleDelete}
+          aria-label="Remove flippingbook"
+          title="Remove flippingbook"
+        >
+          ×
+        </button>
+      </div>
     </div>
   )
 }

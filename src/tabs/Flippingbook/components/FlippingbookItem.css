@@ -1,6 +1,7 @@
 /* FlippingbookItem Component Styles - Based on ImageItem.css */
 .flippingbook-item {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 12px;
   padding: 8px 12px;
@@ -165,12 +166,6 @@
 }
 
 /* File Information Styles */
-.flippingbook-files {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  margin-top: 4px;
-}
 
 .flippingbook-file {
   display: flex;
@@ -192,28 +187,27 @@
   font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
 }
 
-/* Delete Button */
-.flippingbook-delete {
-  position: absolute;
-  top: 4px;
-  right: 4px;
-  width: 20px;
-  height: 20px;
-  padding: 0;
-  border-radius: 50%;
-  font-size: 14px;
-  line-height: 1;
+/* Actions Container */
+.flippingbook-actions {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  opacity: 0;
-  transition: opacity 0.2s ease;
+  flex-direction: column;
+  gap: 4px;
+  flex-shrink: 0;
 }
 
-.flippingbook-item:hover .flippingbook-delete {
-  opacity: 1;
+/* Action Buttons */
+.flippingbook-actions .btn {
+  min-width: 50px;
+  font-size: 10px;
+  padding: 4px 6px;
 }
 
-.flippingbook-delete:hover {
-  transform: scale(1.1);
+/* Delete Button (now part of actions) */
+.flippingbook-delete {
+  font-size: 12px;
+}
+
+.downloadButtons {
+  display: flex;
+  gap: 8px;
 }
