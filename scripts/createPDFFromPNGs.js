@@ -24,7 +24,13 @@ const path = require('path')
 const readline = require('readline')
 
 // Import jsPDF for Node.js (requires canvas for server-side rendering)
-let jsPDF, createCanvas, loadImage
+/** @type {typeof import('jspdf').jsPDF} */
+let jsPDF
+/** @type {typeof import('canvas').createCanvas} */
+let createCanvas
+/** @type {typeof import('canvas').loadImage} */
+let loadImage
+
 try {
   const { jsPDF: JsPDF } = require('jspdf')
   const { createCanvas: CreateCanvas, loadImage: LoadImage } = require('canvas')
@@ -39,6 +45,7 @@ try {
 
 /**
  * Creates a readline interface for user input
+ * @returns {import('readline').Interface}
  */
 function createReadlineInterface() {
   return readline.createInterface({
@@ -49,6 +56,9 @@ function createReadlineInterface() {
 
 /**
  * Prompts user for input with a question
+ * @param {import('readline').Interface} rl - readline interface
+ * @param {string} question - question to ask
+ * @returns {Promise<string>}
  */
 function askQuestion(rl, question) {
   return new Promise((resolve) => {
@@ -82,6 +92,8 @@ async function getFolderPath() {
 
 /**
  * Finds all PNG files in the specified folder
+ * @param {string} folderPath - path to folder
+ * @returns {Promise<string[]>}
  */
 async function findPngFiles(folderPath) {
   try {
@@ -93,12 +105,18 @@ async function findPngFiles(folderPath) {
 
     return pngFiles
   } catch (error) {
-    throw new Error(`Failed to read directory: ${error.message}`)
+    throw new Error(
+      `Failed to read directory: ${
+        error instanceof Error ? error.message : String(error)
+      }`
+    )
   }
 }
 
 /**
  * Checks if file exists and is accessible
+ * @param {string} filePath - path to file
+ * @returns {Promise<boolean>}
  */
 async function checkFileExists(filePath) {
   try {
@@ -112,6 +130,8 @@ async function checkFileExists(filePath) {
 /**
  * Loads image and returns both the image object and its dimensions
  * This avoids loading the same image twice for dimensions and rendering
+ * @param {string} imagePath - path to image file
+ * @returns {Promise<{image: import('canvas').Image, width: number, height: number}>}
  */
 async function loadImageWithDimensions(imagePath) {
   try {
@@ -120,9 +140,9 @@ async function loadImageWithDimensions(imagePath) {
     if (!exists) {
       throw new Error(`File not accessible: ${imagePath}`)
     }
-    
+
     console.log(`Loading image: ${imagePath}`)
-    
+
     // Try loading image directly first
     try {
       const image = await loadImage(imagePath)
@@ -132,8 +152,14 @@ async function loadImageWithDimensions(imagePath) {
         height: image.height,
       }
     } catch (directError) {
-      console.log(`Direct load failed: ${directError.message}`)
-      
+      console.log(
+        `Direct load failed: ${
+          directError instanceof Error
+            ? directError.message
+            : String(directError)
+        }`
+      )
+
       // Try reading file as buffer and loading from buffer (works better with Unicode paths)
       try {
         const imageBuffer = await fs.readFile(imagePath)
@@ -145,18 +171,33 @@ async function loadImageWithDimensions(imagePath) {
           height: image.height,
         }
       } catch (bufferError) {
-        console.error(`Buffer load failed: ${bufferError.message}`)
-        throw new Error(`Failed to load image ${imagePath}: Both direct and buffer methods failed`)
+        console.error(
+          `Buffer load failed: ${
+            bufferError instanceof Error
+              ? bufferError.message
+              : String(bufferError)
+          }`
+        )
+        throw new Error(
+          `Failed to load image ${imagePath}: Both direct and buffer methods failed`
+        )
       }
     }
   } catch (error) {
-    throw new Error(`Failed to load image ${imagePath}: ${error.message}`)
+    throw new Error(
+      `Failed to load image ${imagePath}: ${
+        error instanceof Error ? error.message : String(error)
+      }`
+    )
   }
 }
 
 /**
  * Calculates PDF page dimensions with proper scaling
  * Based on the logic from createNewPage.ts
+ * @param {number} originalWidth - original image width
+ * @param {number} originalHeight - original image height
+ * @returns {{pdfWidth: number, pdfHeight: number, scale: number}}
  */
 function calculatePdfDimensions(originalWidth, originalHeight) {
   // Calculate PDF page dimensions (fit within A4 landscape: 297x210mm = ~842x595 points at 72 DPI)
@@ -182,12 +223,19 @@ function calculatePdfDimensions(originalWidth, originalHeight) {
 /**
  * Adds a PNG image to the PDF with proper scaling
  * Uses pre-loaded image to avoid loading the same file twice
+ * @param {import('jspdf').jsPDF} pdf - jsPDF instance
+ * @param {string} imagePath - path to image file
+ * @param {boolean} isFirstPage - whether this is the first page
+ * @returns {Promise<void>}
  */
 async function addPngToPage(pdf, imagePath, isFirstPage = false) {
   try {
     // Load image and get dimensions in one operation
-    const { image, width: originalWidth, height: originalHeight } =
-      await loadImageWithDimensions(imagePath)
+    const {
+      image,
+      width: originalWidth,
+      height: originalHeight,
+    } = await loadImageWithDimensions(imagePath)
 
     // Calculate PDF dimensions
     const { pdfWidth, pdfHeight } = calculatePdfDimensions(
@@ -231,13 +279,19 @@ async function addPngToPage(pdf, imagePath, isFirstPage = false) {
       )}x${Math.round(pdfHeight)} pts)`
     )
   } catch (error) {
-    console.error(`Failed to add ${imagePath}: ${error.message}`)
+    console.error(
+      `Failed to add ${imagePath}: ${
+        error instanceof Error ? error.message : String(error)
+      }`
+    )
     throw error
   }
 }
 
 /**
  * Gets PDF metadata from user input
+ * @param {string} defaultFilename - default filename for PDF
+ * @returns {Promise<{title: string, filename: string, author: string, creator: string}>}
  */
 async function getPdfMetadata(defaultFilename) {
   const rl = createReadlineInterface()
@@ -276,6 +330,7 @@ async function getPdfMetadata(defaultFilename) {
 
 /**
  * Main function
+ * @returns {Promise<void>}
  */
 async function main() {
   try {
@@ -317,8 +372,10 @@ async function main() {
     // Process each PNG file
     for (let i = 0; i < pngFiles.length; i++) {
       await addPngToPage(pdf, pngFiles[i], i === 0)
-      console.log(`Added: ${path.basename(pngFiles[i])} (${i + 1}/${pngFiles.length})`)
-      
+      console.log(
+        `Added: ${path.basename(pngFiles[i])} (${i + 1}/${pngFiles.length})`
+      )
+
       // Force garbage collection every 50 images to manage memory
       if ((i + 1) % 50 === 0) {
         if (global.gc) {
@@ -351,7 +408,10 @@ async function main() {
     console.log(`📊 Pages: ${pngFiles.length}`)
     console.log(`📏 Size: ${Math.round(pdfBuffer.length / 1024)} KB`)
   } catch (error) {
-    console.error('\n❌ Error:', error.message)
+    console.error(
+      '\n❌ Error:',
+      error instanceof Error ? error.message : String(error)
+    )
     process.exit(1)
   }
 }
