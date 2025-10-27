@@ -78,7 +78,7 @@ AssetSieve intelligently pairs these assets together and enables you to export y
 
 #### Step 2: Configure Detection Settings
 
-1. **Page Pattern**: Adjust the regex pattern if needed (default: `page\\d{4}_3\\.webp`)
+1. **Page Pattern**: Adjust the regex pattern if needed (default: `page\d{4}_3\.webp`)
    - This helps AssetSieve identify which images are magazine pages
    - Most FlippingBook publications use the default pattern
 2. **Remove Duplicates**: Check this option to avoid duplicate pages with identical paths
