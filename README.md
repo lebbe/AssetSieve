@@ -34,10 +34,9 @@ _AssetSieve in action: The extension interface shows captured Pokémon images wi
 
 ### Step 2: Start Collecting Images
 
-1. Click the **"Start Listening"** button (green button)
-2. Browse the website normally - scroll, click, navigate pages
-3. Watch as AssetSieve automatically captures images in the background
-4. Click **"Stop Listening"** (red button) when you're done
+1. Browse the website normally - scroll, click, navigate pages
+2. Watch as AssetSieve automatically captures images in the background (the network sniffer is on by default)
+3. Click **"Stop Listening"** (red button) when you're done collecting images
 
 ### Step 3: Organize Your Images
 
@@ -86,11 +85,11 @@ AssetSieve intelligently pairs these assets together and enables you to export y
 
 #### Step 3: Browse and Capture
 
-1. Click **"Start Listening"** in AssetSieve
-2. Browse through the FlippingBook publication normally
-3. Turn pages, zoom, and navigate as you would typically read
-4. AssetSieve automatically captures page assets in the background
-5. Watch the FlippingBook counter increase as pages are detected
+1. Browse through the FlippingBook publication normally (the network sniffer is on by default)
+2. Turn pages, zoom, and navigate as you would typically read
+3. AssetSieve automatically captures page assets in the background
+4. Watch the FlippingBook counter increase as pages are detected
+5. Click **"Stop Listening"** when you're done capturing pages
 
 #### Step 4: Review and Organize
 
@@ -140,7 +139,6 @@ AssetSieve intelligently pairs these assets together and enables you to export y
 
 ## Tips for Best Results
 
-- **Start listening before browsing**: Turn on image capture before navigating to ensure you don't miss anything
 - **Use filters wisely**: Set minimum dimensions (like 500×500 pixels) to exclude tiny icons and buttons
 - **Check the order**: Images might not load in the order you expect - use the drag-and-drop feature to fix the sequence
 - **Clear between sessions**: Use "Clear Images" to start fresh when moving to a different website or section
