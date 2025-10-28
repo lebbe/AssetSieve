@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import type jsPDF from 'jspdf'
 import { FlippingBookPair } from '../hooks/useCombiner'
 import '../../../components/Button.css'
 
@@ -16,6 +17,22 @@ interface ExportProps {
   sortedImages: FlippingBookPair[]
 }
 
+/**
+ * Dynamically loads jsPDF library
+ */
+async function loadJsPDF() {
+  const jsPDFModule = await import('jspdf')
+  return jsPDFModule.default
+}
+
+/**
+ * Dynamically loads JSZip library
+ */
+async function loadJSZip() {
+  const JSZipModule = await import('jszip')
+  return JSZipModule.default
+}
+
 export function Export({ sortedImages }: ExportProps) {
   const { pdfTitle, filename, author, creator, setters } = useMetadataExport()
   const [exportedPages, setExportedPages] = useState(0)
@@ -25,10 +42,9 @@ export function Export({ sortedImages }: ExportProps) {
 
   async function createPDF(
     flippingBookPages: FlippingBookPair[],
-  ): Promise<any> {
+  ): Promise<jsPDF> {
     // Dynamically import jsPDF to reduce initial bundle size
-    const jsPDFModule = await import('jspdf')
-    const jsPDF = jsPDFModule.default
+    const jsPDF = await loadJsPDF()
     const pdf = new jsPDF()
     setExportedPages(0)
 
@@ -119,8 +135,7 @@ export function Export({ sortedImages }: ExportProps) {
     setDownloadProgress(0)
 
     // Dynamically import JSZip to reduce initial bundle size
-    const JSZipModule = await import('jszip')
-    const JSZip = JSZipModule.default
+    const JSZip = await loadJSZip()
     const zip = new JSZip()
     const webpFolder = zip.folder('webp')
     const svgFolder = zip.folder('svg')
@@ -212,8 +227,7 @@ export function Export({ sortedImages }: ExportProps) {
 
     try {
       // Dynamically import JSZip to reduce initial bundle size
-      const JSZipModule = await import('jszip')
-      const JSZip = JSZipModule.default
+      const JSZip = await loadJSZip()
       const zip = new JSZip()
 
       let processed = 0

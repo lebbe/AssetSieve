@@ -1,4 +1,4 @@
-type jsPDF = any
+import type jsPDF from 'jspdf'
 
 /**
  * Metadata for PDF export
