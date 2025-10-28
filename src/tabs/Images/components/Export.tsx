@@ -7,13 +7,23 @@ import {
   handlePDFExportError,
   getImageFormatForPDF,
 } from '../../../utils/pdfExport'
+import { useState } from 'react'
 
 interface ExportProps {
   sortedImages: ImageData[]
+  onSendToMagForge: (images: ImageData[]) => void
+  countUniqueImages: (images: ImageData[]) => number
 }
 
-export function Export({ sortedImages }: ExportProps) {
+export function Export({
+  sortedImages,
+  onSendToMagForge,
+  countUniqueImages,
+}: ExportProps) {
+  const [isShaking, setIsShaking] = useState(false)
   const { pdfTitle, filename, author, creator, setters } = useMetadataExport()
+
+  const uniqueImageCount = countUniqueImages(sortedImages)
   const getFileExtension = (mimeType: string, url: string) => {
     // Try to get extension from MIME type first
     const mimeExtensions: { [key: string]: string } = {
@@ -242,6 +252,18 @@ export function Export({ sortedImages }: ExportProps) {
     }
   }
 
+  const handleSendToMagForge = () => {
+    if (sortedImages.length === 0) {
+      return
+    }
+
+    onSendToMagForge(sortedImages)
+
+    // Trigger shake animation
+    setIsShaking(true)
+    setTimeout(() => setIsShaking(false), 500)
+  }
+
   return (
     <div className="export-container">
       <MetadataExport
@@ -265,6 +287,18 @@ export function Export({ sortedImages }: ExportProps) {
           disabled={sortedImages.length === 0}
         >
           Export to PDF ({sortedImages.length})
+        </button>
+        <button
+          onClick={handleSendToMagForge}
+          className={`btn btn-blue btn-lg ${isShaking ? 'shake' : ''}`}
+          disabled={uniqueImageCount === 0}
+          title={
+            uniqueImageCount === 0
+              ? 'All images already in MagForge'
+              : `Add ${uniqueImageCount} new image${uniqueImageCount !== 1 ? 's' : ''} to MagForge`
+          }
+        >
+          Send to MagForge ({uniqueImageCount})
         </button>
       </div>
     </div>
