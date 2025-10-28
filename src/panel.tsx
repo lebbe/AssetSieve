@@ -80,7 +80,7 @@ function Panel() {
   )
   return (
     <div>
-      <h1>AssetSieve</h1>
+      <h1 className="sr-only">AssetSieve</h1>
       <PanelCard title="Network">
         <div className="controls">
           <button

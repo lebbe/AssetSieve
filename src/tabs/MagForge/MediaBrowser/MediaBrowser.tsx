@@ -20,7 +20,10 @@ export function MediaBrowser({ images, usedImageUrls }: Props) {
   const filteredImages = useMemo(() => {
     return images.filter((image) => {
       // Name filter
-      if (nameFilter && !image.url.toLowerCase().includes(nameFilter.toLowerCase())) {
+      if (
+        nameFilter &&
+        !image.url.toLowerCase().includes(nameFilter.toLowerCase())
+      ) {
         return false
       }
 
@@ -44,7 +47,15 @@ export function MediaBrowser({ images, usedImageUrls }: Props) {
 
       return true
     })
-  }, [images, nameFilter, minWidth, minHeight, showVectorOnly, hideUsedImages, usedImageUrls])
+  }, [
+    images,
+    nameFilter,
+    minWidth,
+    minHeight,
+    showVectorOnly,
+    hideUsedImages,
+    usedImageUrls,
+  ])
 
   return (
     <div className="media-browser">

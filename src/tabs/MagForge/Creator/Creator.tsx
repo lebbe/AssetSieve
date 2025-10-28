@@ -1,87 +1,126 @@
 import { useState } from 'react'
-import { ImageData } from '../../../hooks/useImageSniffer'
+import { FormatName, getFormatDimensions } from './utils/pdfFormats'
+import { Page, PlacedImage } from './types/page'
+import { Toolbar } from './components/Toolbar'
+import { Pagination } from './components/Pagination'
+import { Canvas } from './components/Canvas'
 import './Creator.css'
 
-type DropEvent = {
-  image: ImageData
-  timestamp: number
-  position: { x: number; y: number }
-}
-
 export function Creator() {
-  const [dropEvents, setDropEvents] = useState<DropEvent[]>([])
-  const [isDragOver, setIsDragOver] = useState(false)
+  const [selectedFormat, setSelectedFormat] =
+    useState<FormatName>('A4 Portrait')
+  const [width, setWidth] = useState<number>(
+    getFormatDimensions('A4 Portrait').width,
+  )
+  const [height, setHeight] = useState<number>(
+    getFormatDimensions('A4 Portrait').height,
+  )
+  const [magazineName, setMagazineName] = useState('')
+  const [creatorName, setCreatorName] = useState('')
+  const [pages, setPages] = useState<Page[]>([{ id: '1', images: [] }])
+  const [currentPageIndex, setCurrentPageIndex] = useState(0)
+  const [zoom, setZoom] = useState(1)
 
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault()
-    e.dataTransfer.dropEffect = 'copy'
-    setIsDragOver(true)
+  const currentPage = pages[currentPageIndex]
+
+  const handleZoomIn = () => {
+    setZoom((prev) => Math.min(prev + 0.25, 3)) // Max 300%
   }
 
-  const handleDragLeave = () => {
-    setIsDragOver(false)
+  const handleZoomOut = () => {
+    setZoom((prev) => Math.max(prev - 0.25, 0.25)) // Min 25%
   }
 
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault()
-    setIsDragOver(false)
+  const handleZoomReset = () => {
+    setZoom(1)
+  }
 
-    try {
-      const data = e.dataTransfer.getData('application/json')
-      const image = JSON.parse(data) as ImageData
+  const handlePageChange = (pageNumber: number) => {
+    setCurrentPageIndex(pageNumber - 1)
+  }
 
-      const rect = e.currentTarget.getBoundingClientRect()
-      const x = e.clientX - rect.left
-      const y = e.clientY - rect.top
-
-      const dropEvent: DropEvent = {
-        image,
-        timestamp: Date.now(),
-        position: { x, y },
-      }
-
-      setDropEvents((prev) => [...prev, dropEvent])
-
-      console.log('Image dropped:', {
-        url: image.url,
-        position: { x, y },
-        size: image.size,
-        dimensions: `${image.width}x${image.height}`,
-      })
-    } catch (error) {
-      console.error('Failed to parse dropped data:', error)
+  const handleAddPage = () => {
+    const newPage: Page = {
+      id: `${Date.now()}`,
+      images: [],
     }
+    setPages([...pages, newPage])
+    setCurrentPageIndex(pages.length) // Go to new page
+  }
+
+  const handleDeletePage = () => {
+    if (pages.length > 1) {
+      const newPages = pages.filter((_, index) => index !== currentPageIndex)
+      setPages(newPages)
+      // Adjust current page if needed
+      if (currentPageIndex >= newPages.length) {
+        setCurrentPageIndex(newPages.length - 1)
+      }
+    }
+  }
+
+  const handleImagesChange = (images: PlacedImage[]) => {
+    const newPages = [...pages]
+    if (currentPage) {
+      newPages[currentPageIndex] = { ...currentPage, images }
+      setPages(newPages)
+    }
+  }
+
+  const handleExport = () => {
+    console.log('Exporting PDF...', {
+      magazineName,
+      creatorName,
+      width,
+      height,
+      pages: pages.length,
+    })
+    alert('PDF export not yet implemented')
+  }
+
+  const handleDoubleResolution = () => {
+    setWidth(width * 2)
+    setHeight(height * 2)
   }
 
   return (
     <div className="creator">
       <h3 className="sr-only">Creator</h3>
-      <div
-        className={`creator-drop-zone ${isDragOver ? 'creator-drop-zone--active' : ''}`}
-        onDragOver={handleDragOver}
-        onDragLeave={handleDragLeave}
-        onDrop={handleDrop}
-      >
-        {dropEvents.length === 0 ? (
-          <p className="creator-placeholder">Drag images here to create your magazine</p>
-        ) : (
-          <div className="creator-events">
-            <h4>Drop Events ({dropEvents.length})</h4>
-            {dropEvents.map((event, index) => (
-              <div key={index} className="creator-event">
-                <span className="event-number">{index + 1}</span>
-                <img src={event.image.url} alt="" className="event-thumbnail" />
-                <div className="event-details">
-                  <div className="event-url">{event.image.url.split('/').pop()}</div>
-                  <div className="event-position">
-                    Position: ({Math.round(event.position.x)}, {Math.round(event.position.y)})
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
+
+      <Toolbar
+        selectedFormat={selectedFormat}
+        onFormatChange={setSelectedFormat}
+        width={width}
+        onWidthChange={setWidth}
+        height={height}
+        onHeightChange={setHeight}
+        magazineName={magazineName}
+        onMagazineNameChange={setMagazineName}
+        creatorName={creatorName}
+        onCreatorNameChange={setCreatorName}
+        onExport={handleExport}
+        onDoubleResolution={handleDoubleResolution}
+      />
+
+      <Pagination
+        currentPage={currentPageIndex + 1}
+        totalPages={pages.length}
+        onPageChange={handlePageChange}
+        onAddPage={handleAddPage}
+        onDeletePage={handleDeletePage}
+        zoom={zoom}
+        onZoomIn={handleZoomIn}
+        onZoomOut={handleZoomOut}
+        onZoomReset={handleZoomReset}
+      />
+
+      <Canvas
+        width={width}
+        height={height}
+        images={currentPage?.images || []}
+        onImagesChange={handleImagesChange}
+        userZoom={zoom}
+      />
     </div>
   )
 }
