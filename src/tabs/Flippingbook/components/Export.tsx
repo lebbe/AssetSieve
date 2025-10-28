@@ -4,9 +4,7 @@ import '../../../components/Button.css'
 
 import './Export.css'
 import { Spinner } from './Spinner'
-import jsPDF from 'jspdf'
 import { createNewPage } from '../utils/createNewPage'
-import JSZip from 'jszip'
 import { useMetadataExport } from '../../../hooks/useMetadataExport'
 import { MetadataExport } from '../../../components/MetadataExport'
 import {
@@ -27,7 +25,10 @@ export function Export({ sortedImages }: ExportProps) {
 
   async function createPDF(
     flippingBookPages: FlippingBookPair[],
-  ): Promise<jsPDF> {
+  ): Promise<any> {
+    // Dynamically import jsPDF to reduce initial bundle size
+    const jsPDFModule = await import('jspdf')
+    const jsPDF = jsPDFModule.default
     const pdf = new jsPDF()
     setExportedPages(0)
 
@@ -117,6 +118,9 @@ export function Export({ sortedImages }: ExportProps) {
     setIsDownloading(true)
     setDownloadProgress(0)
 
+    // Dynamically import JSZip to reduce initial bundle size
+    const JSZipModule = await import('jszip')
+    const JSZip = JSZipModule.default
     const zip = new JSZip()
     const webpFolder = zip.folder('webp')
     const svgFolder = zip.folder('svg')
@@ -207,6 +211,9 @@ export function Export({ sortedImages }: ExportProps) {
     setDownloadProgress(0)
 
     try {
+      // Dynamically import JSZip to reduce initial bundle size
+      const JSZipModule = await import('jszip')
+      const JSZip = JSZipModule.default
       const zip = new JSZip()
 
       let processed = 0

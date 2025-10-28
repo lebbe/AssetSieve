@@ -1,5 +1,6 @@
-import jsPDF from 'jspdf'
 import { FlippingBookPair } from '../hooks/useCombiner'
+
+type jsPDF = any
 
 /**
  * Safely loads an image with CORS handling
