@@ -1,0 +1,52 @@
+.media-browser-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 4px;
+}
+
+.media-browser-item {
+  position: relative;
+  cursor: grab;
+  border-radius: 4px;
+  overflow: hidden;
+  border: 2px solid transparent;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.media-browser-item:hover {
+  border-color: #007bff;
+  transform: scale(1.05);
+}
+
+.media-browser-item:active {
+  cursor: grabbing;
+}
+
+.media-browser-item--used {
+  opacity: 0.5;
+}
+
+.media-browser-item--used:hover {
+  opacity: 0.7;
+}
+
+.media-browser-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.used-badge {
+  position: absolute;
+  bottom: 4px;
+  right: 4px;
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-size: 10px;
+  font-weight: 600;
+}

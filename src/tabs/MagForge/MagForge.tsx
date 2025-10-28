@@ -1,4 +1,7 @@
+import { useMemo } from 'react'
 import { ImageData } from '../../hooks/useImageSniffer'
+import { MediaBrowser } from './MediaBrowser/MediaBrowser'
+import { Creator } from './Creator/Creator'
 
 import './MagForge.css'
 
@@ -10,22 +13,20 @@ type Props = {
 export function MagForge({ importedImages, deleteImage }: Props) {
   const magazineImages = importedImages || []
 
+  // For now, we'll track used images as an empty set
+  // Later this will come from the Creator's state
+  const usedImageUrls = useMemo(() => new Set<string>(), [])
+
   return (
     <div className="magforge">
-      <h2>Hello world</h2>
-      <p>Magazine images stored independently: {magazineImages.length}</p>
-      {magazineImages.length === 0 ? (
-        <p>
-          No images yet. Go to the Images tab and click "Send to MagForge" to
-          add images.
-        </p>
-      ) : (
-        magazineImages.map((img, index) => (
-          <div key={index} className="magazine-image">
-            <img src={img.url} alt={`MagForge Image ${index + 1}`} />
-          </div>
-        ))
-      )}
+      <div className="magforge-layout">
+        <div className="magforge-media">
+          <MediaBrowser images={magazineImages} usedImageUrls={usedImageUrls} />
+        </div>
+        <div className="magforge-creator">
+          <Creator />
+        </div>
+      </div>
     </div>
   )
 }
