@@ -24,3 +24,32 @@ jobs:
 
       - name: Run QA checks
         run: npm run qa
+
+      - name: Build project
+        run: npm run build
+
+      - name: Check bundle size
+        run: |
+          # Calculate total bundle size in bytes
+          BUNDLE_SIZE=$(du -b dist/ | tail -1 | awk '{print $1}')
+
+          # Convert to MB for display
+          BUNDLE_SIZE_MB=$(echo "scale=2; $BUNDLE_SIZE / 1024 / 1024" | bc)
+
+          # Threshold: 1 MB = 1048576 bytes
+          THRESHOLD=1048576
+
+          echo "📦 Total bundle size: ${BUNDLE_SIZE_MB} MB (${BUNDLE_SIZE} bytes)"
+          echo ""
+          echo "📊 Individual file sizes:"
+          ls -lh dist/ | grep -v '^d' | awk '{if(NR>1) print "  " $9 ": " $5}'
+
+          if [ $BUNDLE_SIZE -gt $THRESHOLD ]; then
+            echo ""
+            echo "⚠️  WARNING: Bundle size (${BUNDLE_SIZE_MB} MB) exceeds 1 MB threshold!"
+            echo "❌ Bundle size check FAILED"
+            exit 1
+          else
+            echo ""
+            echo "✅ Bundle size check PASSED (under 1 MB threshold)"
+          fi
