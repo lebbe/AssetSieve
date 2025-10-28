@@ -1,6 +1,5 @@
 import { ImageData } from '../../../hooks/useImageSniffer'
 import '../../../components/Button.css'
-import { jsPDF } from 'jspdf'
 import { useMetadataExport } from '../../../hooks/useMetadataExport'
 import { MetadataExport } from '../../../components/MetadataExport'
 import {
@@ -105,6 +104,9 @@ export function Export({ sortedImages }: ExportProps) {
     if (sortedImages.length === 0) {
       throw new Error('No images to export')
     }
+
+    // Dynamically import jsPDF to reduce initial bundle size
+    const { jsPDF } = await import('jspdf')
 
     const pdf = new jsPDF({
       orientation: 'portrait',
