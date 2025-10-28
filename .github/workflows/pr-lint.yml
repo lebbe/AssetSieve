@@ -31,7 +31,7 @@ jobs:
       - name: Check bundle size
         run: |
           # Calculate total bundle size in bytes
-          BUNDLE_SIZE=$(du -b dist/ | tail -1 | awk '{print $1}')
+          BUNDLE_SIZE=$(du -sb dist/ | cut -f1)
 
           # Convert to MB for display
           BUNDLE_SIZE_MB=$(echo "scale=2; $BUNDLE_SIZE / 1024 / 1024" | bc)
@@ -42,7 +42,7 @@ jobs:
           echo "📦 Total bundle size: ${BUNDLE_SIZE_MB} MB (${BUNDLE_SIZE} bytes)"
           echo ""
           echo "📊 Individual file sizes:"
-          ls -lh dist/ | grep -v '^d' | awk '{if(NR>1) print "  " $9 ": " $5}'
+          find dist/ -type f -exec ls -lh {} + | awk '{print "  " $9 ": " $5}'
 
           if [ $BUNDLE_SIZE -gt $THRESHOLD ]; then
             echo ""
