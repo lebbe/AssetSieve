@@ -1,5 +1,7 @@
 import { InputContainer } from './InputContainer'
 
+import './MetadataExport.css'
+
 type Props = {
   pdfTitle: string
   filename: string

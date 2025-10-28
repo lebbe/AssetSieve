@@ -267,14 +267,6 @@ export function Export({ sortedImages }: ExportProps) {
           Export to PDF ({sortedImages.length})
         </button>
       </div>
-      <span className="export-info">
-        Images will be numbered{' '}
-        {sortedImages.length > 0
-          ? `01-${sortedImages.length
-              .toString()
-              .padStart(getZeroPadding(sortedImages.length), '0')}`
-          : ''}
-      </span>
     </div>
   )
 }
