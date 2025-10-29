@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useCallback } from 'react'
 import { PlacedImage as PlacedImageType } from '../types/page'
 import './PlacedImage.css'
 
@@ -48,40 +48,43 @@ export function PlacedImage({
     }
   }
 
-  const handleMouseMove = (e: MouseEvent) => {
-    if (isDragging) {
-      const dx = (e.clientX - dragStart.current.x) / scale
-      const dy = (e.clientY - dragStart.current.y) / scale
-      onUpdate({
-        ...placedImage,
-        x: dragStart.current.imageX + dx,
-        y: dragStart.current.imageY + dy,
-      })
-    } else if (isResizing) {
-      const dx = (e.clientX - resizeStart.current.x) / scale
+  const handleMouseMove = useCallback(
+    (e: MouseEvent) => {
+      if (isDragging) {
+        const dx = (e.clientX - dragStart.current.x) / scale
+        const dy = (e.clientY - dragStart.current.y) / scale
+        onUpdate({
+          ...placedImage,
+          x: dragStart.current.imageX + dx,
+          y: dragStart.current.imageY + dy,
+        })
+      } else if (isResizing) {
+        const dx = (e.clientX - resizeStart.current.x) / scale
 
-      // Maintain aspect ratio
-      // Use the current placed dimensions if original image dimensions are invalid (e.g., SVG)
-      let aspectRatio = placedImage.image.width / placedImage.image.height
-      if (!isFinite(aspectRatio) || aspectRatio <= 0) {
-        aspectRatio = placedImage.width / placedImage.height
+        // Maintain aspect ratio
+        // Use the current placed dimensions if original image dimensions are invalid (e.g., SVG)
+        let aspectRatio = placedImage.image.width / placedImage.image.height
+        if (!isFinite(aspectRatio) || aspectRatio <= 0) {
+          aspectRatio = placedImage.width / placedImage.height
+        }
+
+        const newWidth = Math.max(50, resizeStart.current.width + dx)
+        const newHeight = newWidth / aspectRatio
+
+        onUpdate({
+          ...placedImage,
+          width: newWidth,
+          height: newHeight,
+        })
       }
+    },
+    [isDragging, isResizing, scale, placedImage, onUpdate],
+  )
 
-      const newWidth = Math.max(50, resizeStart.current.width + dx)
-      const newHeight = newWidth / aspectRatio
-
-      onUpdate({
-        ...placedImage,
-        width: newWidth,
-        height: newHeight,
-      })
-    }
-  }
-
-  const handleMouseUp = () => {
+  const handleMouseUp = useCallback(() => {
     setIsDragging(false)
     setIsResizing(false)
-  }
+  }, [])
 
   // Attach global mouse listeners when dragging/resizing
   useEffect(() => {
@@ -94,7 +97,7 @@ export function PlacedImage({
       }
     }
     return undefined
-  }, [isDragging, isResizing, scale])
+  }, [isDragging, isResizing, handleMouseMove, handleMouseUp])
 
   return (
     <div

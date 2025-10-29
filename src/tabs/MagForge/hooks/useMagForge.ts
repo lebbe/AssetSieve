@@ -1,8 +1,14 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { ImageData } from '../../../hooks/useImageSniffer'
 
 export function useMagForge() {
   const [magForgeImages, setMagForgeImages] = useState<ImageData[]>([])
+
+  // Memoize the set of existing URLs to avoid recalculating on every countUniqueImages call
+  const existingUrls = useMemo(
+    () => new Set(magForgeImages.map((img) => img.url)),
+    [magForgeImages],
+  )
 
   const setUniqueMagForgeImages = (newImages: ImageData[]) => {
     setMagForgeImages((prev) => {
@@ -19,7 +25,6 @@ export function useMagForge() {
   }
 
   const countUniqueImages = (candidateImages: ImageData[]) => {
-    const existingUrls = new Set(magForgeImages.map((img) => img.url))
     return candidateImages.filter((img) => !existingUrls.has(img.url)).length
   }
 
