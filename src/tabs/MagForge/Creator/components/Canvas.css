@@ -1,0 +1,35 @@
+.canvas-container {
+  flex: 1;
+  background: #e9ecef;
+  border-radius: 8px;
+  padding: 20px;
+  overflow: auto;
+  position: relative;
+  outline: none;
+}
+
+.canvas-container--drag-over {
+  background: #d3e7ff;
+}
+
+.canvas-wrapper {
+  display: inline-block;
+}
+
+.canvas {
+  position: relative;
+  background: white;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border-radius: 2px;
+}
+
+.canvas-placeholder {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #999;
+  font-size: 14px;
+  text-align: center;
+  pointer-events: none;
+}

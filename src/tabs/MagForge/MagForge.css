@@ -1,0 +1,28 @@
+.magforge {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
+.magforge-layout {
+  display: grid;
+  grid-template-columns: 350px 1fr;
+  gap: 16px;
+  flex: 1;
+  overflow: hidden;
+}
+
+.magforge-media {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-right: 1px solid #e0e0e0;
+  padding-right: 16px;
+}
+
+.magforge-creator {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
