@@ -21,6 +21,30 @@ export function Canvas({
   const [isDragOver, setIsDragOver] = useState(false)
   const [selectedImageId, setSelectedImageId] = useState<string | null>(null)
 
+  // Helper to extract aspect ratio from SVG viewBox
+  const getAspectRatioFromSVG = async (
+    url: string,
+  ): Promise<number | null> => {
+    try {
+      const response = await fetch(url)
+      const svgText = await response.text()
+      const viewBoxMatch = svgText.match(/viewBox=["']([^"']+)["']/)
+      if (viewBoxMatch && viewBoxMatch[1]) {
+        const values = viewBoxMatch[1].split(/\s+/)
+        if (values.length === 4 && values[2] && values[3]) {
+          const vbWidth = parseFloat(values[2])
+          const vbHeight = parseFloat(values[3])
+          if (vbWidth > 0 && vbHeight > 0) {
+            return vbWidth / vbHeight
+          }
+        }
+      }
+    } catch (error) {
+      console.warn('Failed to parse SVG viewBox:', error)
+    }
+    return null
+  }
+
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault()
     e.dataTransfer.dropEffect = 'copy'
@@ -31,7 +55,7 @@ export function Canvas({
     setIsDragOver(false)
   }
 
-  const handleDrop = (e: React.DragEvent) => {
+  const handleDrop = async (e: React.DragEvent) => {
     e.preventDefault()
     setIsDragOver(false)
 
@@ -57,9 +81,20 @@ export function Canvas({
         placedWidth = image.width
         placedHeight = image.height
       } else {
-        // SVG or unknown size - use decent default that fits canvas
+        // SVG or unknown size - try to get aspect ratio from viewBox
+        const isSVG = image.mimeType.includes('svg')
+        let aspectRatio = 1 // Default to square
+
+        if (isSVG) {
+          const svgAspectRatio = await getAspectRatioFromSVG(image.url)
+          if (svgAspectRatio) {
+            aspectRatio = svgAspectRatio
+          }
+        }
+
+        // Use decent default that fits canvas
         const defaultSize = Math.min(width, height) * 0.3 // 30% of smaller canvas dimension
-        placedWidth = defaultSize
+        placedWidth = defaultSize * aspectRatio
         placedHeight = defaultSize
       }
 

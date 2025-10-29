@@ -19,35 +19,63 @@ export async function createPDF(data: PDFExportData): Promise<void> {
   // Dynamically import jsPDF to reduce initial bundle size
   const { jsPDF: JsPDF } = await import('jspdf')
 
-  // Helper function to convert unsupported formats to PNG
+  // Helper function to convert unsupported formats (including SVG) to PNG with alpha
+  // targetWidth/targetHeight are the desired output dimensions in the PDF
   const convertImageToPNG = async (
     imageUrl: string,
-    width: number,
-    height: number,
+    targetWidth: number,
+    targetHeight: number,
   ): Promise<string> => {
     return new Promise((resolve, reject) => {
       const img = new Image()
       img.crossOrigin = 'anonymous'
 
       img.onload = () => {
+        // Ensure we have valid dimensions
+        let canvasWidth = Math.round(targetWidth)
+        let canvasHeight = Math.round(targetHeight)
+
+        // Fallback to natural size if target dimensions are invalid
+        if (canvasWidth <= 0 || canvasHeight <= 0) {
+          console.warn(
+            `Invalid target dimensions ${targetWidth}x${targetHeight}, using natural size`,
+          )
+          canvasWidth = img.naturalWidth || 100
+          canvasHeight = img.naturalHeight || 100
+        }
+
+        console.log(
+          `Rendering ${imageUrl} to canvas at ${canvasWidth}x${canvasHeight}`,
+        )
+
         const canvas = document.createElement('canvas')
-        canvas.width = width
-        canvas.height = height
-        const ctx = canvas.getContext('2d')
+        canvas.width = canvasWidth
+        canvas.height = canvasHeight
+        const ctx = canvas.getContext('2d', { alpha: true })
         if (!ctx) {
           reject(new Error('Failed to get canvas context'))
           return
         }
 
-        ctx.drawImage(img, 0, 0, width, height)
+        // Clear canvas with transparent background
+        ctx.clearRect(0, 0, canvasWidth, canvasHeight)
+
+        // Draw image at full canvas size - this upscales vector graphics properly
+        ctx.drawImage(img, 0, 0, canvasWidth, canvasHeight)
+
+        // Convert to PNG (preserves alpha channel)
         const pngDataUrl = canvas.toDataURL('image/png')
+        console.log(`Successfully converted ${imageUrl} to PNG`)
         resolve(pngDataUrl)
       }
 
-      img.onerror = () => {
+      img.onerror = (error) => {
+        console.error(`Failed to load image ${imageUrl}:`, error)
         reject(new Error(`Failed to load image: ${imageUrl}`))
       }
 
+      // For SVG, use the URL directly; for others with base64, construct data URL
+      console.log(`Loading image from URL: ${imageUrl}`)
       img.src = imageUrl
     })
   }
@@ -93,26 +121,29 @@ export async function createPDF(data: PDFExportData): Promise<void> {
         const heightInPoints = (placedImage.height * 72) / 96
 
         const mimeType = placedImage.image.mimeType
+        const isSVG = mimeType.includes('svg')
 
-        // Check if format is supported by jsPDF
+        // Check if format is supported by jsPDF (SVG is not directly supported)
         const isSupported =
-          mimeType.includes('jpeg') ||
-          mimeType.includes('jpg') ||
-          mimeType.includes('png') ||
-          mimeType.includes('webp')
+          !isSVG &&
+          (mimeType.includes('jpeg') ||
+            mimeType.includes('jpg') ||
+            mimeType.includes('png') ||
+            mimeType.includes('webp'))
 
         let imageDataUrl: string
         let format: 'JPEG' | 'PNG' | 'WEBP' = 'PNG'
 
         if (!isSupported) {
-          // Convert unsupported formats (AVIF, etc.) to PNG
+          // Convert unsupported formats (SVG, AVIF, etc.) to PNG with alpha
+          // Use the PLACED dimensions (not original image dimensions) for high-quality rendering
           console.log(
-            `Converting unsupported format ${mimeType} to PNG for ${placedImage.image.url}`,
+            `Converting ${mimeType} to PNG at ${placedImage.width}x${placedImage.height} for ${placedImage.image.url}`,
           )
           imageDataUrl = await convertImageToPNG(
             placedImage.image.url,
-            placedImage.image.width,
-            placedImage.image.height,
+            placedImage.width,
+            placedImage.height,
           )
           format = 'PNG'
         } else {

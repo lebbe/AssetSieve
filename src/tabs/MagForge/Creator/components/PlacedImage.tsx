@@ -61,7 +61,12 @@ export function PlacedImage({
       const dx = (e.clientX - resizeStart.current.x) / scale
 
       // Maintain aspect ratio
-      const aspectRatio = placedImage.image.width / placedImage.image.height
+      // Use the current placed dimensions if original image dimensions are invalid (e.g., SVG)
+      let aspectRatio = placedImage.image.width / placedImage.image.height
+      if (!isFinite(aspectRatio) || aspectRatio <= 0) {
+        aspectRatio = placedImage.width / placedImage.height
+      }
+
       const newWidth = Math.max(50, resizeStart.current.width + dx)
       const newHeight = newWidth / aspectRatio
 
