@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "DevTools Hello World Panel",
+  "name": "AssetSieve",
   "version": "1.0",
-  "description": "A Chrome extension that adds a Hello World panel to DevTools",
+  "description": "Scrape images from web sites. Scrape flippingbook.com magazines. Export it as PDF.",
   "background": {
     "service_worker": "background.js"
   },
