@@ -10,6 +10,7 @@ type Props = {
   deleteImage: (url: string) => void
 }
 
+// oxlint-disable-next-line no-unused-vars
 export function MagForge({ importedImages, deleteImage }: Props) {
   const magazineImages = importedImages || []
 

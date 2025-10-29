@@ -22,9 +22,7 @@ export function Canvas({
   const [selectedImageId, setSelectedImageId] = useState<string | null>(null)
 
   // Helper to extract aspect ratio from SVG viewBox
-  const getAspectRatioFromSVG = async (
-    url: string,
-  ): Promise<number | null> => {
+  const getAspectRatioFromSVG = async (url: string): Promise<number | null> => {
     try {
       const response = await fetch(url)
       const svgText = await response.text()
