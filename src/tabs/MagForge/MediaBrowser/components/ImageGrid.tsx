@@ -51,8 +51,16 @@ export function ImageGrid({
               className={`delete-button ${isUsed ? 'delete-button--disabled' : ''}`}
               onClick={(e) => handleDelete(e, image.url, isUsed)}
               disabled={isUsed}
-              title={isUsed ? 'Cannot delete: Image is used on canvas' : 'Delete image'}
-              aria-label={isUsed ? 'Cannot delete: Image is used on canvas' : 'Delete image'}
+              title={
+                isUsed
+                  ? 'Cannot delete: Image is used on canvas'
+                  : 'Delete image'
+              }
+              aria-label={
+                isUsed
+                  ? 'Cannot delete: Image is used on canvas'
+                  : 'Delete image'
+              }
             >
               ×
             </button>
