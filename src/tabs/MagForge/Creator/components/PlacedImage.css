@@ -2,6 +2,7 @@
   position: absolute;
   border: 2px solid transparent;
   transition: border-color 0.1s ease;
+  overflow: hidden;
 }
 
 .placed-image:hover {
@@ -12,11 +13,30 @@
   border-color: #007bff;
 }
 
+.placed-image--editing {
+  border-color: #28a745;
+  border-width: 3px;
+}
+
 .placed-image img {
-  width: 100%;
-  height: 100%;
-  object-fit: fill;
   display: block;
+  user-select: none;
+}
+
+.edit-hint {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(0, 123, 255, 0.9);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  pointer-events: none;
+  white-space: nowrap;
+  z-index: 10;
 }
 
 .resize-handle {
