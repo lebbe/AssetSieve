@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { FormatName, getFormatDimensions } from './utils/pdfFormats'
 import { Page, PlacedImage } from './types/page'
+import { createPDF } from './utils/pdfExport'
 import { Toolbar } from './components/Toolbar'
 import { Pagination } from './components/Pagination'
 import { Canvas } from './components/Canvas'
@@ -67,15 +68,22 @@ export function Creator() {
     }
   }
 
-  const handleExport = () => {
-    console.log('Exporting PDF...', {
-      magazineName,
-      creatorName,
-      width,
-      height,
-      pages: pages.length,
-    })
-    alert('PDF export not yet implemented')
+  const handleExport = async () => {
+    try {
+      await createPDF({
+        metadata: {
+          width,
+          height,
+          magazineName,
+          creatorName,
+        },
+        pages,
+      })
+      console.log('PDF exported successfully!')
+    } catch (error) {
+      console.error('Failed to export PDF:', error)
+      alert('Failed to export PDF. Check console for details.')
+    }
   }
 
   const handleDoubleResolution = () => {
