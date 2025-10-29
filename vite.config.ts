@@ -1,9 +1,11 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
   plugins: [react()],
   build: {
+    minify: mode === 'production',
+    sourcemap: mode === 'development' ? 'inline' : false,
     rollupOptions: {
       input: {
         background: './src/background.ts',
@@ -26,4 +28,4 @@ export default defineConfig({
     cssCodeSplit: false, // Bundle all CSS into a single file
   },
   publicDir: 'public',
-})
+}))
