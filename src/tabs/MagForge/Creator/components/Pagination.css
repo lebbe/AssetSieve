@@ -1,0 +1,23 @@
+.pagination {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
+  background: #f8f9fa;
+  border-radius: 4px;
+  margin-bottom: 12px;
+}
+
+.pagination-info {
+  font-size: 13px;
+  font-weight: 500;
+  color: #495057;
+  padding: 0 8px;
+}
+
+.pagination-divider {
+  width: 1px;
+  height: 20px;
+  background: #dee2e6;
+  margin: 0 4px;
+}

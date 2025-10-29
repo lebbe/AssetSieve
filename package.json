@@ -3,8 +3,9 @@
   "version": "1.0.0",
   "description": "A Chrome extension that adds a Hello World panel to DevTools",
   "scripts": {
-    "dev": "vite",
+    "dev": "vite build --watch --mode development",
     "build": "vite build",
+    "devbuild": "vite build --mode development",
     "preview": "vite preview",
     "lint": "oxlint src",
     "type-check": "tsc --noEmit",

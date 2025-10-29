@@ -8,7 +8,7 @@ import { useDisplayOptions } from '../../hooks/useDisplayOptions'
 import { useDragAndDrop } from '../../hooks/useDragAndDrop'
 import { useFilter } from '../../hooks/useFilter'
 import { NetworkRequest } from '../../hooks/useRequestSniffing'
-import { useImageSniffer } from '../../hooks/useImageSniffer'
+import { useImageSniffer, ImageData } from '../../hooks/useImageSniffer'
 import { useSorting } from '../../hooks/useSorting'
 
 import './Images.css'
@@ -16,8 +16,16 @@ import './Images.css'
 type Props = {
   requests: NetworkRequest[]
   removeRequest: (url: string) => void
+  onSendToMagForge: (images: ImageData[]) => void
+  countUniqueImages: (images: ImageData[]) => number
 }
-export function Images({ requests, removeRequest }: Props) {
+
+export function Images({
+  requests,
+  removeRequest,
+  onSendToMagForge,
+  countUniqueImages,
+}: Props) {
   const { images } = useImageSniffer(requests)
 
   const {
@@ -94,7 +102,11 @@ export function Images({ requests, removeRequest }: Props) {
       )}
       {sortedImages.length > 0 && (
         <PanelCard className="export-panel-card" title="Export">
-          <Export sortedImages={sortedImages} />
+          <Export
+            sortedImages={sortedImages}
+            onSendToMagForge={onSendToMagForge}
+            countUniqueImages={countUniqueImages}
+          />
         </PanelCard>
       )}
       <h2>Detected Images ({sortedImages.length})</h2>

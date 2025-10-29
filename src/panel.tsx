@@ -8,8 +8,10 @@ import { useRequestSniffing } from './hooks/useRequestSniffing'
 import { PanelCard } from './components/PanelCard'
 import { Images } from './tabs/Images/Images'
 import { Flippingbook } from './tabs/Flippingbook/Flippingbook'
+import { MagForge } from './tabs/MagForge/MagForge'
 import { Tabs } from './tabs/Tabs'
 import { Traffic } from './tabs/Traffic/Traffic'
+import { useMagForge } from './tabs/MagForge/hooks/useMagForge'
 
 function Panel() {
   const {
@@ -21,6 +23,13 @@ function Panel() {
     removeRequest,
   } = useRequestSniffing()
 
+  const {
+    magForgeImages,
+    setUniqueMagForgeImages,
+    deleteMagForgeImage,
+    countUniqueImages,
+  } = useMagForge()
+
   // Create stable tabs array with pre-rendered content to prevent remounting
   const tabs = useMemo(
     () => [
@@ -31,6 +40,8 @@ function Panel() {
             key={requests.length === 0 ? 'empty' : 'filled'}
             requests={requests}
             removeRequest={removeRequest}
+            onSendToMagForge={setUniqueMagForgeImages}
+            countUniqueImages={countUniqueImages}
           />
         ),
       },
@@ -45,15 +56,31 @@ function Panel() {
         ),
       },
       {
+        name: 'MagForge',
+        content: (
+          <MagForge
+            key={requests.length === 0 ? 'empty' : 'filled'}
+            importedImages={magForgeImages}
+            deleteImage={deleteMagForgeImage}
+          />
+        ),
+      },
+      {
         name: 'Traffic',
         content: <Traffic requests={requests} />,
       },
     ],
-    [requests, removeRequest],
+    [
+      requests,
+      removeRequest,
+      magForgeImages,
+      deleteMagForgeImage,
+      countUniqueImages,
+    ],
   )
   return (
     <div>
-      <h1>AssetSieve</h1>
+      <h1 className="sr-only">AssetSieve</h1>
       <PanelCard title="Network">
         <div className="controls">
           <button
