@@ -1,6 +1,7 @@
 import { FontFilterState } from '../../../hooks/useFontFilter'
 import { FontFileData } from '../../../hooks/useFontSniffer'
 import { InputContainer } from '../../../components/InputContainer'
+import '../../Images/components/Filter.css'
 import '../../../components/Button.css'
 
 interface FilterProps {
