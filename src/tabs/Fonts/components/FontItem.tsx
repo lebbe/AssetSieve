@@ -1,5 +1,6 @@
 import { FontFileData } from '../../../hooks/useFontSniffer'
 import { ShowDetails } from '../../../hooks/useDisplayOptions'
+import { useEffect, useRef } from 'react'
 import './FontItem.css'
 
 interface FontItemProps {
@@ -25,6 +26,37 @@ export function FontItem({
   isDragging,
   dragOverIndex,
 }: FontItemProps) {
+  const styleRef = useRef<HTMLStyleElement | null>(null)
+
+  // Generate a unique font family name for this font instance
+  const fontFamilyName = `font-preview-${font.url.replace(/[^a-zA-Z0-9]/g, '-')}-${index}`
+
+  // Inject font-face declaration
+  useEffect(() => {
+    // Create style element if it doesn't exist
+    if (!styleRef.current) {
+      styleRef.current = document.createElement('style')
+      document.head.appendChild(styleRef.current)
+    }
+
+    // Create @font-face declaration
+    const fontFaceCSS = `
+      @font-face {
+        font-family: '${fontFamilyName}';
+        src: url(data:${font.mimeType};base64,${font.base64});
+      }
+    `
+
+    styleRef.current.textContent = fontFaceCSS
+
+    // Cleanup on unmount
+    return () => {
+      if (styleRef.current && styleRef.current.parentNode) {
+        styleRef.current.parentNode.removeChild(styleRef.current)
+        styleRef.current = null
+      }
+    }
+  }, [font.base64, font.mimeType, fontFamilyName])
   const formatFileSize = (bytes: number): string => {
     if (bytes < 1024) return `${bytes} B`
     if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`
@@ -75,8 +107,12 @@ export function FontItem({
         </button>
       </div>
 
-      <div className="font-item__preview">
-        {font.metadata.fontFamily || font.filename}
+      <div
+        className="font-item__preview"
+        style={{ fontFamily: `'${fontFamilyName}', sans-serif` }}
+      >
+        {font.metadata.sampleText ||
+          'The quick brown fox jumps over the lazy dog'}
       </div>
 
       {showDetails !== 'none' && (

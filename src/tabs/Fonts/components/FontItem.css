@@ -66,14 +66,16 @@
   background: #f9f9f9;
   border: 1px solid #e0e0e0;
   border-radius: 4px;
-  padding: 1rem;
-  font-size: 1.5rem;
+  padding: 1.5rem 1rem;
+  font-size: 1.25rem;
   text-align: center;
   color: #333;
-  min-height: 60px;
+  min-height: 80px;
   display: flex;
   align-items: center;
   justify-content: center;
+  word-break: break-word;
+  line-height: 1.4;
 }
 
 .font-item__details {
