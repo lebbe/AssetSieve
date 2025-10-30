@@ -20,6 +20,7 @@ export function Sorting({
   const sortOptions: { value: SortBy; label: string }[] = [
     { value: 'manual', label: 'Manual (Original Order)' },
     { value: 'filename', label: 'Filename (A-Z)' },
+    { value: 'filename-numeric', label: 'Filename (Numeric)' },
     { value: 'path', label: 'Path (A-Z)' },
     { value: 'filetype', label: 'File Type (A-Z)' },
     { value: 'size', label: 'File Size (Largest First)' },
