@@ -17,9 +17,6 @@ type InteractionMode =
   | 'cropping-right'
   | 'cropping-bottom'
   | 'panning'
-  | 'rotating-tl'
-  | 'rotating-tr'
-  | 'rotating-bl'
   | 'rotating-br'
 
 export function PlacedImage({
@@ -46,6 +43,7 @@ export function PlacedImage({
     rotation: 0,
     centerX: 0,
     centerY: 0,
+    startAngle: 0, // Initial angle from center to corner
   })
 
   // Get current crop values or defaults
@@ -71,18 +69,17 @@ export function PlacedImage({
     const x = e.clientX - rect.left
     const y = e.clientY - rect.top
     const edgeThreshold = 10 // pixels
-    const cornerThreshold = 15 // pixels
+    const cornerThreshold = 20 // pixels for rotation handle
 
     const isNearRight = x >= rect.width - edgeThreshold
     const isNearBottom = y >= rect.height - edgeThreshold
-    const isNearLeft = x <= cornerThreshold
-    const isNearTop = y <= cornerThreshold
 
-    // Check corners first (for rotation)
-    if (isNearLeft && isNearTop) return 'rotating-tl'
-    if (isNearRight && isNearTop) return 'rotating-tr'
-    if (isNearLeft && isNearBottom) return 'rotating-bl'
-    if (isNearRight && isNearBottom) return 'rotating-br'
+    // Check bottom-right corner for rotation (larger area)
+    const isNearBottomRightCorner =
+      x >= rect.width - cornerThreshold && y >= rect.height - cornerThreshold
+
+    // Check corners first (for rotation) - only bottom-right
+    if (isNearBottomRightCorner) return 'rotating-br'
 
     // Check edges (for cropping)
     if (isNearRight) return 'cropping-right'
@@ -108,9 +105,6 @@ export function PlacedImage({
       'cropping-right': 'ew-resize',
       'cropping-bottom': 'ns-resize',
       panning: 'move',
-      'rotating-tl': 'alias', // Using alias as a rotation cursor approximation
-      'rotating-tr': 'alias',
-      'rotating-bl': 'alias',
       'rotating-br': 'alias',
     }
     setCursor(cursorMap[zone] || 'default')
@@ -192,20 +186,20 @@ export function PlacedImage({
           croppedX: newCroppedX,
           croppedY: newCroppedY,
         })
-      } else if (
-        interactionMode === 'rotating-tl' ||
-        interactionMode === 'rotating-tr' ||
-        interactionMode === 'rotating-bl' ||
-        interactionMode === 'rotating-br'
-      ) {
+      } else if (interactionMode === 'rotating-br') {
         // Calculate rotation based on mouse position relative to center
         const mouseX = e.clientX / scale
         const mouseY = e.clientY / scale
         const centerX = dragStart.current.centerX
         const centerY = dragStart.current.centerY
 
-        const angle = Math.atan2(mouseY - centerY, mouseX - centerX)
-        const rotation = (angle * 180) / Math.PI
+        // Calculate current angle from center to mouse
+        const currentAngle = Math.atan2(mouseY - centerY, mouseX - centerX)
+
+        // Calculate rotation as difference from start angle, preserving initial rotation
+        const angleDiff = currentAngle - dragStart.current.startAngle
+        const rotation =
+          dragStart.current.rotation + (angleDiff * 180) / Math.PI
 
         onUpdate({
           ...placedImage,
@@ -228,10 +222,19 @@ export function PlacedImage({
     const zone = getInteractionZone(e, rect)
 
     if (placedImage.isEditing && zone !== 'none') {
-      // Advanced editing mode
+      // Advanced editing mode - perform interaction
       const cropValues = getCropValues()
-      const centerX = placedImage.x + placedImage.width / 2
-      const centerY = placedImage.y + placedImage.height / 2
+      const centerX = placedImage.x + cropValues.croppedWidth / 2
+      const centerY = placedImage.y + cropValues.croppedHeight / 2
+
+      // For rotation, calculate the initial angle from center to corner
+      let startAngle = 0
+      if (zone === 'rotating-br') {
+        // Calculate angle from center to bottom-right corner
+        const cornerX = e.clientX / scale
+        const cornerY = e.clientY / scale
+        startAngle = Math.atan2(cornerY - centerY, cornerX - centerX)
+      }
 
       dragStart.current = {
         x: e.clientX,
@@ -247,10 +250,17 @@ export function PlacedImage({
         rotation: placedImage.rotation ?? 0,
         centerX,
         centerY,
+        startAngle,
       }
 
       setInteractionMode(zone)
       updateCursor(zone)
+    } else if (isSelected && placedImage.isEditing && zone === 'none') {
+      // Image is in editing mode but clicked outside interaction zones - exit editing mode
+      onUpdate({
+        ...placedImage,
+        isEditing: false,
+      })
     } else if (isSelected && !placedImage.isEditing) {
       // Image is selected but not in editing mode - enter editing mode
       onUpdate({
@@ -277,6 +287,7 @@ export function PlacedImage({
         rotation: 0,
         centerX: 0,
         centerY: 0,
+        startAngle: 0,
       }
       setCursor('grabbing')
     }
@@ -340,6 +351,7 @@ export function PlacedImage({
           top: `${-cropValues.croppedY}px`,
         }}
       />
+      {placedImage.isEditing && <div className="rotation-handle" />}
     </div>
   )
 }
