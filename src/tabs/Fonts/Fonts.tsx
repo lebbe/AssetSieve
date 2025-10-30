@@ -31,8 +31,14 @@ export function Fonts({ requests, removeRequest }: Props) {
     handleInputChange,
   } = useFontFilter(fonts)
 
-  const { sortedFonts, sortBy, setSortBy, reversed, setReversed, setFontOrder } =
-    useFontSorting(filteredFonts)
+  const {
+    sortedFonts,
+    sortBy,
+    setSortBy,
+    reversed,
+    setReversed,
+    setFontOrder,
+  } = useFontSorting(filteredFonts)
 
   const {
     previewSize,

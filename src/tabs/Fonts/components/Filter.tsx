@@ -52,7 +52,10 @@ export function Filter({
         </div>
 
         <div className="filter-row">
-          <InputContainer label="Classification" htmlFor="classification-filter">
+          <InputContainer
+            label="Classification"
+            htmlFor="classification-filter"
+          >
             <select
               id="classification-filter"
               value={filters.classification}

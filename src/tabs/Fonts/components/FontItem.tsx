@@ -80,7 +80,8 @@ export function FontItem({
       </div>
 
       {showDetails !== 'none' && (
-        <div className="font-item__details">{showDetails === 'full' && (
+        <div className="font-item__details">
+          {showDetails === 'full' && (
             <>
               {font.metadata.fontFamily && (
                 <div className="font-item__detail">

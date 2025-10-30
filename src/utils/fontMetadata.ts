@@ -147,7 +147,9 @@ function parseTTF(dataView: DataView): Partial<FontData> {
  * @param {ArrayBuffer} arrayBuffer - The raw buffer for the WOFF2 file.
  * @returns {Promise<Partial<FontData>>} - A promise resolving to the extracted metadata.
  */
-async function parseWOFF2(arrayBuffer: ArrayBuffer): Promise<Partial<FontData>> {
+async function parseWOFF2(
+  arrayBuffer: ArrayBuffer,
+): Promise<Partial<FontData>> {
   const dataView = new DataView(arrayBuffer)
   const metadata: Partial<FontData> = { signature: 'WOFF2' }
 
@@ -184,7 +186,9 @@ async function parseWOFF2(arrayBuffer: ArrayBuffer): Promise<Partial<FontData>> 
       compressedDataOffset + compressedLength,
     ),
   ])
-  const decompressStream = new DecompressionStream('deflate-raw' as CompressionFormat)
+  const decompressStream = new DecompressionStream(
+    'deflate-raw' as CompressionFormat,
+  )
   try {
     const decompressedStream = compressedBlob
       .stream()
@@ -237,13 +241,13 @@ function parseNameTable(
     // This is a simplification; robust parsing is much more complex.
     if (platformID === 3 && encodingID === 1) {
       // Windows, Unicode BMP
-      (metadata as any)[nameKey] = decodeUtf16BE(dataView, offset, length)
+      ;(metadata as any)[nameKey] = decodeUtf16BE(dataView, offset, length)
     } else if (platformID === 1 && encodingID === 0) {
       // Macintosh, Roman
-      (metadata as any)[nameKey] = decodeMacRoman(dataView, offset, length)
+      ;(metadata as any)[nameKey] = decodeMacRoman(dataView, offset, length)
     } else if (!(metadata as any)[nameKey]) {
       // Fallback
-      (metadata as any)[nameKey] = decodeUtf16BE(dataView, offset, length)
+      ;(metadata as any)[nameKey] = decodeUtf16BE(dataView, offset, length)
     }
   }
   return metadata

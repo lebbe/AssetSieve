@@ -11,13 +11,7 @@ export interface FontFileData {
   metadata: FontData
 }
 
-const fontExtensions = [
-  '.ttf',
-  '.otf',
-  '.woff',
-  '.woff2',
-  '.eot',
-]
+const fontExtensions = ['.ttf', '.otf', '.woff', '.woff2', '.eot']
 
 const fontMimeTypes = [
   'font/ttf',
@@ -35,7 +29,7 @@ const fontMimeTypes = [
 // Helper function to detect if a request is likely a font
 function isLikelyFont(request: NetworkRequest): boolean {
   // Check MIME type first
-  if (fontMimeTypes.some(type => request.mimeType.includes(type))) {
+  if (fontMimeTypes.some((type) => request.mimeType.includes(type))) {
     return true
   }
 
