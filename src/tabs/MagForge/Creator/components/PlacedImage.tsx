@@ -66,22 +66,36 @@ export function PlacedImage({
       return 'none'
     }
 
-    const x = e.clientX - rect.left
-    const y = e.clientY - rect.top
+    // Get mouse position relative to the bounding box
+    const mouseX = e.clientX - rect.left
+    const mouseY = e.clientY - rect.top
+
+    // Transform mouse coordinates to account for rotation
+    const rotation = placedImage.rotation ?? 0
+    const rotationRad = (rotation * Math.PI) / 180
+
+    // Center of the element
+    const centerX = rect.width / 2
+    const centerY = rect.height / 2
+
+    // Translate to origin, rotate, translate back
+    const relX = mouseX - centerX
+    const relY = mouseY - centerY
+
+    const rotatedX =
+      relX * Math.cos(-rotationRad) - relY * Math.sin(-rotationRad)
+    const rotatedY =
+      relX * Math.sin(-rotationRad) + relY * Math.cos(-rotationRad)
+
+    const x = rotatedX + centerX
+    const y = rotatedY + centerY
+
     const edgeThreshold = 10 // pixels
-    const cornerThreshold = 20 // pixels for rotation handle
 
     const isNearRight = x >= rect.width - edgeThreshold
     const isNearBottom = y >= rect.height - edgeThreshold
 
-    // Check bottom-right corner for rotation (larger area)
-    const isNearBottomRightCorner =
-      x >= rect.width - cornerThreshold && y >= rect.height - cornerThreshold
-
-    // Check corners first (for rotation) - only bottom-right
-    if (isNearBottomRightCorner) return 'rotating-br'
-
-    // Check edges (for cropping)
+    // Check edges (for cropping) - rotation is handled by the handle element
     if (isNearRight) return 'cropping-right'
     if (isNearBottom) return 'cropping-bottom'
 
@@ -187,19 +201,18 @@ export function PlacedImage({
           croppedY: newCroppedY,
         })
       } else if (interactionMode === 'rotating-br') {
-        // Calculate rotation based on mouse position relative to center
+        // Calculate rotation to make bottom-right corner point toward mouse
         const mouseX = e.clientX / scale
         const mouseY = e.clientY / scale
         const centerX = dragStart.current.centerX
         const centerY = dragStart.current.centerY
 
-        // Calculate current angle from center to mouse
-        const currentAngle = Math.atan2(mouseY - centerY, mouseX - centerX)
+        // Calculate angle from center to mouse cursor
+        const angleToMouse = Math.atan2(mouseY - centerY, mouseX - centerX)
 
-        // Calculate rotation as difference from start angle, preserving initial rotation
-        const angleDiff = currentAngle - dragStart.current.startAngle
-        const rotation =
-          dragStart.current.rotation + (angleDiff * 180) / Math.PI
+        // The bottom-right corner is at 45 degrees (π/4) in the unrotated state
+        // We want to rotate so that corner points to the mouse
+        const rotation = (angleToMouse * 180) / Math.PI - 45
 
         onUpdate({
           ...placedImage,
@@ -227,15 +240,6 @@ export function PlacedImage({
       const centerX = placedImage.x + cropValues.croppedWidth / 2
       const centerY = placedImage.y + cropValues.croppedHeight / 2
 
-      // For rotation, calculate the initial angle from center to corner
-      let startAngle = 0
-      if (zone === 'rotating-br') {
-        // Calculate angle from center to bottom-right corner
-        const cornerX = e.clientX / scale
-        const cornerY = e.clientY / scale
-        startAngle = Math.atan2(cornerY - centerY, cornerX - centerX)
-      }
-
       dragStart.current = {
         x: e.clientX,
         y: e.clientY,
@@ -250,7 +254,7 @@ export function PlacedImage({
         rotation: placedImage.rotation ?? 0,
         centerX,
         centerY,
-        startAngle,
+        startAngle: 0,
       }
 
       setInteractionMode(zone)
@@ -291,6 +295,34 @@ export function PlacedImage({
       }
       setCursor('grabbing')
     }
+  }
+
+  const handleRotationHandleMouseDown = (e: React.MouseEvent) => {
+    e.stopPropagation()
+
+    const cropValues = getCropValues()
+    const centerX = placedImage.x + cropValues.croppedWidth / 2
+    const centerY = placedImage.y + cropValues.croppedHeight / 2
+
+    dragStart.current = {
+      x: e.clientX,
+      y: e.clientY,
+      imageX: placedImage.x,
+      imageY: placedImage.y,
+      width: placedImage.width,
+      height: placedImage.height,
+      croppedX: cropValues.croppedX,
+      croppedY: cropValues.croppedY,
+      croppedWidth: cropValues.croppedWidth,
+      croppedHeight: cropValues.croppedHeight,
+      rotation: placedImage.rotation ?? 0,
+      centerX,
+      centerY,
+      startAngle: 0,
+    }
+
+    setInteractionMode('rotating-br')
+    updateCursor('rotating-br')
   }
 
   const handleHover = (e: React.MouseEvent) => {
@@ -351,7 +383,12 @@ export function PlacedImage({
           top: `${-cropValues.croppedY}px`,
         }}
       />
-      {placedImage.isEditing && <div className="rotation-handle" />}
+      {placedImage.isEditing && (
+        <div
+          className="rotation-handle"
+          onMouseDown={handleRotationHandleMouseDown}
+        />
+      )}
     </div>
   )
 }
