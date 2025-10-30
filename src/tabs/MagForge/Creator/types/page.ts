@@ -14,7 +14,6 @@ export type PlacedImage = {
   croppedHeight?: number
   croppedX?: number
   croppedY?: number
-  rotation?: number
 }
 
 export type Page = {
