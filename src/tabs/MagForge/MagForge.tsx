@@ -1,7 +1,8 @@
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { ImageData } from '../../hooks/useImageSniffer'
 import { MediaBrowser } from './MediaBrowser/MediaBrowser'
 import { Creator } from './Creator/Creator'
+import { Page } from './Creator/types/page'
 
 import './MagForge.css'
 
@@ -10,21 +11,33 @@ type Props = {
   deleteImage: (url: string) => void
 }
 
-export function MagForge({ importedImages }: Props) {
+export function MagForge({ importedImages, deleteImage }: Props) {
   const magazineImages = importedImages || []
+  const [pages, setPages] = useState<Page[]>([{ id: '1', images: [] }])
 
-  // For now, we'll track used images as an empty set
-  // Later this will come from the Creator's state
-  const usedImageUrls = useMemo(() => new Set<string>(), [])
+  // Track which images are used across all pages
+  const usedImageUrls = useMemo(() => {
+    const urls = new Set<string>()
+    pages.forEach((page) => {
+      page.images.forEach((placedImage) => {
+        urls.add(placedImage.image.url)
+      })
+    })
+    return urls
+  }, [pages])
 
   return (
     <div className="magforge">
       <div className="magforge-layout">
         <div className="magforge-media">
-          <MediaBrowser images={magazineImages} usedImageUrls={usedImageUrls} />
+          <MediaBrowser
+            images={magazineImages}
+            usedImageUrls={usedImageUrls}
+            deleteImage={deleteImage}
+          />
         </div>
         <div className="magforge-creator">
-          <Creator />
+          <Creator pages={pages} onPagesChange={setPages} />
         </div>
       </div>
     </div>

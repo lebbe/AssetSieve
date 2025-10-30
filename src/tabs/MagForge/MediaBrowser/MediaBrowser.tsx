@@ -7,9 +7,10 @@ import './MediaBrowser.css'
 type Props = {
   images: ImageData[]
   usedImageUrls: Set<string>
+  deleteImage: (url: string) => void
 }
 
-export function MediaBrowser({ images, usedImageUrls }: Props) {
+export function MediaBrowser({ images, usedImageUrls, deleteImage }: Props) {
   const [nameFilter, setNameFilter] = useState('')
   const [minWidth, setMinWidth] = useState('')
   const [minHeight, setMinHeight] = useState('')
@@ -80,6 +81,7 @@ export function MediaBrowser({ images, usedImageUrls }: Props) {
         images={filteredImages}
         previewSize={previewSize}
         usedImageUrls={usedImageUrls}
+        deleteImage={deleteImage}
       />
     </div>
   )

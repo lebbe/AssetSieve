@@ -5,12 +5,23 @@ type Props = {
   images: ImageData[]
   previewSize: number
   usedImageUrls: Set<string>
+  deleteImage: (url: string) => void
 }
 
-export function ImageGrid({ images, previewSize, usedImageUrls }: Props) {
+export function ImageGrid({
+  images,
+  previewSize,
+  usedImageUrls,
+  deleteImage,
+}: Props) {
   const handleDragStart = (e: React.DragEvent, image: ImageData) => {
     e.dataTransfer.effectAllowed = 'copy'
     e.dataTransfer.setData('application/json', JSON.stringify(image))
+  }
+
+  const handleDelete = (e: React.MouseEvent, url: string) => {
+    e.stopPropagation()
+    deleteImage(url)
   }
 
   return (
@@ -30,6 +41,16 @@ export function ImageGrid({ images, previewSize, usedImageUrls }: Props) {
           >
             <img src={image.url} alt="" draggable={false} />
             {isUsed && <div className="used-badge">Used</div>}
+            {!isUsed && (
+              <button
+                className="delete-button"
+                onClick={(e) => handleDelete(e, image.url)}
+                aria-label="Delete image"
+                title="Delete image"
+              >
+                ×
+              </button>
+            )}
           </div>
         )
       })}
