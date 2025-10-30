@@ -160,20 +160,32 @@ export async function createPDF(data: PDFExportData): Promise<void> {
         let imageDataUrl: string
         let format: 'JPEG' | 'PNG' | 'WEBP' = 'PNG'
 
+        // Calculate scaling factor between placed dimensions and actual image dimensions
+        const actualImageWidth = placedImage.image.width || placedImage.width
+        const actualImageHeight = placedImage.image.height || placedImage.height
+        const scaleX = actualImageWidth / placedImage.width
+        const scaleY = actualImageHeight / placedImage.height
+
+        // Scale crop coordinates to actual image space
+        const actualCroppedX = croppedX * scaleX
+        const actualCroppedY = croppedY * scaleY
+        const actualCroppedWidth = croppedWidth * scaleX
+        const actualCroppedHeight = croppedHeight * scaleY
+
         if (!isSupported) {
           // Convert unsupported formats (SVG, AVIF, etc.) to PNG with alpha
           // Use the cropped dimensions for rendering
           console.log(
-            `Converting ${mimeType} to PNG at ${croppedWidth}x${croppedHeight} (cropped from ${croppedX}, ${croppedY}) for ${placedImage.image.url}`,
+            `Converting ${mimeType} to PNG at ${croppedWidth}x${croppedHeight} (cropped from ${actualCroppedX}, ${actualCroppedY}, ${actualCroppedWidth}x${actualCroppedHeight}) for ${placedImage.image.url}`,
           )
           imageDataUrl = await convertImageToPNG(
             placedImage.image.url,
             croppedWidth,
             croppedHeight,
-            croppedX,
-            croppedY,
-            placedImage.width,
-            placedImage.height,
+            actualCroppedX,
+            actualCroppedY,
+            actualCroppedWidth,
+            actualCroppedHeight,
           )
           format = 'PNG'
         } else {
@@ -186,16 +198,16 @@ export async function createPDF(data: PDFExportData): Promise<void> {
           ) {
             // Image is cropped, convert to PNG with cropping
             console.log(
-              `Cropping ${mimeType} to PNG at ${croppedWidth}x${croppedHeight} (cropped from ${croppedX}, ${croppedY})`,
+              `Cropping ${mimeType} to PNG at ${croppedWidth}x${croppedHeight} (cropped from ${actualCroppedX}, ${actualCroppedY}, ${actualCroppedWidth}x${actualCroppedHeight})`,
             )
             imageDataUrl = await convertImageToPNG(
               `data:${mimeType};base64,${placedImage.image.base64}`,
               croppedWidth,
               croppedHeight,
-              croppedX,
-              croppedY,
-              placedImage.width,
-              placedImage.height,
+              actualCroppedX,
+              actualCroppedY,
+              actualCroppedWidth,
+              actualCroppedHeight,
             )
             format = 'PNG'
           } else {

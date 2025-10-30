@@ -266,6 +266,26 @@ export function PlacedImage({
     }
   }
 
+  const handleResizeMouseDown = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    onClick()
+    setInteractionMode('resizing')
+
+    const cropValues = getCropValues()
+    dragStart.current = {
+      x: e.clientX,
+      y: e.clientY,
+      imageX: placedImage.x,
+      imageY: placedImage.y,
+      width: placedImage.width,
+      height: placedImage.height,
+      croppedX: cropValues.croppedX,
+      croppedY: cropValues.croppedY,
+      croppedWidth: cropValues.croppedWidth,
+      croppedHeight: cropValues.croppedHeight,
+    }
+  }
+
   const handleHover = (e: React.MouseEvent) => {
     if (interactionMode !== 'none') return
 
@@ -322,6 +342,9 @@ export function PlacedImage({
           top: `${-cropValues.croppedY}px`,
         }}
       />
+      {isSelected && !placedImage.isEditing && (
+        <div className="resize-handle" onMouseDown={handleResizeMouseDown} />
+      )}
     </div>
   )
 }
