@@ -1,0 +1,131 @@
+.font-item {
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 1rem;
+  transition: all 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.font-item:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.font-item.is-dragging {
+  opacity: 0.5;
+  cursor: grabbing;
+}
+
+.font-item.drag-over-before {
+  border-top: 3px solid #4caf50;
+}
+
+.font-item.drag-over-after {
+  border-bottom: 3px solid #4caf50;
+}
+
+.font-item__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  cursor: grab;
+  gap: 0.5rem;
+}
+
+.font-item__header:active {
+  cursor: grabbing;
+}
+
+.font-item__name {
+  font-weight: 600;
+  font-size: 1rem;
+  color: #333;
+  word-break: break-word;
+  flex: 1;
+}
+
+.font-item__delete {
+  background: #f44336;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 0.25rem 0.5rem;
+  cursor: pointer;
+  font-size: 0.875rem;
+  transition: background 0.2s;
+  flex-shrink: 0;
+}
+
+.font-item__delete:hover {
+  background: #d32f2f;
+}
+
+.font-item__preview {
+  background: #f9f9f9;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  padding: 1rem;
+  font-size: 1.5rem;
+  text-align: center;
+  color: #333;
+  min-height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.font-item__details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+}
+
+.font-item__detail {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.font-item__detail-label {
+  color: #666;
+  font-weight: 500;
+}
+
+.font-item__detail-value {
+  color: #333;
+  text-align: right;
+  word-break: break-word;
+}
+
+.font-item__classification {
+  display: inline-block;
+  background: #e3f2fd;
+  color: #1976d2;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.font-item__classification--monospace {
+  background: #f3e5f5;
+  color: #7b1fa2;
+}
+
+.font-item__classification--serif {
+  background: #fff3e0;
+  color: #ef6c00;
+}
+
+.font-item__classification--sans-serif {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+
+.font-item__classification--script {
+  background: #fce4ec;
+  color: #c2185b;
+}

@@ -7,6 +7,7 @@ import './components/Input.css'
 import { useRequestSniffing } from './hooks/useRequestSniffing'
 import { PanelCard } from './components/PanelCard'
 import { Images } from './tabs/Images/Images'
+import { Fonts } from './tabs/Fonts/Fonts'
 import { Flippingbook } from './tabs/Flippingbook/Flippingbook'
 import { MagForge } from './tabs/MagForge/MagForge'
 import { Tabs } from './tabs/Tabs'
@@ -42,6 +43,16 @@ function Panel() {
             removeRequest={removeRequest}
             onSendToMagForge={setUniqueMagForgeImages}
             countUniqueImages={countUniqueImages}
+          />
+        ),
+      },
+      {
+        name: 'Fonts',
+        content: (
+          <Fonts
+            key={requests.length === 0 ? 'empty' : 'filled'}
+            requests={requests}
+            removeRequest={removeRequest}
           />
         ),
       },

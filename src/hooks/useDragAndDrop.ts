@@ -1,9 +1,8 @@
 import { useState } from 'react'
-import { ImageData } from './useImageSniffer'
 
-export function useDragAndDrop(
-  sortedImages: ImageData[],
-  setImageOrder: (newOrder: ImageData[]) => void,
+export function useDragAndDrop<T>(
+  sortedItems: T[],
+  setItemOrder: (newOrder: T[]) => void,
 ) {
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null)
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null)
@@ -18,7 +17,7 @@ export function useDragAndDrop(
       dragOverIndex !== null &&
       draggedIndex !== dragOverIndex
     ) {
-      const newOrder = [...sortedImages]
+      const newOrder = [...sortedItems]
       const draggedItem = newOrder[draggedIndex]
 
       if (!draggedItem) {
@@ -33,7 +32,7 @@ export function useDragAndDrop(
       // Insert it at the new position
       newOrder.splice(dragOverIndex, 0, draggedItem)
 
-      setImageOrder(newOrder)
+      setItemOrder(newOrder)
     }
 
     setDraggedIndex(null)
