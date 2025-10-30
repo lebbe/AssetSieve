@@ -86,3 +86,10 @@
 .delete-button:active {
   transform: scale(0.95);
 }
+
+@media (prefers-reduced-motion: reduce) {
+  .delete-button:hover,
+  .delete-button:active {
+    transform: none;
+  }
+}
