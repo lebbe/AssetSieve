@@ -7,7 +7,12 @@ import { Pagination } from './components/Pagination'
 import { Canvas } from './components/Canvas'
 import './Creator.css'
 
-export function Creator() {
+type Props = {
+  pages: Page[]
+  onPagesChange: (pages: Page[]) => void
+}
+
+export function Creator({ pages, onPagesChange }: Props) {
   const [selectedFormat, setSelectedFormat] =
     useState<FormatName>('A4 Portrait')
   const [width, setWidth] = useState<number>(
@@ -18,7 +23,6 @@ export function Creator() {
   )
   const [magazineName, setMagazineName] = useState('')
   const [creatorName, setCreatorName] = useState('')
-  const [pages, setPages] = useState<Page[]>([{ id: '1', images: [] }])
   const [currentPageIndex, setCurrentPageIndex] = useState(0)
   const [zoom, setZoom] = useState(1)
 
@@ -45,14 +49,14 @@ export function Creator() {
       id: `${Date.now()}`,
       images: [],
     }
-    setPages([...pages, newPage])
+    onPagesChange([...pages, newPage])
     setCurrentPageIndex(pages.length) // Go to new page
   }
 
   const handleDeletePage = () => {
     if (pages.length > 1) {
       const newPages = pages.filter((_, index) => index !== currentPageIndex)
-      setPages(newPages)
+      onPagesChange(newPages)
       // Adjust current page if needed
       if (currentPageIndex >= newPages.length) {
         setCurrentPageIndex(newPages.length - 1)
@@ -64,7 +68,7 @@ export function Creator() {
     const newPages = [...pages]
     if (currentPage) {
       newPages[currentPageIndex] = { ...currentPage, images }
-      setPages(newPages)
+      onPagesChange(newPages)
     }
   }
 
