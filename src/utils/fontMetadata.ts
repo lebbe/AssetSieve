@@ -38,6 +38,23 @@ export interface FontData {
   classification?: string
   xHeight?: number
   capHeight?: number
+  // CSS-derived metadata
+  cssUsage?: {
+    fontFamilyDeclarations: string[] // All font-family names found in CSS
+    fontWeights: string[] // Detected font-weights
+    fontStyles: string[] // Detected font-styles (normal, italic, oblique)
+    unicodeRanges: string[] // Unicode ranges specified in CSS
+    usedInSelectors: string[] // CSS selectors where this font is used
+  }
+  // Request metadata
+  referer?: string
+  fontService?: string // Detected service (e.g., "Google Fonts", "Adobe Fonts")
+  // Runtime-detected characteristics
+  isMonospaceDetected?: boolean // Detected via Canvas measurement
+  actualMetrics?: {
+    avgCharWidth: number
+    hasVariableWidth: boolean
+  }
 }
 
 /**

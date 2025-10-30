@@ -1,10 +1,7 @@
 import { useEffect, useState } from 'react'
 import { NetworkRequest } from './useRequestSniffing'
-import { collectFontData } from '../utils/fontMetadata'
-import {
-  EnhancedFontData,
-  collectEnhancedFontMetadata,
-} from '../utils/fontEnhancedMetadata'
+import { collectFontData, FontData } from '../utils/fontMetadata'
+import { collectEnhancedFontMetadata } from '../utils/fontEnhancedMetadata'
 
 export interface FontFileData {
   url: string
@@ -12,7 +9,7 @@ export interface FontFileData {
   size: number
   filename: string
   base64: string
-  metadata: EnhancedFontData
+  metadata: FontData
 }
 
 const fontExtensions = ['.ttf', '.otf', '.woff', '.woff2', '.eot']
@@ -117,12 +114,13 @@ export function useFontSniffer(requests: NetworkRequest[]) {
             const filename = getFilenameFromUrl(request.url)
             const baseFontData = await collectFontData(arrayBuffer, filename)
 
-            // Collect enhanced metadata
+            // Collect enhanced metadata (fills in missing fields from CSS/runtime)
             const enhancedMetadata = await collectEnhancedFontMetadata(
               request.url,
               base64Content,
               actualMimeType || request.mimeType,
               baseFontData,
+              filename,
               request.chromeRequest,
             )
 

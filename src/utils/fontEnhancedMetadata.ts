@@ -1,36 +1,13 @@
 import { FontData } from './fontMetadata'
 
 /**
- * Enhanced font metadata that includes information from CSS and runtime analysis
- */
-export interface EnhancedFontData extends FontData {
-  // CSS-derived metadata
-  cssUsage?: {
-    fontFamilyDeclarations: string[] // All font-family names found in CSS
-    fontWeights: string[] // Detected font-weights
-    fontStyles: string[] // Detected font-styles (normal, italic, oblique)
-    unicodeRanges: string[] // Unicode ranges specified in CSS
-    usedInSelectors: string[] // CSS selectors where this font is used
-  }
-  // Request metadata
-  referer?: string
-  fontService?: string // Detected service (e.g., "Google Fonts", "Adobe Fonts")
-  // Runtime-detected characteristics
-  isMonospaceDetected?: boolean // Detected via Canvas measurement
-  actualMetrics?: {
-    avgCharWidth: number
-    hasVariableWidth: boolean
-  }
-}
-
-/**
  * Analyzes CSS stylesheets to find font-face rules and usage
  */
 export function analyzeCSSForFont(
   fontUrl: string,
-): Promise<EnhancedFontData['cssUsage']> {
+): Promise<FontData['cssUsage']> {
   return new Promise((resolve) => {
-    const usage: EnhancedFontData['cssUsage'] = {
+    const usage: FontData['cssUsage'] = {
       fontFamilyDeclarations: [],
       fontWeights: [],
       fontStyles: [],
@@ -255,16 +232,17 @@ export async function getRequestMetadata(
 }
 
 /**
- * Combines all enhanced metadata collection methods
+ * Combines all enhanced metadata collection methods and fills in missing FontData fields
  */
 export async function collectEnhancedFontMetadata(
   fontUrl: string,
   base64: string,
   mimeType: string,
   baseFontData: FontData,
+  filename: string,
   chromeRequest?: chrome.devtools.network.Request,
-): Promise<EnhancedFontData> {
-  const enhanced: EnhancedFontData = { ...baseFontData }
+): Promise<FontData> {
+  const enhanced: FontData = { ...baseFontData }
 
   try {
     // Collect CSS usage information
@@ -275,6 +253,15 @@ export async function collectEnhancedFontMetadata(
         cssUsage.usedInSelectors.length > 0)
     ) {
       enhanced.cssUsage = cssUsage
+
+      // Use CSS font-family to fill in missing fontFamily from file
+      if (
+        !enhanced.fontFamily &&
+        cssUsage.fontFamilyDeclarations.length > 0 &&
+        cssUsage.fontFamilyDeclarations[0]
+      ) {
+        enhanced.fontFamily = cssUsage.fontFamilyDeclarations[0]
+      }
     }
 
     // Detect font service
@@ -297,6 +284,22 @@ export async function collectEnhancedFontMetadata(
     enhanced.actualMetrics = {
       avgCharWidth: metrics.avgCharWidth,
       hasVariableWidth: metrics.hasVariableWidth,
+    }
+
+    // Set name with proper priority: file metadata -> CSS -> filename
+    if (enhanced.fontFamily || enhanced.fullName) {
+      // Already has name from file metadata
+      enhanced.name = enhanced.fontFamily || enhanced.fullName || enhanced.name
+    } else if (
+      cssUsage &&
+      cssUsage.fontFamilyDeclarations.length > 0 &&
+      cssUsage.fontFamilyDeclarations[0]
+    ) {
+      // Use CSS font-family if no file metadata
+      enhanced.name = cssUsage.fontFamilyDeclarations[0]
+    } else {
+      // Fallback to filename
+      enhanced.name = filename
     }
   } catch (error) {
     console.error('Error collecting enhanced font metadata:', error)
