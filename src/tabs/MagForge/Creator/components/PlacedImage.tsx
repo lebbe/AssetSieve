@@ -28,6 +28,8 @@ export function PlacedImage({
   const [interactionMode, setInteractionMode] =
     useState<InteractionMode>('none')
   const [cursor, setCursor] = useState('grab')
+  const dragDistance = useRef(0)
+  const justSelected = useRef(false)
   const dragStart = useRef({
     x: 0,
     y: 0,
@@ -41,48 +43,69 @@ export function PlacedImage({
     croppedHeight: 0,
   })
 
-  // Get current crop values or defaults
   const getCropValues = () => {
+    const rawCroppedWidth = placedImage.croppedWidth ?? placedImage.width
+    const rawCroppedHeight = placedImage.croppedHeight ?? placedImage.height
+    const rawCroppedX = placedImage.croppedX ?? 0
+    const rawCroppedY = placedImage.croppedY ?? 0
+
+    const croppedWidth = Math.min(rawCroppedWidth, placedImage.width)
+    const croppedHeight = Math.min(rawCroppedHeight, placedImage.height)
+
+    const maxOffsetX = placedImage.width - croppedWidth
+    const maxOffsetY = placedImage.height - croppedHeight
+
+    const croppedX = Math.max(0, Math.min(rawCroppedX, maxOffsetX))
+    const croppedY = Math.max(0, Math.min(rawCroppedY, maxOffsetY))
+
     return {
-      croppedWidth: placedImage.croppedWidth ?? placedImage.width,
-      croppedHeight: placedImage.croppedHeight ?? placedImage.height,
-      croppedX: placedImage.croppedX ?? 0,
-      croppedY: placedImage.croppedY ?? 0,
+      croppedWidth,
+      croppedHeight,
+      croppedX,
+      croppedY,
       maxWidth: placedImage.width,
       maxHeight: placedImage.height,
     }
   }
 
-  const getInteractionZone = (
-    e: React.MouseEvent,
-    rect: DOMRect,
-  ): InteractionMode => {
-    if (!placedImage.isEditing) {
+  const getInteractionZone = useCallback(
+    (e: React.MouseEvent, rect: DOMRect): InteractionMode => {
+      if (!placedImage.isEditing) {
+        return 'none'
+      }
+
+      const x = e.clientX - rect.left
+      const y = e.clientY - rect.top
+      const edgeThreshold = 10 // pixels
+
+      const isNearRight = x >= rect.width - edgeThreshold
+      const isNearBottom = y >= rect.height - edgeThreshold
+
+      // Check edges (for cropping)
+      if (isNearRight) return 'cropping-right'
+      if (isNearBottom) return 'cropping-bottom'
+
+      // Center area (for panning if cropped)
+      const cropValues = getCropValues()
+      if (
+        cropValues.croppedWidth < cropValues.maxWidth ||
+        cropValues.croppedHeight < cropValues.maxHeight
+      ) {
+        return 'panning'
+      }
+
       return 'none'
-    }
-
-    const x = e.clientX - rect.left
-    const y = e.clientY - rect.top
-    const edgeThreshold = 10 // pixels
-
-    const isNearRight = x >= rect.width - edgeThreshold
-    const isNearBottom = y >= rect.height - edgeThreshold
-
-    // Check edges (for cropping)
-    if (isNearRight) return 'cropping-right'
-    if (isNearBottom) return 'cropping-bottom'
-
-    // Center area (for panning if cropped)
-    const cropValues = getCropValues()
-    if (
-      cropValues.croppedWidth < cropValues.maxWidth ||
-      cropValues.croppedHeight < cropValues.maxHeight
-    ) {
-      return 'panning'
-    }
-
-    return 'none'
-  }
+    },
+    [
+      placedImage.isEditing,
+      placedImage.width,
+      placedImage.height,
+      placedImage.croppedWidth,
+      placedImage.croppedHeight,
+      placedImage.croppedX,
+      placedImage.croppedY,
+    ],
+  )
 
   const updateCursor = (zone: InteractionMode) => {
     const cursorMap: Record<InteractionMode, string> = {
@@ -96,12 +119,42 @@ export function PlacedImage({
     setCursor(cursorMap[zone] || 'default')
   }
 
+  const initializeDragStart = useCallback(
+    (e: React.MouseEvent, useCropValues = false) => {
+      const cropValues = useCropValues ? getCropValues() : null
+      dragStart.current = {
+        x: e.clientX,
+        y: e.clientY,
+        imageX: placedImage.x,
+        imageY: placedImage.y,
+        width: placedImage.width,
+        height: placedImage.height,
+        croppedX: cropValues?.croppedX ?? 0,
+        croppedY: cropValues?.croppedY ?? 0,
+        croppedWidth: cropValues?.croppedWidth ?? placedImage.width,
+        croppedHeight: cropValues?.croppedHeight ?? placedImage.height,
+      }
+    },
+    [
+      placedImage.x,
+      placedImage.y,
+      placedImage.width,
+      placedImage.height,
+      placedImage.croppedX,
+      placedImage.croppedY,
+      placedImage.croppedWidth,
+      placedImage.croppedHeight,
+    ],
+  )
+
   const handleMouseMove = useCallback(
     (e: MouseEvent) => {
       if (interactionMode === 'none') return
 
       const dx = (e.clientX - dragStart.current.x) / scale
       const dy = (e.clientY - dragStart.current.y) / scale
+
+      dragDistance.current = Math.sqrt(dx * dx + dy * dy)
 
       if (interactionMode === 'dragging') {
         // Normal dragging (move entire image)
@@ -111,7 +164,6 @@ export function PlacedImage({
           y: dragStart.current.imageY + dy,
         })
       } else if (interactionMode === 'resizing') {
-        // Normal resizing (scale entire image)
         let aspectRatio = placedImage.image.width / placedImage.image.height
         if (!isFinite(aspectRatio) || aspectRatio <= 0) {
           aspectRatio = placedImage.width / placedImage.height
@@ -120,10 +172,18 @@ export function PlacedImage({
         const newWidth = Math.max(50, dragStart.current.width + dx)
         const newHeight = newWidth / aspectRatio
 
+        // Scale crop dimensions proportionally when resizing
+        const scaleX = newWidth / dragStart.current.width
+        const scaleY = newHeight / dragStart.current.height
+
         onUpdate({
           ...placedImage,
           width: newWidth,
           height: newHeight,
+          croppedWidth: dragStart.current.croppedWidth * scaleX,
+          croppedHeight: dragStart.current.croppedHeight * scaleY,
+          croppedX: dragStart.current.croppedX * scaleX,
+          croppedY: dragStart.current.croppedY * scaleY,
         })
       } else if (interactionMode === 'cropping-right') {
         // Crop from right edge
@@ -152,7 +212,6 @@ export function PlacedImage({
           croppedHeight: newCroppedHeight,
         })
       } else if (interactionMode === 'panning') {
-        // Pan the image within the cropped area
         const maxOffsetX =
           dragStart.current.width - dragStart.current.croppedWidth
         const maxOffsetY =
@@ -184,63 +243,27 @@ export function PlacedImage({
 
   const handleMouseDown = (e: React.MouseEvent) => {
     e.stopPropagation()
+    dragDistance.current = 0
 
     const rect = e.currentTarget.getBoundingClientRect()
     const zone = getInteractionZone(e, rect)
 
     if (placedImage.isEditing && zone !== 'none') {
       // Advanced editing mode - perform interaction
-      const cropValues = getCropValues()
-
-      dragStart.current = {
-        x: e.clientX,
-        y: e.clientY,
-        imageX: placedImage.x,
-        imageY: placedImage.y,
-        width: placedImage.width,
-        height: placedImage.height,
-        croppedX: cropValues.croppedX,
-        croppedY: cropValues.croppedY,
-        croppedWidth: cropValues.croppedWidth,
-        croppedHeight: cropValues.croppedHeight,
-      }
-
+      initializeDragStart(e, true)
       setInteractionMode(zone)
       updateCursor(zone)
     } else if (isSelected && !placedImage.isEditing) {
       // Image is selected but not in editing mode - start dragging
       setInteractionMode('dragging')
-      dragStart.current = {
-        x: e.clientX,
-        y: e.clientY,
-        imageX: placedImage.x,
-        imageY: placedImage.y,
-        width: placedImage.width,
-        height: placedImage.height,
-        croppedX: 0,
-        croppedY: 0,
-        croppedWidth: placedImage.width,
-        croppedHeight: placedImage.height,
-      }
+      initializeDragStart(e, false)
       setCursor('grabbing')
     } else if (!isSelected) {
-      // Select the image first
       onClick()
+      justSelected.current = true
 
-      // Start dragging
       setInteractionMode('dragging')
-      dragStart.current = {
-        x: e.clientX,
-        y: e.clientY,
-        imageX: placedImage.x,
-        imageY: placedImage.y,
-        width: placedImage.width,
-        height: placedImage.height,
-        croppedX: 0,
-        croppedY: 0,
-        croppedWidth: placedImage.width,
-        croppedHeight: placedImage.height,
-      }
+      initializeDragStart(e, false)
       setCursor('grabbing')
     }
   }
@@ -248,10 +271,30 @@ export function PlacedImage({
   const handleClick = (e: React.MouseEvent) => {
     e.stopPropagation()
 
+    const clickThreshold = 5
+    if (dragDistance.current > clickThreshold) {
+      dragDistance.current = 0
+      return
+    }
+
+    // If the image was just selected in handleMouseDown, don't toggle edit mode yet
+    if (justSelected.current) {
+      justSelected.current = false
+      return
+    }
+
     const rect = e.currentTarget.getBoundingClientRect()
     const zone = getInteractionZone(e, rect)
 
-    if (isSelected && placedImage.isEditing && zone === 'none') {
+    if (!isSelected) {
+      // When clicking an unselected image, ensure it's not in edit mode
+      if (placedImage.isEditing) {
+        onUpdate({
+          ...placedImage,
+          isEditing: false,
+        })
+      }
+    } else if (isSelected && placedImage.isEditing && zone === 'none') {
       // Exit editing mode
       onUpdate({
         ...placedImage,
@@ -270,20 +313,7 @@ export function PlacedImage({
     e.stopPropagation()
     onClick()
     setInteractionMode('resizing')
-
-    const cropValues = getCropValues()
-    dragStart.current = {
-      x: e.clientX,
-      y: e.clientY,
-      imageX: placedImage.x,
-      imageY: placedImage.y,
-      width: placedImage.width,
-      height: placedImage.height,
-      croppedX: cropValues.croppedX,
-      croppedY: cropValues.croppedY,
-      croppedWidth: cropValues.croppedWidth,
-      croppedHeight: cropValues.croppedHeight,
-    }
+    initializeDragStart(e, true)
   }
 
   const handleHover = (e: React.MouseEvent) => {

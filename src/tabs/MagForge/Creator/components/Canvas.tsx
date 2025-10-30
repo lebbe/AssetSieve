@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 import { PlacedImage as PlacedImageType } from '../types/page'
 import { PlacedImage } from './PlacedImage'
 import './Canvas.css'
@@ -21,7 +21,6 @@ export function Canvas({
   const [isDragOver, setIsDragOver] = useState(false)
   const [selectedImageId, setSelectedImageId] = useState<string | null>(null)
 
-  // Helper to extract aspect ratio from SVG viewBox
   const getAspectRatioFromSVG = async (url: string): Promise<number | null> => {
     try {
       const response = await fetch(url)
@@ -70,18 +69,15 @@ export function Canvas({
       const x = (e.clientX - rect.left) / userZoom
       const y = (e.clientY - rect.top) / userZoom
 
-      // Calculate initial size - use actual pixel dimensions
       let placedWidth: number
       let placedHeight: number
 
       if (image.width > 0 && image.height > 0) {
-        // Use actual dimensions
         placedWidth = image.width
         placedHeight = image.height
       } else {
-        // SVG or unknown size - try to get aspect ratio from viewBox
         const isSVG = image.mimeType.includes('svg')
-        let aspectRatio = 1 // Default to square
+        let aspectRatio = 1
 
         if (isSVG) {
           const svgAspectRatio = await getAspectRatioFromSVG(image.url)
@@ -90,13 +86,11 @@ export function Canvas({
           }
         }
 
-        // Use decent default that fits canvas
-        const defaultSize = Math.min(width, height) * 0.3 // 30% of smaller canvas dimension
+        const defaultSize = Math.min(width, height) * 0.3
         placedWidth = defaultSize * aspectRatio
         placedHeight = defaultSize
       }
 
-      // Make sure it doesn't exceed canvas dimensions
       if (placedWidth > width || placedHeight > height) {
         const scaleToFit = Math.min(
           (width * 0.8) / placedWidth,
@@ -125,23 +119,26 @@ export function Canvas({
   }
 
   const handleImageClick = (id: string) => {
+    exitEditMode()
     setSelectedImageId(id)
   }
 
-  const handleCanvasClick = (e: React.MouseEvent) => {
-    // Only deselect if clicking directly on canvas (not on an image)
-    if (e.target === e.currentTarget) {
-      // Exit editing mode for the selected image
-      if (selectedImageId) {
-        const selectedImage = images.find((img) => img.id === selectedImageId)
-        if (selectedImage?.isEditing) {
-          onImagesChange(
-            images.map((img) =>
-              img.id === selectedImageId ? { ...img, isEditing: false } : img,
-            ),
-          )
-        }
+  const exitEditMode = useCallback(() => {
+    if (selectedImageId) {
+      const selectedImage = images.find((img) => img.id === selectedImageId)
+      if (selectedImage?.isEditing) {
+        onImagesChange(
+          images.map((img) =>
+            img.id === selectedImageId ? { ...img, isEditing: false } : img,
+          ),
+        )
       }
+    }
+  }, [selectedImageId, images, onImagesChange])
+
+  const handleCanvasClick = (e: React.MouseEvent) => {
+    if (e.target === e.currentTarget) {
+      exitEditMode()
       setSelectedImageId(null)
     }
   }
@@ -153,20 +150,13 @@ export function Canvas({
     }
   }
 
-  // Handle keyboard delete and escape
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Delete' && selectedImageId) {
       handleDeleteSelected()
     } else if (e.key === 'Escape' && selectedImageId) {
-      // Exit editing mode
+      exitEditMode()
       const selectedImage = images.find((img) => img.id === selectedImageId)
-      if (selectedImage?.isEditing) {
-        onImagesChange(
-          images.map((img) =>
-            img.id === selectedImageId ? { ...img, isEditing: false } : img,
-          ),
-        )
-      } else {
+      if (!selectedImage?.isEditing) {
         setSelectedImageId(null)
       }
     }
