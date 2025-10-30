@@ -207,18 +207,22 @@ export function PlacedImage({
 
       setInteractionMode(zone)
       updateCursor(zone)
-    } else if (isSelected && placedImage.isEditing && zone === 'none') {
-      // Image is in editing mode but clicked outside interaction zones - exit editing mode
-      onUpdate({
-        ...placedImage,
-        isEditing: false,
-      })
     } else if (isSelected && !placedImage.isEditing) {
-      // Image is selected but not in editing mode - enter editing mode
-      onUpdate({
-        ...placedImage,
-        isEditing: true,
-      })
+      // Image is selected but not in editing mode - start dragging
+      setInteractionMode('dragging')
+      dragStart.current = {
+        x: e.clientX,
+        y: e.clientY,
+        imageX: placedImage.x,
+        imageY: placedImage.y,
+        width: placedImage.width,
+        height: placedImage.height,
+        croppedX: 0,
+        croppedY: 0,
+        croppedWidth: placedImage.width,
+        croppedHeight: placedImage.height,
+      }
+      setCursor('grabbing')
     } else if (!isSelected) {
       // Select the image first
       onClick()
@@ -238,6 +242,27 @@ export function PlacedImage({
         croppedHeight: placedImage.height,
       }
       setCursor('grabbing')
+    }
+  }
+
+  const handleClick = (e: React.MouseEvent) => {
+    e.stopPropagation()
+
+    const rect = e.currentTarget.getBoundingClientRect()
+    const zone = getInteractionZone(e, rect)
+
+    if (isSelected && placedImage.isEditing && zone === 'none') {
+      // Exit editing mode
+      onUpdate({
+        ...placedImage,
+        isEditing: false,
+      })
+    } else if (isSelected && !placedImage.isEditing) {
+      // Enter editing mode (click only triggers if no drag happened)
+      onUpdate({
+        ...placedImage,
+        isEditing: true,
+      })
     }
   }
 
@@ -280,6 +305,7 @@ export function PlacedImage({
         cursor,
       }}
       onMouseDown={handleMouseDown}
+      onClick={handleClick}
       onMouseMove={handleHover}
     >
       <img
