@@ -145,6 +145,55 @@ export function FontItem({
                   </span>
                 </div>
               )}
+              {font.metadata.isMonospaceDetected !== undefined && (
+                <div className="font-item__detail">
+                  <span className="font-item__detail-label">Detected:</span>
+                  <span className="font-item__detail-value">
+                    {font.metadata.isMonospaceDetected
+                      ? '✓ Monospace'
+                      : 'Variable Width'}
+                  </span>
+                </div>
+              )}
+              {font.metadata.fontService && (
+                <div className="font-item__detail">
+                  <span className="font-item__detail-label">Service:</span>
+                  <span className="font-item__detail-value">
+                    {font.metadata.fontService}
+                  </span>
+                </div>
+              )}
+              {font.metadata.cssUsage &&
+                font.metadata.cssUsage.fontFamilyDeclarations.length > 0 && (
+                  <div className="font-item__detail">
+                    <span className="font-item__detail-label">CSS Names:</span>
+                    <span className="font-item__detail-value">
+                      {font.metadata.cssUsage.fontFamilyDeclarations.join(', ')}
+                    </span>
+                  </div>
+                )}
+              {font.metadata.cssUsage &&
+                font.metadata.cssUsage.fontWeights.length > 0 && (
+                  <div className="font-item__detail">
+                    <span className="font-item__detail-label">Weights:</span>
+                    <span className="font-item__detail-value">
+                      {font.metadata.cssUsage.fontWeights.join(', ')}
+                    </span>
+                  </div>
+                )}
+              {font.metadata.cssUsage &&
+                font.metadata.cssUsage.usedInSelectors.length > 0 && (
+                  <div className="font-item__detail">
+                    <span className="font-item__detail-label">Used in:</span>
+                    <span className="font-item__detail-value">
+                      {font.metadata.cssUsage.usedInSelectors
+                        .slice(0, 3)
+                        .join(', ')}
+                      {font.metadata.cssUsage.usedInSelectors.length > 3 &&
+                        ` (+${font.metadata.cssUsage.usedInSelectors.length - 3} more)`}
+                    </span>
+                  </div>
+                )}
               <div className="font-item__detail">
                 <span className="font-item__detail-label">Format:</span>
                 <span className="font-item__detail-value">
@@ -188,6 +237,22 @@ export function FontItem({
                     className={`font-item__classification ${getClassificationClass(font.metadata.classification)}`}
                   >
                     {font.metadata.classification}
+                  </span>
+                </div>
+              )}
+              {font.metadata.isMonospaceDetected !== undefined && (
+                <div className="font-item__detail">
+                  <span className="font-item__detail-label">Detected:</span>
+                  <span className="font-item__detail-value">
+                    {font.metadata.isMonospaceDetected ? '✓ Mono' : 'Variable'}
+                  </span>
+                </div>
+              )}
+              {font.metadata.fontService && (
+                <div className="font-item__detail">
+                  <span className="font-item__detail-label">Service:</span>
+                  <span className="font-item__detail-value">
+                    {font.metadata.fontService}
                   </span>
                 </div>
               )}
