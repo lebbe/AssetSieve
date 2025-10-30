@@ -128,6 +128,24 @@ export function Canvas({
     setSelectedImageId(id)
   }
 
+  const handleCanvasClick = (e: React.MouseEvent) => {
+    // Only deselect if clicking directly on canvas (not on an image)
+    if (e.target === e.currentTarget) {
+      // Exit editing mode for the selected image
+      if (selectedImageId) {
+        const selectedImage = images.find((img) => img.id === selectedImageId)
+        if (selectedImage?.isEditing) {
+          onImagesChange(
+            images.map((img) =>
+              img.id === selectedImageId ? { ...img, isEditing: false } : img,
+            ),
+          )
+        }
+      }
+      setSelectedImageId(null)
+    }
+  }
+
   const handleDeleteSelected = () => {
     if (selectedImageId) {
       onImagesChange(images.filter((img) => img.id !== selectedImageId))
@@ -135,10 +153,22 @@ export function Canvas({
     }
   }
 
-  // Handle keyboard delete
+  // Handle keyboard delete and escape
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Delete' && selectedImageId) {
       handleDeleteSelected()
+    } else if (e.key === 'Escape' && selectedImageId) {
+      // Exit editing mode
+      const selectedImage = images.find((img) => img.id === selectedImageId)
+      if (selectedImage?.isEditing) {
+        onImagesChange(
+          images.map((img) =>
+            img.id === selectedImageId ? { ...img, isEditing: false } : img,
+          ),
+        )
+      } else {
+        setSelectedImageId(null)
+      }
     }
   }
 
@@ -164,6 +194,7 @@ export function Canvas({
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
           onDrop={handleDrop}
+          onClick={handleCanvasClick}
         >
           {images.map((placedImage) => (
             <PlacedImage

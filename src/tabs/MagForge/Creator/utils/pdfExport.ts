@@ -21,10 +21,15 @@ export async function createPDF(data: PDFExportData): Promise<void> {
 
   // Helper function to convert unsupported formats (including SVG) to PNG with alpha
   // targetWidth/targetHeight are the desired output dimensions in the PDF
+  // sourceX/sourceY/sourceWidth/sourceHeight are the crop region within the source image
   const convertImageToPNG = async (
     imageUrl: string,
     targetWidth: number,
     targetHeight: number,
+    sourceX: number = 0,
+    sourceY: number = 0,
+    sourceWidth?: number,
+    sourceHeight?: number,
   ): Promise<string> => {
     return new Promise((resolve, reject) => {
       const img = new Image()
@@ -44,8 +49,12 @@ export async function createPDF(data: PDFExportData): Promise<void> {
           canvasHeight = img.naturalHeight || 100
         }
 
+        // Use full image dimensions if crop dimensions not specified
+        const srcWidth = sourceWidth ?? img.naturalWidth
+        const srcHeight = sourceHeight ?? img.naturalHeight
+
         console.log(
-          `Rendering ${imageUrl} to canvas at ${canvasWidth}x${canvasHeight}`,
+          `Rendering ${imageUrl} to canvas at ${canvasWidth}x${canvasHeight} from source region (${sourceX}, ${sourceY}, ${srcWidth}, ${srcHeight})`,
         )
 
         const canvas = document.createElement('canvas')
@@ -60,8 +69,19 @@ export async function createPDF(data: PDFExportData): Promise<void> {
         // Clear canvas with transparent background
         ctx.clearRect(0, 0, canvasWidth, canvasHeight)
 
-        // Draw image at full canvas size - this upscales vector graphics properly
-        ctx.drawImage(img, 0, 0, canvasWidth, canvasHeight)
+        // Draw the cropped portion of the image
+        // Parameters: image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight
+        ctx.drawImage(
+          img,
+          sourceX,
+          sourceY,
+          srcWidth,
+          srcHeight,
+          0,
+          0,
+          canvasWidth,
+          canvasHeight,
+        )
 
         // Convert to PNG (preserves alpha channel)
         const pngDataUrl = canvas.toDataURL('image/png')
@@ -114,11 +134,17 @@ export async function createPDF(data: PDFExportData): Promise<void> {
     // Load and place each image on the page
     for (const placedImage of page.images) {
       try {
-        // Convert pixel coordinates to points
+        // Get crop values (use full dimensions if not cropped)
+        const croppedWidth = placedImage.croppedWidth ?? placedImage.width
+        const croppedHeight = placedImage.croppedHeight ?? placedImage.height
+        const croppedX = placedImage.croppedX ?? 0
+        const croppedY = placedImage.croppedY ?? 0
+
+        // Convert pixel coordinates to points (use cropped dimensions)
         const xInPoints = (placedImage.x * 72) / 96
         const yInPoints = (placedImage.y * 72) / 96
-        const widthInPoints = (placedImage.width * 72) / 96
-        const heightInPoints = (placedImage.height * 72) / 96
+        const widthInPoints = (croppedWidth * 72) / 96
+        const heightInPoints = (croppedHeight * 72) / 96
 
         const mimeType = placedImage.image.mimeType
         const isSVG = mimeType.includes('svg')
@@ -134,30 +160,69 @@ export async function createPDF(data: PDFExportData): Promise<void> {
         let imageDataUrl: string
         let format: 'JPEG' | 'PNG' | 'WEBP' = 'PNG'
 
+        // Calculate scaling factor between placed dimensions and actual image dimensions
+        const actualImageWidth = placedImage.image.width || placedImage.width
+        const actualImageHeight = placedImage.image.height || placedImage.height
+        const scaleX = actualImageWidth / placedImage.width
+        const scaleY = actualImageHeight / placedImage.height
+
+        // Scale crop coordinates to actual image space
+        const actualCroppedX = croppedX * scaleX
+        const actualCroppedY = croppedY * scaleY
+        const actualCroppedWidth = croppedWidth * scaleX
+        const actualCroppedHeight = croppedHeight * scaleY
+
         if (!isSupported) {
           // Convert unsupported formats (SVG, AVIF, etc.) to PNG with alpha
-          // Use the PLACED dimensions (not original image dimensions) for high-quality rendering
+          // Use the cropped dimensions for rendering
           console.log(
-            `Converting ${mimeType} to PNG at ${placedImage.width}x${placedImage.height} for ${placedImage.image.url}`,
+            `Converting ${mimeType} to PNG at ${croppedWidth}x${croppedHeight} (cropped from ${actualCroppedX}, ${actualCroppedY}, ${actualCroppedWidth}x${actualCroppedHeight}) for ${placedImage.image.url}`,
           )
           imageDataUrl = await convertImageToPNG(
             placedImage.image.url,
-            placedImage.width,
-            placedImage.height,
+            croppedWidth,
+            croppedHeight,
+            actualCroppedX,
+            actualCroppedY,
+            actualCroppedWidth,
+            actualCroppedHeight,
           )
           format = 'PNG'
         } else {
-          // Use original base64 data for supported formats
-          imageDataUrl = `data:${mimeType};base64,${placedImage.image.base64}`
+          // For supported formats, we need to crop them if necessary
+          if (
+            croppedX > 0 ||
+            croppedY > 0 ||
+            croppedWidth < placedImage.width ||
+            croppedHeight < placedImage.height
+          ) {
+            // Image is cropped, convert to PNG with cropping
+            console.log(
+              `Cropping ${mimeType} to PNG at ${croppedWidth}x${croppedHeight} (cropped from ${actualCroppedX}, ${actualCroppedY}, ${actualCroppedWidth}x${actualCroppedHeight})`,
+            )
+            imageDataUrl = await convertImageToPNG(
+              `data:${mimeType};base64,${placedImage.image.base64}`,
+              croppedWidth,
+              croppedHeight,
+              actualCroppedX,
+              actualCroppedY,
+              actualCroppedWidth,
+              actualCroppedHeight,
+            )
+            format = 'PNG'
+          } else {
+            // Use original base64 data for supported formats when not cropped
+            imageDataUrl = `data:${mimeType};base64,${placedImage.image.base64}`
 
-          if (mimeType.includes('jpeg') || mimeType.includes('jpg')) {
-            format = 'JPEG'
-          } else if (mimeType.includes('webp')) {
-            format = 'WEBP'
+            if (mimeType.includes('jpeg') || mimeType.includes('jpg')) {
+              format = 'JPEG'
+            } else if (mimeType.includes('webp')) {
+              format = 'WEBP'
+            }
           }
         }
 
-        // Add image to PDF
+        // Add image to PDF (using cropped dimensions)
         pdf.addImage(
           imageDataUrl,
           format,
