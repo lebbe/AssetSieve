@@ -29,7 +29,8 @@ export function PlacedImage({
   onUpdate,
   scale,
 }: Props) {
-  const [interactionMode, setInteractionMode] = useState<InteractionMode>('none')
+  const [interactionMode, setInteractionMode] =
+    useState<InteractionMode>('none')
   const [cursor, setCursor] = useState('grab')
   const dragStart = useRef({
     x: 0,
@@ -59,7 +60,10 @@ export function PlacedImage({
     }
   }
 
-  const getInteractionZone = (e: React.MouseEvent, rect: DOMRect): InteractionMode => {
+  const getInteractionZone = (
+    e: React.MouseEvent,
+    rect: DOMRect,
+  ): InteractionMode => {
     if (!placedImage.isEditing) {
       return 'none'
     }
@@ -86,7 +90,10 @@ export function PlacedImage({
 
     // Center area (for panning if cropped)
     const cropValues = getCropValues()
-    if (cropValues.croppedWidth < cropValues.maxWidth || cropValues.croppedHeight < cropValues.maxHeight) {
+    if (
+      cropValues.croppedWidth < cropValues.maxWidth ||
+      cropValues.croppedHeight < cropValues.maxHeight
+    ) {
       return 'panning'
     }
 
@@ -142,7 +149,10 @@ export function PlacedImage({
         // Crop from right edge
         const newCroppedWidth = Math.max(
           50,
-          Math.min(dragStart.current.croppedWidth + dx, dragStart.current.width),
+          Math.min(
+            dragStart.current.croppedWidth + dx,
+            dragStart.current.width,
+          ),
         )
         onUpdate({
           ...placedImage,
@@ -152,7 +162,10 @@ export function PlacedImage({
         // Crop from bottom edge
         const newCroppedHeight = Math.max(
           50,
-          Math.min(dragStart.current.croppedHeight + dy, dragStart.current.height),
+          Math.min(
+            dragStart.current.croppedHeight + dy,
+            dragStart.current.height,
+          ),
         )
         onUpdate({
           ...placedImage,
@@ -160,11 +173,19 @@ export function PlacedImage({
         })
       } else if (interactionMode === 'panning') {
         // Pan the image within the cropped area
-        const maxOffsetX = dragStart.current.width - dragStart.current.croppedWidth
-        const maxOffsetY = dragStart.current.height - dragStart.current.croppedHeight
+        const maxOffsetX =
+          dragStart.current.width - dragStart.current.croppedWidth
+        const maxOffsetY =
+          dragStart.current.height - dragStart.current.croppedHeight
 
-        const newCroppedX = Math.max(0, Math.min(dragStart.current.croppedX - dx, maxOffsetX))
-        const newCroppedY = Math.max(0, Math.min(dragStart.current.croppedY - dy, maxOffsetY))
+        const newCroppedX = Math.max(
+          0,
+          Math.min(dragStart.current.croppedX - dx, maxOffsetX),
+        )
+        const newCroppedY = Math.max(
+          0,
+          Math.min(dragStart.current.croppedY - dy, maxOffsetY),
+        )
 
         onUpdate({
           ...placedImage,
