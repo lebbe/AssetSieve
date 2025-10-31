@@ -1,0 +1,38 @@
+.fonts-grid {
+  display: grid;
+  gap: 1rem;
+  padding: 1rem 0;
+}
+
+.fonts-grid--compact {
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+}
+
+.fonts-grid--normal {
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+}
+
+.fonts-grid--spacious {
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+}
+
+.no-fonts {
+  padding: 2rem;
+  text-align: center;
+  color: #666;
+  background: #f5f5f5;
+  border-radius: 8px;
+  margin: 1rem 0;
+}
+
+.font-analysis {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.control-panels {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1rem;
+}
