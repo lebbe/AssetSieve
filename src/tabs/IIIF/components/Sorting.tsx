@@ -1,10 +1,10 @@
-import { FlippingBookSortBy } from '../hooks/useFlippingBookSorting'
+import { IIIFSortBy } from '../hooks/useIIIFSorting'
 import { InputContainer } from '../../../components/InputContainer'
 import { SortButton } from '../../../components/SortButton'
 
 interface SortingProps {
-  sortBy: FlippingBookSortBy
-  setSortBy: (sortBy: FlippingBookSortBy) => void
+  sortBy: IIIFSortBy
+  setSortBy: (sortBy: IIIFSortBy) => void
   reversed: boolean
   setReversed: (reversed: boolean) => void
   totalImages: number
@@ -17,24 +17,21 @@ export function Sorting({
   setReversed,
   totalImages,
 }: SortingProps) {
-  const sortOptions: { value: FlippingBookSortBy; label: string }[] = [
-    { value: 'manual', label: 'Manual (Original Order)' },
-    { value: 'filename', label: 'Filename (A-Z)' },
-    { value: 'path', label: 'Path (A-Z)' },
-    { value: 'filetype', label: 'File Type (A-Z)' },
-    { value: 'size', label: 'File Size (Largest First)' },
-    { value: 'width', label: 'Width (Largest First)' },
-    { value: 'height', label: 'Height (Largest First)' },
+  const sortOptions: { value: IIIFSortBy; label: string }[] = [
+    { value: 'default', label: 'Default (Download Order)' },
+    { value: 'baseUrl', label: 'Base URL (A-Z)' },
+    { value: 'identifier', label: 'Identifier (A-Z)' },
+    { value: 'dimensions', label: 'Dimensions (Largest First)' },
   ]
 
   return (
     <div className="sorting-container">
       <div className="sorting-controls">
-        <InputContainer label="Sort FlippingBooks by" htmlFor="sort-select">
+        <InputContainer label="Sort by" htmlFor="iiif-sort-select">
           <select
-            id="sort-select"
+            id="iiif-sort-select"
             value={sortBy}
-            onChange={(e) => setSortBy(e.target.value as FlippingBookSortBy)}
+            onChange={(e) => setSortBy(e.target.value as IIIFSortBy)}
             className="input"
           >
             {sortOptions.map((option) => (
@@ -50,8 +47,8 @@ export function Sorting({
           onToggle={() => setReversed(!reversed)}
         />
 
-        <span className="sorting-info">
-          {totalImages} item{totalImages !== 1 ? 's' : ''}
+        <span className="sorting-result-count">
+          Showing {totalImages} {totalImages === 1 ? 'image' : 'images'}
         </span>
       </div>
     </div>

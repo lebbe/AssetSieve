@@ -9,6 +9,7 @@ import { PanelCard } from './components/PanelCard'
 import { Images } from './tabs/Images/Images'
 import { Flippingbook } from './tabs/Flippingbook/Flippingbook'
 import { MagForge } from './tabs/MagForge/MagForge'
+import { IIIF } from './tabs/IIIF/IIIF'
 import { Tabs } from './tabs/Tabs'
 import { Traffic } from './tabs/Traffic/Traffic'
 import { useMagForge } from './tabs/MagForge/hooks/useMagForge'
@@ -52,6 +53,15 @@ function Panel() {
             key={requests.length === 0 ? 'empty' : 'filled'}
             requests={requests}
             removeRequest={removeRequest}
+          />
+        ),
+      },
+      {
+        name: 'IIIF',
+        content: (
+          <IIIF
+            key={requests.length === 0 ? 'empty' : 'filled'}
+            requests={requests}
           />
         ),
       },

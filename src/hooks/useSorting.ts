@@ -1,10 +1,8 @@
 import { useMemo, useState } from 'react'
 import { ImageData } from './useImageSniffer'
-import { naturalCompare } from '../utils/naturalSort'
 
 export type SortBy =
   | 'filename'
-  | 'filename-numeric'
   | 'path'
   | 'filetype'
   | 'size'
@@ -95,13 +93,6 @@ export function useSorting(filteredImages: ImageData[]) {
           const filenameA = getFilenameFromUrl(a.url).toLowerCase()
           const filenameB = getFilenameFromUrl(b.url).toLowerCase()
           comparison = filenameA.localeCompare(filenameB)
-          break
-        }
-
-        case 'filename-numeric': {
-          const filenameA = getFilenameFromUrl(a.url).toLowerCase()
-          const filenameB = getFilenameFromUrl(b.url).toLowerCase()
-          comparison = naturalCompare(filenameA, filenameB)
           break
         }
 

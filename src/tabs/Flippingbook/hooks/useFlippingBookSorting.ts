@@ -1,11 +1,9 @@
 import { useState, useMemo, useEffect } from 'react'
 import { FlippingBookPair } from './useCombiner'
-import { naturalCompare } from '../../../utils/naturalSort'
 
 export type FlippingBookSortBy =
   | 'manual'
   | 'filename'
-  | 'filename-numeric'
   | 'path'
   | 'filetype'
   | 'size'
@@ -47,12 +45,6 @@ export function useFlippingBookSorting(flippingBooks: FlippingBookPair[]) {
       case 'filename':
         sorted = [...flippingBooks].sort((a, b) =>
           a.filename.localeCompare(b.filename),
-        )
-        break
-
-      case 'filename-numeric':
-        sorted = [...flippingBooks].sort((a, b) =>
-          naturalCompare(a.filename.toLowerCase(), b.filename.toLowerCase()),
         )
         break
 

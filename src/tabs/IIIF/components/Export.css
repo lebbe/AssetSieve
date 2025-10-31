@@ -1,0 +1,49 @@
+.export-container {
+  margin-top: 2rem;
+  padding: 1.5rem;
+  border: 1px solid var(--border-color, #ddd);
+  border-radius: 8px;
+  background: var(--card-bg, white);
+}
+
+.export-actions {
+  margin-top: 1rem;
+}
+
+.export-actions button {
+  width: 100%;
+}
+
+.export-warning {
+  margin-top: 1rem;
+  padding: 0.75rem;
+  background: #fff3cd;
+  border: 1px solid #ffc107;
+  border-radius: 4px;
+  color: #856404;
+  font-size: 0.9rem;
+}
+
+.export-progress {
+  margin-top: 1rem;
+}
+
+.progress-bar {
+  height: 8px;
+  background: var(--progress-bg, #e0e0e0);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progress-bar__fill {
+  height: 100%;
+  background: var(--progress-color, #4caf50);
+  transition: width 0.3s ease;
+}
+
+.export-status {
+  margin-top: 0.5rem;
+  font-size: 0.85rem;
+  color: var(--text-muted, #666);
+  text-align: center;
+}
