@@ -38,6 +38,8 @@ export interface FontData {
   classification?: string
   xHeight?: number
   capHeight?: number
+  // File format information
+  format?: string // File format (WOFF2, WOFF, TTF, OTF, EOT) derived from mimeType
   // CSS-derived metadata
   cssUsage?: {
     fontFamilyDeclarations: string[] // All font-family names found in CSS

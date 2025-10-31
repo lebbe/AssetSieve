@@ -232,6 +232,18 @@ export async function getRequestMetadata(
 }
 
 /**
+ * Extracts clean format name from mimeType
+ */
+function getFormatFromMimeType(mimeType: string): string {
+  if (mimeType.includes('woff2')) return 'WOFF2'
+  if (mimeType.includes('woff')) return 'WOFF'
+  if (mimeType.includes('ttf')) return 'TTF'
+  if (mimeType.includes('otf')) return 'OTF'
+  if (mimeType.includes('eot')) return 'EOT'
+  return 'Unknown'
+}
+
+/**
  * Combines all enhanced metadata collection methods and fills in missing FontData fields
  */
 export async function collectEnhancedFontMetadata(
@@ -245,6 +257,9 @@ export async function collectEnhancedFontMetadata(
   const enhanced: FontData = { ...baseFontData }
 
   try {
+    // Extract format from mimeType (more reliable than filename extension)
+    enhanced.format = getFormatFromMimeType(mimeType)
+
     // Collect CSS usage information
     const cssUsage = await analyzeCSSForFont(fontUrl)
     if (

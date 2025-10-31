@@ -31,6 +31,23 @@ export function FontItem({
   // Generate a unique font family name for this font instance
   const fontFamilyName = `font-preview-${font.url.replace(/[^a-zA-Z0-9]/g, '-')}-${index}`
 
+  // Helper function to get format from mimeType (with fallback to metadata)
+  const getFormatFromMimeType = (mimeType: string): string => {
+    // First try to use the format from metadata if available
+    if (font.metadata.format) {
+      return font.metadata.format
+    }
+    // Otherwise derive it from mimeType
+    if (mimeType.includes('woff2')) return 'WOFF2'
+    if (mimeType.includes('woff')) return 'WOFF'
+    if (mimeType.includes('ttf')) return 'TTF'
+    if (mimeType.includes('otf')) return 'OTF'
+    if (mimeType.includes('eot')) return 'EOT'
+    // Fallback to extension from filename if mimeType is not specific
+    const ext = font.filename.split('.').pop()?.toUpperCase()
+    return ext || 'UNKNOWN'
+  }
+
   // Inject font-face declaration
   useEffect(() => {
     // Create style element if it doesn't exist
@@ -197,7 +214,7 @@ export function FontItem({
               <div className="font-item__detail">
                 <span className="font-item__detail-label">Format:</span>
                 <span className="font-item__detail-value">
-                  {font.filename.split('.').pop()?.toUpperCase()}
+                  {getFormatFromMimeType(font.mimeType)}
                 </span>
               </div>
               <div className="font-item__detail">
