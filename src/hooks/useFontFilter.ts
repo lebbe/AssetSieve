@@ -22,10 +22,10 @@ export function useFontFilter(fonts: FontFileData[]) {
   const availableFileTypes = useMemo(() => {
     const types = new Set<string>()
     fonts.forEach((font) => {
-      // Extract extension from filename or mime type
-      const ext = font.filename.split('.').pop()?.toUpperCase()
-      if (ext) {
-        types.add(ext)
+      // Use format from metadata (derived from mimeType) instead of filename
+      const format = font.metadata.format
+      if (format) {
+        types.add(format)
       }
     })
     return Array.from(types).sort()
@@ -82,8 +82,8 @@ export function useFontFilter(fonts: FontFileData[]) {
 
       // File type filter
       if (filters.fileTypes.size > 0) {
-        const ext = font.filename.split('.').pop()?.toUpperCase()
-        if (!ext || !filters.fileTypes.has(ext)) {
+        const format = font.metadata.format
+        if (!format || !filters.fileTypes.has(format)) {
           return false
         }
       }

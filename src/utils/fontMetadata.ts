@@ -47,6 +47,7 @@ export interface FontData {
     fontStyles: string[] // Detected font-styles (normal, italic, oblique)
     unicodeRanges: string[] // Unicode ranges specified in CSS
     usedInSelectors: string[] // CSS selectors where this font is used
+    fontFamilyStacks: string[] // Full font-family stacks from CSS rules
   }
   // Request metadata
   referer?: string

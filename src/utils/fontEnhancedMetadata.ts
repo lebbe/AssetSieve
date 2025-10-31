@@ -1,6 +1,25 @@
 import { FontData } from './fontMetadata'
 
 /**
+ * Extracts generic font family hints from CSS font-family stacks
+ * e.g., "Google Sans Flex", -apple-system, sans-serif -> "Sans-serif"
+ */
+function extractGenericFamilyFromStack(
+  fontFamilyStack: string,
+): string | undefined {
+  const stack = fontFamilyStack.toLowerCase()
+
+  // Check for generic families at the end of the stack
+  if (stack.includes('sans-serif')) return 'Sans-serif'
+  if (stack.includes('serif') && !stack.includes('sans-serif')) return 'Serif'
+  if (stack.includes('monospace')) return 'Monospace'
+  if (stack.includes('cursive')) return 'Script'
+  if (stack.includes('fantasy')) return 'Decorative'
+
+  return undefined
+}
+
+/**
  * Analyzes CSS stylesheets to find font-face rules and usage
  */
 export function analyzeCSSForFont(
@@ -13,6 +32,7 @@ export function analyzeCSSForFont(
       fontStyles: [],
       unicodeRanges: [],
       usedInSelectors: [],
+      fontFamilyStacks: [],
     }
 
     try {
@@ -26,7 +46,8 @@ export function analyzeCSSForFont(
           fontWeights: [],
           fontStyles: [],
           unicodeRanges: [],
-          usedInSelectors: []
+          usedInSelectors: [],
+          fontFamilyStacks: []
         };
         
         // Analyze all stylesheets
@@ -74,6 +95,8 @@ export function analyzeCSSForFont(
                   fontFamily.includes(name)
                 )) {
                   results.usedInSelectors.push(styleRule.selectorText);
+                  // Capture the full font-family stack for generic family detection
+                  results.fontFamilyStacks.push(fontFamily);
                 }
               }
             });
@@ -87,6 +110,37 @@ export function analyzeCSSForFont(
     `,
         (result, isException) => {
           if (!isException && result && typeof result === 'object') {
+            // Deduplicate arrays before assigning (using bracket notation and type assertions)
+            if (Array.isArray(result['fontFamilyDeclarations'])) {
+              result['fontFamilyDeclarations'] = [
+                ...new Set(result['fontFamilyDeclarations'] as string[]),
+              ]
+            }
+            if (Array.isArray(result['fontWeights'])) {
+              result['fontWeights'] = [
+                ...new Set(result['fontWeights'] as string[]),
+              ]
+            }
+            if (Array.isArray(result['fontStyles'])) {
+              result['fontStyles'] = [
+                ...new Set(result['fontStyles'] as string[]),
+              ]
+            }
+            if (Array.isArray(result['unicodeRanges'])) {
+              result['unicodeRanges'] = [
+                ...new Set(result['unicodeRanges'] as string[]),
+              ]
+            }
+            if (Array.isArray(result['usedInSelectors'])) {
+              result['usedInSelectors'] = [
+                ...new Set(result['usedInSelectors'] as string[]),
+              ]
+            }
+            if (Array.isArray(result['fontFamilyStacks'])) {
+              result['fontFamilyStacks'] = [
+                ...new Set(result['fontFamilyStacks'] as string[]),
+              ]
+            }
             Object.assign(usage, result)
           }
           resolve(usage)
@@ -276,6 +330,18 @@ export async function collectEnhancedFontMetadata(
         cssUsage.fontFamilyDeclarations[0]
       ) {
         enhanced.fontFamily = cssUsage.fontFamilyDeclarations[0]
+      }
+
+      // Use CSS font-family stacks to detect generic family if classification is missing
+      if (!enhanced.classification && cssUsage.fontFamilyStacks.length > 0) {
+        // Try to detect from any stack
+        for (const stack of cssUsage.fontFamilyStacks) {
+          const genericFamily = extractGenericFamilyFromStack(stack)
+          if (genericFamily) {
+            enhanced.classification = genericFamily
+            break
+          }
+        }
       }
     }
 
