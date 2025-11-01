@@ -1,0 +1,40 @@
+name: Create Release
+
+on:
+  push:
+    tags:
+      - 'v*' # Runs only when you push a tag like v1.0, v1.0.1, etc.
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+    steps:
+      # 1. Check out the code
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 2. Set up Node.js environment
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20' # Specify your Node.js version
+
+      # 3. Install dependencies and build the project
+      - name: Install dependencies and build
+        run: |
+          npm install
+          npm run build
+
+      # 4. Create a ZIP archive of the build directory
+      #    Assumes your build output is in a 'build' directory. Change if it's 'dist'.
+      - name: Archive build directory
+        run: |
+          cd build
+          zip -r ../release.zip .
+
+      # 5. Create the GitHub Release and upload the ZIP file
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: release.zip # The name of the file to upload
+          fail_on_unmatched_files: true # Fails if the zip file is not found
