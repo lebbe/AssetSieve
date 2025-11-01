@@ -14,19 +14,23 @@ export async function stitchIIIFImage(iiifImage: IIIFImage): Promise<string> {
       return
     }
 
-    // Track loaded tiles
-    let loadedCount = 0
-    const totalTiles = iiifImage.tiles.filter((t) => t.imageData).length
+    // Filter tiles with data and sort by resolution (low-res first, high-res last)
+    // This ensures high-res tiles are drawn on top of low-res ones
+    const tilesWithData = iiifImage.tiles
+      .filter((t) => t.imageData)
+      .sort((a, b) => a.scaledWidth - b.scaledWidth)
 
-    if (totalTiles === 0) {
+    if (tilesWithData.length === 0) {
       reject(new Error('No image data available for tiles'))
       return
     }
 
-    // Draw each tile
-    iiifImage.tiles.forEach((tile: IIIFTile) => {
-      if (!tile.imageData) return
+    // Track loaded tiles
+    let loadedCount = 0
+    const totalTiles = tilesWithData.length
 
+    // Draw each tile
+    tilesWithData.forEach((tile: IIIFTile) => {
       const img = new Image()
 
       img.onload = () => {
@@ -54,7 +58,7 @@ export async function stitchIIIFImage(iiifImage: IIIFImage): Promise<string> {
       }
 
       // Set image source
-      const dataUrl = `data:${tile.imageData.mimeType};base64,${tile.imageData.base64}`
+      const dataUrl = `data:${tile.imageData!.mimeType};base64,${tile.imageData!.base64}`
       img.src = dataUrl
     })
   })

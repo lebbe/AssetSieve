@@ -46,14 +46,20 @@ export function IIIFItem({
       ? Math.round((tilesWithData.length / iiifImage.tiles.length) * 100)
       : 0
 
-  // Reset stitched image when tiles change (e.g., higher resolution tiles arrive)
+  // Create a stable identifier for the tile set (only changes when actual tiles change)
+  const tilesSignature = iiifImage.tiles
+    .map((t) => `${t.url}:${t.scaledWidth}`)
+    .sort()
+    .join('|')
+
+  // Reset stitched image when tiles actually change (e.g., higher resolution tiles arrive)
   useEffect(() => {
     // If we have a preview but tiles changed, clear it to trigger re-stitch
     if (combinedPreview) {
       setCombinedPreview(null)
       setError(null)
     }
-  }, [iiifImage.tiles])
+  }, [tilesSignature])
 
   // Automatically stitch when all tiles are ready
   useEffect(() => {
