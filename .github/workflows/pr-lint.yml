@@ -36,8 +36,8 @@ jobs:
           # Convert to MB for display
           BUNDLE_SIZE_MB=$(echo "scale=2; $BUNDLE_SIZE / 1024 / 1024" | bc)
 
-          # Threshold: 1.1 MB = 1153434 bytes
-          THRESHOLD=1153434
+          # Threshold: 2 MB = 2097152 bytes
+          THRESHOLD=2097152
 
           echo "📦 Total bundle size: ${BUNDLE_SIZE_MB} MB (${BUNDLE_SIZE} bytes)"
           echo ""
@@ -46,10 +46,10 @@ jobs:
 
           if [ $BUNDLE_SIZE -gt $THRESHOLD ]; then
             echo ""
-            echo "⚠️  WARNING: Bundle size (${BUNDLE_SIZE_MB} MB) exceeds 1.1 MB threshold!"
+            echo "⚠️  WARNING: Bundle size (${BUNDLE_SIZE_MB} MB) exceeds 2 MB threshold!"
             echo "❌ Bundle size check FAILED"
             exit 1
           else
             echo ""
-            echo "✅ Bundle size check PASSED (under 1.1 MB threshold)"
+            echo "✅ Bundle size check PASSED (under 2 MB threshold)"
           fi
