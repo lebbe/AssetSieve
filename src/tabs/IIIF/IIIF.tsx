@@ -23,11 +23,20 @@ export function IIIF({ requests }: Props) {
   const { images } = useImageSniffer(requests)
   const { iiifImages, detectedTiles } = useIIIFDetector(requests, images)
   const [deletedBaseUrls, setDeletedBaseUrls] = useState<Set<string>>(new Set())
+  const [renamedIdentifiers, setRenamedIdentifiers] = useState<
+    Map<string, string>
+  >(new Map())
 
-  // Filter out deleted images
-  const visibleImages = iiifImages.filter(
-    (img) => !deletedBaseUrls.has(img.baseUrl),
-  )
+  // Filter out deleted images and apply renames
+  const visibleImages = iiifImages
+    .filter((img) => !deletedBaseUrls.has(img.baseUrl))
+    .map((img) => {
+      const renamedId = renamedIdentifiers.get(img.baseUrl)
+      if (renamedId) {
+        return { ...img, identifier: renamedId }
+      }
+      return img
+    })
 
   const { filteredImages, filters, handleInputChange, clearFilters } =
     useIIIFFilter(visibleImages)
@@ -55,6 +64,10 @@ export function IIIF({ requests }: Props) {
 
   const handleDelete = (baseUrl: string) => {
     setDeletedBaseUrls((prev) => new Set(prev).add(baseUrl))
+  }
+
+  const handleRename = (baseUrl: string, newIdentifier: string) => {
+    setRenamedIdentifiers((prev) => new Map(prev).set(baseUrl, newIdentifier))
   }
 
   const handleImageClick = (imageUrl: string) => {
@@ -158,6 +171,7 @@ export function IIIF({ requests }: Props) {
                 onDragEnd={handleDragEnd}
                 onDragOver={handleDragOver}
                 onDelete={handleDelete}
+                onRename={handleRename}
                 isDragging={draggedIndex === index}
                 dragOverIndex={dragOverIndex}
                 onImageClick={handleImageClick}

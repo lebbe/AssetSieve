@@ -148,6 +148,26 @@
   text-overflow: ellipsis;
   white-space: nowrap;
   color: #333;
+  cursor: pointer;
+  padding: 2px 4px;
+  border-radius: 3px;
+  transition: background-color 0.15s ease;
+}
+
+.iiif-item__title:hover {
+  background-color: #f0f0f0;
+}
+
+.iiif-item__title-input {
+  font-weight: 500;
+  font-size: 13px;
+  color: #333;
+  border: 1px solid #007bff;
+  border-radius: 3px;
+  padding: 2px 4px;
+  outline: none;
+  width: 100%;
+  background: white;
 }
 
 .iiif-item__meta {

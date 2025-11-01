@@ -11,7 +11,13 @@ export function useIIIFSorting(images: IIIFImage[]) {
   const sortedImages = useMemo(() => {
     // Use manual order if sortBy is 'default' and manual order exists
     if (sortBy === 'default' && manualOrder.length > 0) {
-      return reversed ? [...manualOrder].reverse() : manualOrder
+      // Find new images that aren't in manualOrder
+      const manualBaseUrls = new Set(manualOrder.map((img) => img.baseUrl))
+      const newImages = images.filter((img) => !manualBaseUrls.has(img.baseUrl))
+
+      // Append new images to the end of manual order
+      const combined = [...manualOrder, ...newImages]
+      return reversed ? [...combined].reverse() : combined
     }
 
     const sorted = [...images]

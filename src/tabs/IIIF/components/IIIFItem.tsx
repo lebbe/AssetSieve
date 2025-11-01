@@ -11,6 +11,7 @@ interface Props {
   onDragEnd?: () => void
   onDragOver?: (index: number) => void
   onDelete?: (baseUrl: string) => void
+  onRename?: (baseUrl: string, newIdentifier: string) => void
   isDragging?: boolean
   dragOverIndex?: number | null
   onImageClick?: (imageUrl: string) => void
@@ -24,6 +25,7 @@ export function IIIFItem({
   onDragEnd,
   onDragOver,
   onDelete,
+  onRename,
   isDragging,
   dragOverIndex,
   onImageClick,
@@ -34,6 +36,8 @@ export function IIIFItem({
     iiifImage.combinedImage || null,
   )
   const [error, setError] = useState<string | null>(null)
+  const [isEditingName, setIsEditingName] = useState(false)
+  const [editedName, setEditedName] = useState(iiifImage.identifier)
 
   const tilesWithData = iiifImage.tiles.filter((t) => t.imageData)
   const tilesReady = tilesWithData.length === iiifImage.tiles.length
@@ -85,6 +89,27 @@ export function IIIFItem({
     e.preventDefault()
     e.stopPropagation()
     onDelete?.(iiifImage.baseUrl)
+  }
+
+  const handleNameClick = () => {
+    setIsEditingName(true)
+    setEditedName(iiifImage.identifier)
+  }
+
+  const handleNameBlur = () => {
+    setIsEditingName(false)
+    if (editedName.trim() && editedName !== iiifImage.identifier) {
+      onRename?.(iiifImage.baseUrl, editedName.trim())
+    }
+  }
+
+  const handleNameKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      e.currentTarget.blur()
+    } else if (e.key === 'Escape') {
+      setEditedName(iiifImage.identifier)
+      setIsEditingName(false)
+    }
   }
 
   const handleImageClick = () => {
@@ -165,9 +190,25 @@ export function IIIFItem({
       )}
 
       <div className="iiif-item__info">
-        <div className="iiif-item__title" title={iiifImage.identifier}>
-          {iiifImage.identifier}
-        </div>
+        {isEditingName ? (
+          <input
+            type="text"
+            className="iiif-item__title-input"
+            value={editedName}
+            onChange={(e) => setEditedName(e.target.value)}
+            onBlur={handleNameBlur}
+            onKeyDown={handleNameKeyDown}
+            autoFocus
+          />
+        ) : (
+          <div
+            className="iiif-item__title"
+            title={`${iiifImage.identifier} (click to rename)`}
+            onClick={handleNameClick}
+          >
+            {iiifImage.identifier}
+          </div>
+        )}
         <div className="iiif-item__meta">
           <span className="meta-item">
             {iiifImage.fullWidth} × {iiifImage.fullHeight}px
