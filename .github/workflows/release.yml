@@ -33,10 +33,10 @@ jobs:
       - name: Archive build directory
         run: |
           cd dist
-          zip -r ../release.zip .
+          zip -r ../AssetSieve.zip .
 
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
-          files: release.zip
+          files: AssetSieve.zip
           fail_on_unmatched_files: true

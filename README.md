@@ -65,32 +65,17 @@ This extension is intended to be run locally from source.
 
 ### Steps
 
-1.  **Clone the Repository**
+1.  **Go to [relases](https://github.com/lebbe/AssetSieve/releases)**
 
-    ```bash
-    git clone https://github.com/lebbe/AssetSieve.git
-    cd AssetSieve
-    ```
+2.  **Download the `AssetSieve.zip` asset on the latest releasep**
 
-2.  **Install Dependencies**
-
-    ```bash
-    npm install
-    ```
-
-3.  **Build the Extension**
-
-    ```bash
-    npm run build
-    ```
-
-    This command will generate a `dist/` directory containing the unpacked extension files.
+3.  Unzip the downloaded release
 
 4.  **Load in Chrome**
     1.  Open Chrome and navigate to `chrome://extensions`.
     2.  Enable the **"Developer mode"** toggle, usually in the top-right corner.
     3.  Click **"Load unpacked"**.
-    4.  Select the `dist/` directory created in the previous step.
+    4.  Select the `AssetSieve/` directory created in the previous step.
     5.  The AssetSieve extension icon will appear in your browser's toolbar, and the panel will be available in DevTools.
 
 ---
