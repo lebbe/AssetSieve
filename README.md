@@ -1,4 +1,4 @@
-# AssetSieve: A Developer's Web Archiving & Network Analysis Tool
+# AssetSieve: A Web Archiving Tool
 
 **AssetSieve** is a powerful Chrome extension that captures, organizes, and exports images from any website. Effortlessly create PDFs from digital magazines, reassemble high-resolution art from museum archives, or simply download all images from a gallery. Stop juggling screenshots and manual saves—let AssetSieve automate your digital archiving.
 
