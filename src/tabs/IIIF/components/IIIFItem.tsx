@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { IIIFImage } from '../hooks/useIIIFDetector'
 import { stitchIIIFImage, downloadIIIFImage } from '../utils/iiifStitcher'
 import './IIIFItem.css'
@@ -38,6 +38,7 @@ export function IIIFItem({
   const [error, setError] = useState<string | null>(null)
   const [isEditingName, setIsEditingName] = useState(false)
   const [editedName, setEditedName] = useState(iiifImage.identifier)
+  const prevTilesSignatureRef = useRef<string>('')
 
   const tilesWithData = iiifImage.tiles.filter((t) => t.imageData)
   const tilesReady = tilesWithData.length === iiifImage.tiles.length
@@ -54,12 +55,17 @@ export function IIIFItem({
 
   // Reset stitched image when tiles actually change (e.g., higher resolution tiles arrive)
   useEffect(() => {
-    // If we have a preview but tiles changed, clear it to trigger re-stitch
-    if (combinedPreview) {
-      setCombinedPreview(null)
-      setError(null)
+    // Check if tiles signature has actually changed
+    if (tilesSignature !== prevTilesSignatureRef.current) {
+      prevTilesSignatureRef.current = tilesSignature
+
+      // If we have a preview, clear it to trigger re-stitch with new tiles
+      if (combinedPreview) {
+        setCombinedPreview(null)
+        setError(null)
+      }
     }
-  }, [tilesSignature])
+  }, [tilesSignature, combinedPreview])
 
   // Automatically stitch when all tiles are ready
   useEffect(() => {
