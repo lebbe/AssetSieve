@@ -137,6 +137,85 @@ AssetSieve intelligently pairs these assets together and enables you to export y
 
 ---
 
+## How to Use AssetSieve IIIF
+
+### What is IIIF?
+
+IIIF (International Image Interoperability Framework) is a standardized way to deliver high-resolution images on the web. Many libraries, museums, and archives use IIIF to share digitized collections. Instead of loading one large image file, IIIF splits images into small tiles that are loaded on-demand as you zoom and pan - similar to how Google Maps works.
+
+AssetSieve's **IIIF Tab** automatically detects these tiled images, stitches them back together into complete high-resolution images, and lets you export them as a PDF or individual downloads.
+
+### Example Sites
+
+Many cultural institutions use IIIF to share their digitized collections:
+
+- **National Library of Norway** (nb.no) - Digitized books, newspapers, and manuscripts
+- **Europeana** - European cultural heritage collections
+- **Digital Public Library of America** (DPLA) - American archives
+- **Wellcome Collection** - Medical history and images
+- **Yale University Library** - Art collections and manuscripts
+
+When you're browsing digital books or viewing artwork on these sites, AssetSieve can capture and reassemble the high-resolution images automatically.
+
+### Step-by-Step Usage
+
+#### Step 1: Access a IIIF-Enabled Website
+
+1. Navigate to a digital collection that uses IIIF (like nb.no's book reader)
+2. Open Chrome DevTools (F12) and click the **"AssetSieve"** tab
+3. Switch to the **"IIIF"** tab within AssetSieve
+
+#### Step 2: Browse and Capture
+
+1. Browse through the digital publication normally
+2. Turn pages, zoom, and navigate as you would typically browse
+3. AssetSieve automatically detects IIIF tile requests and groups them by image
+4. Once all tiles for an image are loaded, they are automatically stitched together
+5. Watch the progress as tiles are detected and images are assembled
+6. Click **"Stop Listening"** when you're done capturing pages
+
+#### Step 3: Review and Organize
+
+- **Filter images**: Search by identifier, dimensions, or number of tiles
+- **Sort images**: Arrange by URL, identifier, or dimensions
+- **Drag and drop**: Manually reorder images into your preferred sequence
+- **Preview images**: Click any thumbnail to view the full-resolution stitched image
+- **Delete unwanted images**: Remove any images you don't want to keep
+
+#### Step 4: Export Your Collection
+
+1. **Export to PDF**: Click "Export to PDF" to generate a document with all stitched images
+   - Images are automatically compressed for manageable file sizes
+   - Progress tracking shows the export status
+2. **Download individual images**: Click the download button on any image to save it separately
+
+### Key Features
+
+- **Automatic IIIF Detection**: Recognizes IIIF Image API URLs and groups tiles by source image
+- **Smart Stitching**: Automatically reassembles tiles into complete high-resolution images using canvas
+- **Quality Selection**: Always selects the highest resolution tiles available
+- **Progress Tracking**: Visual feedback shows tile loading and stitching progress
+- **Image Compression**: PDF export includes smart compression to avoid memory errors
+- **Modal Viewer**: Click thumbnails to view full-resolution images
+
+### Technical Notes
+
+AssetSieve supports the IIIF Image API URL format:
+
+```
+{base}/{identifier}/{region}/{size}/{rotation}/{quality}.{format}
+```
+
+The tool automatically:
+
+- Parses IIIF URLs to extract tile coordinates and dimensions
+- Groups tiles belonging to the same source image
+- Calculates the final canvas size from tile positions
+- Stitches tiles together in the correct positions
+- Handles multiple resolution levels (always choosing the highest quality)
+
+---
+
 ## Tips for Best Results
 
 - **Use filters wisely**: Set minimum dimensions (like 500×500 pixels) to exclude tiny icons and buttons

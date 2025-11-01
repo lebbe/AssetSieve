@@ -1,0 +1,33 @@
+.filter-container {
+  margin-bottom: 1.5rem;
+}
+
+.filter-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.filter-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.filter-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border-color, #ddd);
+}
+
+.filter-stats {
+  font-size: 0.9rem;
+  color: var(--text-muted, #666);
+}
+
+.btn-clear {
+  font-size: 0.9rem;
+}
