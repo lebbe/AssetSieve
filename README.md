@@ -56,12 +56,7 @@ A comprehensive network analysis utility built into the extension. This provides
 
 ## Installation from Source
 
-This extension is intended to be run locally from source.
-
-### Prerequisites
-
-- Git
-- Node.js and npm (or a compatible package manager)
+This extension is intended to be installed locally from source.
 
 ### Steps
 
@@ -83,4 +78,4 @@ This extension is intended to be run locally from source.
 ## Legal and Privacy Notice
 
 - **Local Processing**: All data collection and processing occur locally within your browser. No information is sent to any external server.
-- **User Responsibility**: This tool is for personal, archival use of content you legally own or have explicit permission to access. Users are solely responsible for complying with all copyright laws, terms of service, and other legal agreements for any website they use this tool on. Do not use this tool for piracy or to circumvent paywalls.
+- **User Responsibility**: This tool is for personal, archival use of content you legally own or have explicit permission to access. Users are solely responsible for complying with all copyright laws, terms of service, and other legal agreements for any website they use this tool on. Do not use this tool for piracy or to circumvent paywalls. Do not redistribute content created with this tool without consent from the copyright holder.
