@@ -174,7 +174,7 @@ export function Canvas({
 
   // Handle keyboard delete and escape
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Delete' && selectedImageId) {
+    if ((e.key === 'Delete' || e.key === 'Backspace') && selectedImageId) {
       handleDeleteSelected()
     } else if (e.key === 'Escape' && selectedImageId) {
       // Exit editing mode

@@ -139,23 +139,10 @@ export function PlacedImage({
         const newWidth = Math.max(50, dragStart.current.width + dx)
         const newHeight = newWidth / aspectRatio
 
-        // Apply grid snapping to the resized dimensions
-        const snapped = snapToGrid(
-          placedImage.x,
-          placedImage.y,
-          newWidth,
-          newHeight,
-          canvasWidth,
-          gridSettings,
-          e.altKey,
-        )
-
         onUpdate({
           ...placedImage,
           width: newWidth,
           height: newHeight,
-          x: snapped.x,
-          y: snapped.y,
         })
       } else if (interactionMode === 'cropping-right') {
         // Crop from right edge
