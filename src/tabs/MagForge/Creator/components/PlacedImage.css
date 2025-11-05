@@ -1,21 +1,21 @@
 .placed-image {
   position: absolute;
-  border: 2px solid transparent;
-  transition: border-color 0.1s ease;
+  outline: 2px solid transparent;
+  transition: outline-color 0.1s ease;
   overflow: hidden;
 }
 
 .placed-image:hover {
-  border-color: rgba(0, 123, 255, 0.3);
+  outline-color: rgba(0, 123, 255, 0.3);
 }
 
 .placed-image--selected {
-  border-color: #007bff;
+  outline-color: #007bff;
 }
 
 .placed-image--editing {
-  border-color: #28a745;
-  border-style: dashed;
+  outline-color: #28a745;
+  outline-style: dashed;
 }
 
 .placed-image img {

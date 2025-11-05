@@ -1,0 +1,51 @@
+.grid-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 12px;
+  background: #f8f9fa;
+  border-radius: 4px;
+  border: 1px solid #dee2e6;
+}
+
+.grid-controls-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.grid-controls-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: #495057;
+  white-space: nowrap;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.grid-controls-label input[type='checkbox'] {
+  margin: 0;
+  cursor: pointer;
+}
+
+.grid-controls-select {
+  width: 70px;
+}
+
+.grid-controls-input {
+  width: 60px;
+}
+
+.grid-controls-select:disabled,
+.grid-controls-input:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.grid-controls-divider {
+  width: 1px;
+  height: 24px;
+  background: #dee2e6;
+}

@@ -1,6 +1,8 @@
 import { useState } from 'react'
-import { PlacedImage as PlacedImageType } from '../types/page'
+import { PlacedImage as PlacedImageType, GridSettings } from '../types/page'
 import { PlacedImage } from './PlacedImage'
+import { GridOverlay } from './GridOverlay'
+import { snapToGrid } from '../utils/gridSnapping'
 import './Canvas.css'
 
 type Props = {
@@ -9,6 +11,7 @@ type Props = {
   images: PlacedImageType[]
   onImagesChange: (images: PlacedImageType[]) => void
   userZoom: number
+  gridSettings: GridSettings
 }
 
 export function Canvas({
@@ -17,6 +20,7 @@ export function Canvas({
   images,
   onImagesChange,
   userZoom,
+  gridSettings,
 }: Props) {
   const [isDragOver, setIsDragOver] = useState(false)
   const [selectedImageId, setSelectedImageId] = useState<string | null>(null)
@@ -67,8 +71,8 @@ export function Canvas({
       const rect = canvasElement.getBoundingClientRect()
 
       // Convert from screen coordinates to canvas coordinates (accounting for zoom)
-      const x = (e.clientX - rect.left) / userZoom
-      const y = (e.clientY - rect.top) / userZoom
+      const rawX = (e.clientX - rect.left) / userZoom
+      const rawY = (e.clientY - rect.top) / userZoom
 
       // Calculate initial size - use actual pixel dimensions
       let placedWidth: number
@@ -106,11 +110,26 @@ export function Canvas({
         placedHeight *= scaleToFit
       }
 
+      // Center on drop point (before snapping)
+      const x = rawX - placedWidth / 2
+      const y = rawY - placedHeight / 2
+
+      // Apply grid snapping (check if Alt key is pressed)
+      const snapped = snapToGrid(
+        x,
+        y,
+        placedWidth,
+        placedHeight,
+        width,
+        gridSettings,
+        e.altKey,
+      )
+
       const newImage: PlacedImageType = {
         id: `${Date.now()}-${Math.random()}`,
         image,
-        x: x - placedWidth / 2, // Center on drop point
-        y: y - placedHeight / 2,
+        x: snapped.x,
+        y: snapped.y,
         width: placedWidth,
         height: placedHeight,
         zIndex: images.length,
@@ -155,7 +174,7 @@ export function Canvas({
 
   // Handle keyboard delete and escape
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Delete' && selectedImageId) {
+    if ((e.key === 'Delete' || e.key === 'Backspace') && selectedImageId) {
       handleDeleteSelected()
     } else if (e.key === 'Escape' && selectedImageId) {
       // Exit editing mode
@@ -196,6 +215,11 @@ export function Canvas({
           onDrop={handleDrop}
           onClick={handleCanvasClick}
         >
+          <GridOverlay
+            width={width}
+            height={height}
+            gridSettings={gridSettings}
+          />
           {images.map((placedImage) => (
             <PlacedImage
               key={placedImage.id}
@@ -208,6 +232,8 @@ export function Canvas({
                   images.map((img) => (img.id === updated.id ? updated : img)),
                 )
               }}
+              canvasWidth={width}
+              gridSettings={gridSettings}
             />
           ))}
           {images.length === 0 && (
