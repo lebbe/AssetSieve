@@ -1,4 +1,4 @@
-import { Page } from '../types/page'
+import { Page, PlacedTextBox } from '../types/page'
 
 type PDFMetadata = {
   width: number
@@ -10,6 +10,80 @@ type PDFMetadata = {
 type PDFExportData = {
   metadata: PDFMetadata
   pages: Page[]
+}
+
+// Constants for text rendering
+const TEXT_PADDING = 8
+const LINE_HEIGHT_MULTIPLIER = 1.2
+const UNDERLINE_OFFSET = 2
+const MIN_UNDERLINE_WIDTH = 1
+const UNDERLINE_WIDTH_DIVISOR = 16
+
+// Helper function to render text box to canvas
+const renderTextBoxToCanvas = async (
+  textBox: PlacedTextBox,
+  targetWidth: number,
+  targetHeight: number,
+): Promise<string> => {
+  return new Promise((resolve) => {
+    const canvas = document.createElement('canvas')
+    canvas.width = Math.round(targetWidth)
+    canvas.height = Math.round(targetHeight)
+    const ctx = canvas.getContext('2d', { alpha: true })
+
+    if (!ctx) {
+      resolve('')
+      return
+    }
+
+    // Clear with transparent background
+    ctx.clearRect(0, 0, canvas.width, canvas.height)
+
+    // Draw background if not transparent
+    if (textBox.backgroundColor !== 'transparent') {
+      ctx.fillStyle = textBox.backgroundColor
+      ctx.fillRect(0, 0, canvas.width, canvas.height)
+    }
+
+    // Set up text styling
+    const fontWeight = textBox.isBold ? '700' : '400'
+    const fontStyle = textBox.isItalic ? 'italic' : 'normal'
+    ctx.font = `${fontStyle} ${fontWeight} ${textBox.fontSize}px "${textBox.fontFamily}"`
+    ctx.fillStyle = textBox.color
+    ctx.textBaseline = 'top'
+
+    // Handle underline
+    const lineHeight = textBox.fontSize * LINE_HEIGHT_MULTIPLIER
+    const lines = textBox.text.split('\n')
+
+    lines.forEach((line, index) => {
+      const y = TEXT_PADDING + index * lineHeight
+
+      // Draw text
+      ctx.fillText(line, TEXT_PADDING, y)
+
+      // Draw underline if needed
+      if (textBox.isUnderline && line.length > 0) {
+        const metrics = ctx.measureText(line)
+        ctx.beginPath()
+        ctx.strokeStyle = textBox.color
+        ctx.lineWidth = Math.max(
+          MIN_UNDERLINE_WIDTH,
+          textBox.fontSize / UNDERLINE_WIDTH_DIVISOR,
+        )
+        ctx.moveTo(TEXT_PADDING, y + textBox.fontSize + UNDERLINE_OFFSET)
+        ctx.lineTo(
+          TEXT_PADDING + metrics.width,
+          y + textBox.fontSize + UNDERLINE_OFFSET,
+        )
+        ctx.stroke()
+      }
+    })
+
+    // Convert to PNG
+    const pngDataUrl = canvas.toDataURL('image/png')
+    resolve(pngDataUrl)
+  })
 }
 
 export async function createPDF(data: PDFExportData): Promise<void> {
@@ -236,6 +310,38 @@ export async function createPDF(data: PDFExportData): Promise<void> {
           `Failed to add image ${placedImage.image.url} to PDF:`,
           error,
         )
+      }
+    }
+
+    // Load and place each text box on the page
+    for (const textBox of page.textBoxes) {
+      try {
+        // Convert pixel coordinates to points
+        const xInPoints = (textBox.x * 72) / 96
+        const yInPoints = (textBox.y * 72) / 96
+        const widthInPoints = (textBox.width * 72) / 96
+        const heightInPoints = (textBox.height * 72) / 96
+
+        // Render text box to canvas with alpha
+        const textBoxDataUrl = await renderTextBoxToCanvas(
+          textBox,
+          textBox.width,
+          textBox.height,
+        )
+
+        if (textBoxDataUrl) {
+          // Add text box image to PDF
+          pdf.addImage(
+            textBoxDataUrl,
+            'PNG',
+            xInPoints,
+            yInPoints,
+            widthInPoints,
+            heightInPoints,
+          )
+        }
+      } catch (error) {
+        console.error(`Failed to add text box to PDF:`, error)
       }
     }
   }

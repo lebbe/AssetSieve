@@ -19,6 +19,7 @@ type Props = {
   onCreatorNameChange: (name: string) => void
   onExport: () => void
   onDoubleResolution: () => void
+  onAddTextBox: () => void
 }
 
 export function Toolbar({
@@ -34,6 +35,7 @@ export function Toolbar({
   onCreatorNameChange,
   onExport,
   onDoubleResolution,
+  onAddTextBox,
 }: Props) {
   const handleFormatChange = (e: ChangeEvent<HTMLSelectElement>) => {
     const format = e.target.value as FormatName
@@ -103,6 +105,14 @@ export function Toolbar({
           title="Double the resolution (2x width and height)"
         >
           2x
+        </button>
+
+        <button
+          className="btn btn-sm"
+          onClick={onAddTextBox}
+          title="Add a text box to the page"
+        >
+          Add Text Box
         </button>
 
         <div className="toolbar-group toolbar-group--grow">

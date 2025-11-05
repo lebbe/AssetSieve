@@ -7,20 +7,23 @@ AssetSieve is a Chrome extension DevTools panel for capturing, organizing, and e
 ## Code Style & Formatting
 
 ### Syntax Rules
+
 - **No semicolons** - This project does not use semicolons
 - **Single quotes** - Always use single quotes for strings
 - **Function declarations** - Prefer function declarations over arrow functions for top-level exports
+
   ```typescript
   // ✅ Good
   export function ComponentName({ prop1, prop2 }: Props) {}
   export function useHookName() {}
   export function utilityFunction() {}
-  
+
   // ❌ Avoid
   export const ComponentName = ({ prop1, prop2 }: Props) => {}
   ```
 
 ### TypeScript
+
 - Use TypeScript interfaces for props and types
 - Define props interface right before the component
 - Use type inference where obvious, explicit types where needed
@@ -29,9 +32,11 @@ AssetSieve is a Chrome extension DevTools panel for capturing, organizing, and e
 ## Architectural Principles
 
 ### 1. DIVIDE AND CONQUER
+
 **Use folders and files to separate code appropriately.**
 
 Follow the existing structure:
+
 ```
 src/
 ├── components/        # Reusable UI components
@@ -52,6 +57,7 @@ src/
 - Each component should have its own CSS file when it needs styles
 
 ### 2. PUT STATE IN HOOKS
+
 **Provide a hook with the same name as the component to contain logic.**
 
 This pattern is used throughout the codebase:
@@ -59,8 +65,7 @@ This pattern is used throughout the codebase:
 - **Component-specific hooks**: When a component has significant logic, create a hook with the same name
   - Example: `Filter.tsx` uses `useFilter.ts` or `useTrafficFilter.ts`
   - Example: `Images.tsx` uses `useImageSniffer.ts`
-  
-- **Hook location**: 
+- **Hook location**:
   - Shared hooks go in `src/hooks/`
   - Tab-specific hooks go in `src/tabs/[TabName]/hooks/`
   - Component-specific hooks can live alongside components in the `components/` subfolder
@@ -71,6 +76,7 @@ This pattern is used throughout the codebase:
   - `useFlippingBookSorting` for sorting FlippingBook items
 
 **Example pattern:**
+
 ```typescript
 // Filter.tsx
 export function Filter({ data }: Props) {
@@ -87,6 +93,7 @@ export function useFilter(data: DataType[]) {
 ```
 
 ### 3. NO FILES SHOULD BE NAMED "INDEX"
+
 **Use file naming that actually explains the content of the file.**
 
 - ✅ `Filter.tsx`, `useFilter.ts`, `TrafficItem.tsx`
@@ -95,6 +102,7 @@ export function useFilter(data: DataType[]) {
 When you see what file is changing in a git diff or search results, the filename should immediately tell you what it contains.
 
 ### 4. KISS (Keep It Simple, Stupid)
+
 **Whenever possible keep the code simple and straightforward.**
 
 - Write clear, readable code over clever code
@@ -104,6 +112,7 @@ When you see what file is changing in a git diff or search results, the filename
 - Keep functions focused on a single responsibility
 
 ### 5. AVOID HASTY ABSTRACTIONS
+
 **Keeping code DRY is less important than keeping code readable.**
 
 - Don't create abstractions until you have 3+ similar use cases
@@ -115,6 +124,7 @@ When you see what file is changing in a git diff or search results, the filename
 ## Component Patterns
 
 ### React Components
+
 ```typescript
 // Component with props
 interface ComponentNameProps {
@@ -125,12 +135,12 @@ interface ComponentNameProps {
 export function ComponentName({ data, onAction }: ComponentNameProps) {
   // Hooks at the top
   const { filtered } = useFilter(data)
-  
+
   // Event handlers
   const handleClick = () => {
     onAction(someItem)
   }
-  
+
   // Render
   return (
     <div className="component-name">
@@ -141,19 +151,20 @@ export function ComponentName({ data, onAction }: ComponentNameProps) {
 ```
 
 ### Custom Hooks
+
 ```typescript
 export function useCustomHook(input: InputType) {
   const [state, setState] = useState(initialValue)
-  
+
   const derivedValue = useMemo(() => {
     // Expensive computation
     return computed
   }, [dependencies])
-  
+
   const handleAction = useCallback(() => {
     // Handler logic
   }, [dependencies])
-  
+
   return {
     state,
     derivedValue,
@@ -165,26 +176,34 @@ export function useCustomHook(input: InputType) {
 ## Common Patterns in This Codebase
 
 ### Filtering Pattern
+
 Most tabs implement a filtering system with:
+
 - A `Filter` component for UI
 - A `useFilter` or `use[Feature]Filter` hook for logic
 - Filter state includes available options and current selections
 - Filters are applied via `useMemo` for performance
 
 ### Sorting Pattern
+
 Most tabs implement sorting with:
+
 - A `Sorting` component for UI
 - A `useSorting` or `use[Feature]Sorting` hook for logic
 - Support for sort field, direction (reversed), and custom ordering
 
 ### Drag and Drop
+
 Reorderable lists use:
+
 - `useDragAndDrop` hook or feature-specific variant
 - HTML5 drag and drop events
 - Visual feedback during dragging
 
 ### Export Functionality
+
 Each tab can export data:
+
 - `Export` component in the tab's components folder
 - PDF generation using jsPDF
 - Metadata export functionality
