@@ -12,6 +12,13 @@ type PDFExportData = {
   pages: Page[]
 }
 
+// Constants for text rendering
+const TEXT_PADDING = 8
+const LINE_HEIGHT_MULTIPLIER = 1.2
+const UNDERLINE_OFFSET = 2
+const MIN_UNDERLINE_WIDTH = 1
+const UNDERLINE_WIDTH_DIVISOR = 16
+
 // Helper function to render text box to canvas
 const renderTextBoxToCanvas = async (
   textBox: PlacedTextBox,
@@ -40,23 +47,29 @@ const renderTextBoxToCanvas = async (
     ctx.textBaseline = 'top'
 
     // Handle underline
-    const lineHeight = textBox.fontSize * 1.2
+    const lineHeight = textBox.fontSize * LINE_HEIGHT_MULTIPLIER
     const lines = textBox.text.split('\n')
 
     lines.forEach((line, index) => {
-      const y = 8 + index * lineHeight
+      const y = TEXT_PADDING + index * lineHeight
 
       // Draw text
-      ctx.fillText(line, 8, y)
+      ctx.fillText(line, TEXT_PADDING, y)
 
       // Draw underline if needed
       if (textBox.isUnderline && line.length > 0) {
         const metrics = ctx.measureText(line)
         ctx.beginPath()
         ctx.strokeStyle = textBox.color
-        ctx.lineWidth = Math.max(1, textBox.fontSize / 16)
-        ctx.moveTo(8, y + textBox.fontSize + 2)
-        ctx.lineTo(8 + metrics.width, y + textBox.fontSize + 2)
+        ctx.lineWidth = Math.max(
+          MIN_UNDERLINE_WIDTH,
+          textBox.fontSize / UNDERLINE_WIDTH_DIVISOR,
+        )
+        ctx.moveTo(TEXT_PADDING, y + textBox.fontSize + UNDERLINE_OFFSET)
+        ctx.lineTo(
+          TEXT_PADDING + metrics.width,
+          y + textBox.fontSize + UNDERLINE_OFFSET,
+        )
         ctx.stroke()
       }
     })
@@ -304,9 +317,6 @@ export async function createPDF(data: PDFExportData): Promise<void> {
         const heightInPoints = (textBox.height * 72) / 96
 
         // Render text box to canvas with alpha
-        console.log(
-          `Rendering text box to PNG at ${textBox.width}x${textBox.height}`,
-        )
         const textBoxDataUrl = await renderTextBoxToCanvas(
           textBox,
           textBox.width,

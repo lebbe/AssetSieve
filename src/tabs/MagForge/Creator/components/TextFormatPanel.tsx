@@ -18,6 +18,8 @@ const FONT_OPTIONS: { value: FontFamily; label: string }[] = [
 
 const FONT_SIZES = [8, 10, 12, 14, 16, 18, 20, 24, 28, 32, 36, 48, 64, 72, 96]
 
+const PANEL_OFFSET = 50
+
 export function TextFormatPanel({ textBox, onUpdate, scale }: Props) {
   const handleFontFamilyChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     onUpdate({
@@ -66,7 +68,7 @@ export function TextFormatPanel({ textBox, onUpdate, scale }: Props) {
       className="text-format-panel"
       style={{
         left: `${textBox.x}px`,
-        top: `${textBox.y - 50 / scale}px`,
+        top: `${textBox.y - PANEL_OFFSET / scale}px`,
         transform: `scale(${1 / scale})`,
         transformOrigin: 'top left',
       }}

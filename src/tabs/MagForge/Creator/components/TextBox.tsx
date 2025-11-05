@@ -16,6 +16,10 @@ type Props = {
 
 type InteractionMode = 'none' | 'dragging' | 'resizing'
 
+// Constants
+const MIN_TEXT_BOX_WIDTH = 100
+const MIN_TEXT_BOX_HEIGHT = 50
+
 export function TextBox({
   textBox,
   isSelected,
@@ -67,8 +71,14 @@ export function TextBox({
           y: snapped.y,
         })
       } else if (interactionMode === 'resizing') {
-        const newWidth = Math.max(100, dragStart.current.width + dx)
-        const newHeight = Math.max(50, dragStart.current.height + dy)
+        const newWidth = Math.max(
+          MIN_TEXT_BOX_WIDTH,
+          dragStart.current.width + dx,
+        )
+        const newHeight = Math.max(
+          MIN_TEXT_BOX_HEIGHT,
+          dragStart.current.height + dy,
+        )
 
         onUpdate({
           ...textBox,
