@@ -1,0 +1,48 @@
+.text-box {
+  position: absolute;
+  border: 2px solid transparent;
+  box-sizing: border-box;
+  overflow: hidden;
+  padding: 8px;
+  word-wrap: break-word;
+  white-space: pre-wrap;
+}
+
+.text-box--selected {
+  border-color: #2196f3;
+  outline: 1px solid rgba(33, 150, 243, 0.3);
+}
+
+.text-box--editing {
+  border-color: #4caf50;
+}
+
+.text-box-content {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.text-box-textarea {
+  width: 100%;
+  height: 100%;
+  border: none;
+  outline: none;
+  background: transparent;
+  resize: none;
+  padding: 0;
+  margin: 0;
+  overflow: auto;
+}
+
+.text-box .resize-handle {
+  position: absolute;
+  right: -5px;
+  bottom: -5px;
+  width: 10px;
+  height: 10px;
+  background: #2196f3;
+  border: 1px solid white;
+  cursor: nwse-resize;
+}

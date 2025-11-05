@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { FormatName, getFormatDimensions } from './utils/pdfFormats'
-import { Page, PlacedImage, GridSettings } from './types/page'
+import { Page, PlacedImage, PlacedTextBox, GridSettings } from './types/page'
 import { createPDF } from './utils/pdfExport'
 import { Toolbar } from './components/Toolbar'
 import { Pagination } from './components/Pagination'
@@ -53,6 +53,7 @@ export function Creator({ pages, onPagesChange }: Props) {
     const newPage: Page = {
       id: `${Date.now()}`,
       images: [],
+      textBoxes: [],
       gridSettings: { ...currentGridSettings },
     }
     onPagesChange([...pages, newPage])
@@ -76,6 +77,35 @@ export function Creator({ pages, onPagesChange }: Props) {
       newPages[currentPageIndex] = { ...currentPage, images }
       onPagesChange(newPages)
     }
+  }
+
+  const handleTextBoxesChange = (textBoxes: PlacedTextBox[]) => {
+    const newPages = [...pages]
+    if (currentPage) {
+      newPages[currentPageIndex] = { ...currentPage, textBoxes }
+      onPagesChange(newPages)
+    }
+  }
+
+  const handleAddTextBox = () => {
+    const newTextBox: PlacedTextBox = {
+      id: `${Date.now()}-${Math.random()}`,
+      text: 'Double-click to edit',
+      x: 50,
+      y: 50,
+      width: 200,
+      height: 100,
+      zIndex:
+        (currentPage?.images.length || 0) +
+        (currentPage?.textBoxes.length || 0),
+      fontFamily: 'Lato',
+      fontSize: 16,
+      isBold: false,
+      isItalic: false,
+      isUnderline: false,
+      color: '#000000',
+    }
+    handleTextBoxesChange([...(currentPage?.textBoxes || []), newTextBox])
   }
 
   const handleGridSettingsChange = (gridSettings: GridSettings) => {
@@ -126,6 +156,7 @@ export function Creator({ pages, onPagesChange }: Props) {
         onCreatorNameChange={setCreatorName}
         onExport={handleExport}
         onDoubleResolution={handleDoubleResolution}
+        onAddTextBox={handleAddTextBox}
       />
 
       <Pagination
@@ -150,6 +181,8 @@ export function Creator({ pages, onPagesChange }: Props) {
         height={height}
         images={currentPage?.images || []}
         onImagesChange={handleImagesChange}
+        textBoxes={currentPage?.textBoxes || []}
+        onTextBoxesChange={handleTextBoxesChange}
         userZoom={zoom}
         gridSettings={currentPage?.gridSettings || DEFAULT_GRID_SETTINGS}
       />

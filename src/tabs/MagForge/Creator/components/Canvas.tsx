@@ -1,6 +1,11 @@
 import { useState } from 'react'
-import { PlacedImage as PlacedImageType, GridSettings } from '../types/page'
+import {
+  PlacedImage as PlacedImageType,
+  PlacedTextBox,
+  GridSettings,
+} from '../types/page'
 import { PlacedImage } from './PlacedImage'
+import { TextBox } from './TextBox'
 import { GridOverlay } from './GridOverlay'
 import { snapToGrid } from '../utils/gridSnapping'
 import './Canvas.css'
@@ -10,6 +15,8 @@ type Props = {
   height: number
   images: PlacedImageType[]
   onImagesChange: (images: PlacedImageType[]) => void
+  textBoxes: PlacedTextBox[]
+  onTextBoxesChange: (textBoxes: PlacedTextBox[]) => void
   userZoom: number
   gridSettings: GridSettings
 }
@@ -19,11 +26,16 @@ export function Canvas({
   height,
   images,
   onImagesChange,
+  textBoxes,
+  onTextBoxesChange,
   userZoom,
   gridSettings,
 }: Props) {
   const [isDragOver, setIsDragOver] = useState(false)
   const [selectedImageId, setSelectedImageId] = useState<string | null>(null)
+  const [selectedTextBoxId, setSelectedTextBoxId] = useState<string | null>(
+    null,
+  )
 
   // Helper to extract aspect ratio from SVG viewBox
   const getAspectRatioFromSVG = async (url: string): Promise<number | null> => {
@@ -145,10 +157,16 @@ export function Canvas({
 
   const handleImageClick = (id: string) => {
     setSelectedImageId(id)
+    setSelectedTextBoxId(null)
+  }
+
+  const handleTextBoxClick = (id: string) => {
+    setSelectedTextBoxId(id)
+    setSelectedImageId(null)
   }
 
   const handleCanvasClick = (e: React.MouseEvent) => {
-    // Only deselect if clicking directly on canvas (not on an image)
+    // Only deselect if clicking directly on canvas (not on an image or text box)
     if (e.target === e.currentTarget) {
       // Exit editing mode for the selected image
       if (selectedImageId) {
@@ -162,6 +180,7 @@ export function Canvas({
         }
       }
       setSelectedImageId(null)
+      setSelectedTextBoxId(null)
     }
   }
 
@@ -169,14 +188,20 @@ export function Canvas({
     if (selectedImageId) {
       onImagesChange(images.filter((img) => img.id !== selectedImageId))
       setSelectedImageId(null)
+    } else if (selectedTextBoxId) {
+      onTextBoxesChange(textBoxes.filter((tb) => tb.id !== selectedTextBoxId))
+      setSelectedTextBoxId(null)
     }
   }
 
   // Handle keyboard delete and escape
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if ((e.key === 'Delete' || e.key === 'Backspace') && selectedImageId) {
+    if (
+      (e.key === 'Delete' || e.key === 'Backspace') &&
+      (selectedImageId || selectedTextBoxId)
+    ) {
       handleDeleteSelected()
-    } else if (e.key === 'Escape' && selectedImageId) {
+    } else if (e.key === 'Escape' && (selectedImageId || selectedTextBoxId)) {
       // Exit editing mode
       const selectedImage = images.find((img) => img.id === selectedImageId)
       if (selectedImage?.isEditing) {
@@ -187,6 +212,7 @@ export function Canvas({
         )
       } else {
         setSelectedImageId(null)
+        setSelectedTextBoxId(null)
       }
     }
   }
@@ -236,9 +262,25 @@ export function Canvas({
               gridSettings={gridSettings}
             />
           ))}
-          {images.length === 0 && (
+          {textBoxes.map((textBox) => (
+            <TextBox
+              key={textBox.id}
+              textBox={textBox}
+              isSelected={selectedTextBoxId === textBox.id}
+              onClick={() => handleTextBoxClick(textBox.id)}
+              scale={userZoom}
+              onUpdate={(updated: PlacedTextBox) => {
+                onTextBoxesChange(
+                  textBoxes.map((tb) => (tb.id === updated.id ? updated : tb)),
+                )
+              }}
+              canvasWidth={width}
+              gridSettings={gridSettings}
+            />
+          ))}
+          {images.length === 0 && textBoxes.length === 0 && (
             <div className="canvas-placeholder">
-              Drag images here to add them to the page
+              Drag images here or add text boxes
             </div>
           )}
         </div>

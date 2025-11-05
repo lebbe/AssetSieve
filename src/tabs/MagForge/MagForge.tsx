@@ -13,7 +13,9 @@ type Props = {
 
 export function MagForge({ importedImages, deleteImage }: Props) {
   const magazineImages = importedImages || []
-  const [pages, setPages] = useState<Page[]>([{ id: '1', images: [] }])
+  const [pages, setPages] = useState<Page[]>([
+    { id: '1', images: [], textBoxes: [] },
+  ])
 
   // Track which images are used across all pages
   const usedImageUrls = useMemo(() => {
