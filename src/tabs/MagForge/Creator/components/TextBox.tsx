@@ -95,6 +95,9 @@ export function TextBox({
   }, [])
 
   const handleMouseDown = (e: React.MouseEvent) => {
+    // Ignore right-clicks to allow context menu
+    if (e.button !== 0) return
+
     e.stopPropagation()
 
     if (isEditing) return
@@ -204,6 +207,7 @@ export function TextBox({
           fontStyle: getFontStyle(),
           textDecoration: getTextDecoration(),
           color: textBox.color,
+          backgroundColor: textBox.backgroundColor,
           cursor: isEditing ? 'text' : 'grab',
         }}
         onMouseDown={handleMouseDown}
@@ -224,6 +228,7 @@ export function TextBox({
               fontStyle: getFontStyle(),
               textDecoration: getTextDecoration(),
               color: textBox.color,
+              backgroundColor: textBox.backgroundColor,
             }}
           />
         ) : (

@@ -63,6 +63,22 @@ export function TextFormatPanel({ textBox, onUpdate, scale }: Props) {
     })
   }
 
+  const handleBackgroundColorChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    onUpdate({
+      ...textBox,
+      backgroundColor: e.target.value,
+    })
+  }
+
+  const handleClearBackground = () => {
+    onUpdate({
+      ...textBox,
+      backgroundColor: 'transparent',
+    })
+  }
+
   return (
     <div
       className="text-format-panel"
@@ -131,6 +147,28 @@ export function TextFormatPanel({ textBox, onUpdate, scale }: Props) {
         onChange={handleColorChange}
         title="Text Color"
       />
+
+      <input
+        type="color"
+        className="text-format-color"
+        value={
+          textBox.backgroundColor === 'transparent'
+            ? '#ffffff'
+            : textBox.backgroundColor
+        }
+        onChange={handleBackgroundColorChange}
+        title="Background Color"
+      />
+
+      {textBox.backgroundColor !== 'transparent' && (
+        <button
+          className="text-format-btn text-format-btn--small"
+          onClick={handleClearBackground}
+          title="Clear Background"
+        >
+          ×
+        </button>
+      )}
     </div>
   )
 }

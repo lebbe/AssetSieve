@@ -104,6 +104,7 @@ export function Creator({ pages, onPagesChange }: Props) {
       isItalic: false,
       isUnderline: false,
       color: '#000000',
+      backgroundColor: 'transparent',
     }
     handleTextBoxesChange([...(currentPage?.textBoxes || []), newTextBox])
   }

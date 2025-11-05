@@ -39,6 +39,12 @@ const renderTextBoxToCanvas = async (
     // Clear with transparent background
     ctx.clearRect(0, 0, canvas.width, canvas.height)
 
+    // Draw background if not transparent
+    if (textBox.backgroundColor !== 'transparent') {
+      ctx.fillStyle = textBox.backgroundColor
+      ctx.fillRect(0, 0, canvas.width, canvas.height)
+    }
+
     // Set up text styling
     const fontWeight = textBox.isBold ? '700' : '400'
     const fontStyle = textBox.isItalic ? 'italic' : 'normal'

@@ -38,6 +38,7 @@ export type PlacedTextBox = {
   isItalic: boolean
   isUnderline: boolean
   color: string
+  backgroundColor: string
 }
 
 export type GridSettings = {
