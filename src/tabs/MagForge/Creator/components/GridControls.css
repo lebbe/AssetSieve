@@ -38,6 +38,12 @@
   width: 60px;
 }
 
+.grid-controls-select:disabled,
+.grid-controls-input:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .grid-controls-divider {
   width: 1px;
   height: 24px;

@@ -70,7 +70,8 @@ select.input {
 /* Size variants */
 
 /* Small inputs for compact areas */
-.input--small {
+.input--small,
+.input-sm {
   padding: 4px 6px;
   font-size: 12px;
 }
