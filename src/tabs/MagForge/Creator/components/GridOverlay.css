@@ -1,0 +1,4 @@
+.grid-overlay {
+  pointer-events: none;
+  user-select: none;
+}

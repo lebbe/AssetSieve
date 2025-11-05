@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
-import { PlacedImage as PlacedImageType } from '../types/page'
+import { PlacedImage as PlacedImageType, GridSettings } from '../types/page'
+import { snapToGrid } from '../utils/gridSnapping'
 import './PlacedImage.css'
 
 type Props = {
@@ -8,6 +9,8 @@ type Props = {
   onClick: () => void
   onUpdate: (updated: PlacedImageType) => void
   scale: number
+  canvasWidth: number
+  gridSettings: GridSettings
 }
 
 type InteractionMode =
@@ -24,6 +27,8 @@ export function PlacedImage({
   onClick,
   onUpdate,
   scale,
+  canvasWidth,
+  gridSettings,
 }: Props) {
   const [interactionMode, setInteractionMode] =
     useState<InteractionMode>('none')
@@ -105,10 +110,24 @@ export function PlacedImage({
 
       if (interactionMode === 'dragging') {
         // Normal dragging (move entire image)
+        const rawX = dragStart.current.imageX + dx
+        const rawY = dragStart.current.imageY + dy
+
+        // Apply grid snapping
+        const snapped = snapToGrid(
+          rawX,
+          rawY,
+          placedImage.width,
+          placedImage.height,
+          canvasWidth,
+          gridSettings,
+          e.altKey,
+        )
+
         onUpdate({
           ...placedImage,
-          x: dragStart.current.imageX + dx,
-          y: dragStart.current.imageY + dy,
+          x: snapped.x,
+          y: snapped.y,
         })
       } else if (interactionMode === 'resizing') {
         // Normal resizing (scale entire image)
@@ -120,10 +139,23 @@ export function PlacedImage({
         const newWidth = Math.max(50, dragStart.current.width + dx)
         const newHeight = newWidth / aspectRatio
 
+        // Apply grid snapping to the resized dimensions
+        const snapped = snapToGrid(
+          placedImage.x,
+          placedImage.y,
+          newWidth,
+          newHeight,
+          canvasWidth,
+          gridSettings,
+          e.altKey,
+        )
+
         onUpdate({
           ...placedImage,
           width: newWidth,
           height: newHeight,
+          x: snapped.x,
+          y: snapped.y,
         })
       } else if (interactionMode === 'cropping-right') {
         // Crop from right edge
@@ -174,7 +206,7 @@ export function PlacedImage({
         })
       }
     },
-    [interactionMode, scale, placedImage, onUpdate],
+    [interactionMode, scale, placedImage, onUpdate, canvasWidth, gridSettings],
   )
 
   const handleMouseUp = useCallback(() => {

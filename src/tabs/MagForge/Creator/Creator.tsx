@@ -1,10 +1,12 @@
 import { useState } from 'react'
 import { FormatName, getFormatDimensions } from './utils/pdfFormats'
-import { Page, PlacedImage } from './types/page'
+import { Page, PlacedImage, GridSettings } from './types/page'
 import { createPDF } from './utils/pdfExport'
 import { Toolbar } from './components/Toolbar'
 import { Pagination } from './components/Pagination'
 import { Canvas } from './components/Canvas'
+import { GridControls } from './components/GridControls'
+import { DEFAULT_GRID_SETTINGS } from './utils/gridSnapping'
 import './Creator.css'
 
 type Props = {
@@ -45,9 +47,13 @@ export function Creator({ pages, onPagesChange }: Props) {
   }
 
   const handleAddPage = () => {
+    // Use current page's grid settings for new page
+    const currentGridSettings =
+      currentPage?.gridSettings || DEFAULT_GRID_SETTINGS
     const newPage: Page = {
       id: `${Date.now()}`,
       images: [],
+      gridSettings: { ...currentGridSettings },
     }
     onPagesChange([...pages, newPage])
     setCurrentPageIndex(pages.length) // Go to new page
@@ -68,6 +74,14 @@ export function Creator({ pages, onPagesChange }: Props) {
     const newPages = [...pages]
     if (currentPage) {
       newPages[currentPageIndex] = { ...currentPage, images }
+      onPagesChange(newPages)
+    }
+  }
+
+  const handleGridSettingsChange = (gridSettings: GridSettings) => {
+    const newPages = [...pages]
+    if (currentPage) {
+      newPages[currentPageIndex] = { ...currentPage, gridSettings }
       onPagesChange(newPages)
     }
   }
@@ -126,12 +140,18 @@ export function Creator({ pages, onPagesChange }: Props) {
         onZoomReset={handleZoomReset}
       />
 
+      <GridControls
+        gridSettings={currentPage?.gridSettings || DEFAULT_GRID_SETTINGS}
+        onGridSettingsChange={handleGridSettingsChange}
+      />
+
       <Canvas
         width={width}
         height={height}
         images={currentPage?.images || []}
         onImagesChange={handleImagesChange}
         userZoom={zoom}
+        gridSettings={currentPage?.gridSettings || DEFAULT_GRID_SETTINGS}
       />
     </div>
   )
