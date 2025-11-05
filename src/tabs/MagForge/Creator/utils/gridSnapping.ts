@@ -51,7 +51,8 @@ export function snapToGrid(
   // Find closest column for left edge
   let minLeftDist = Infinity
   for (let col = 0; col <= columns; col++) {
-    const colX = col * (columnWidth + gutter)
+    // Calculate column position: columnWidth * col + gutter * col (gutter comes before each column after the first)
+    const colX = col * columnWidth + (col > 0 ? col * gutter : 0)
     const dist = Math.abs(x - colX)
     if (dist < minLeftDist) {
       minLeftDist = dist
@@ -64,7 +65,7 @@ export function snapToGrid(
   let rightSnappedX = x
   const rightEdge = x + width
   for (let col = 0; col <= columns; col++) {
-    const colX = col * (columnWidth + gutter)
+    const colX = col * columnWidth + (col > 0 ? col * gutter : 0)
     const dist = Math.abs(rightEdge - colX)
     if (dist < minRightDist) {
       minRightDist = dist
@@ -123,7 +124,7 @@ export function getGridLines(
 
   const verticalLines: number[] = []
   for (let col = 0; col <= columns; col++) {
-    verticalLines.push(col * (columnWidth + gutter))
+    verticalLines.push(col * columnWidth + (col > 0 ? col * gutter : 0))
   }
 
   // Calculate row positions
