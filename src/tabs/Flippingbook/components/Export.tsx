@@ -50,10 +50,13 @@ export function Export({ sortedImages }: ExportProps) {
 
     // Process each page in the flipping book sequentially
     for (const flippingBook of flippingBookPages) {
-      // Skip pages without WebP data
-      if (!flippingBook.webp.base64 && !flippingBook.webp.url) {
+      // Skip pages without background image data
+      if (
+        !flippingBook.backgroundImage.base64 &&
+        !flippingBook.backgroundImage.url
+      ) {
         console.warn(
-          `Skipping page ${flippingBook.filename}: missing WebP data`,
+          `Skipping page ${flippingBook.filename}: missing background image data`,
         )
         continue
       }
@@ -89,7 +92,7 @@ export function Export({ sortedImages }: ExportProps) {
 
   const handleDownloadUrls = () => {
     const urls = sortedImages
-      .map((flippingBook) => flippingBook.webp.url)
+      .map((flippingBook) => flippingBook.backgroundImage.url)
       .join('\n')
     const blob = new Blob([urls], { type: 'text/plain' })
     const url = URL.createObjectURL(blob)
@@ -127,7 +130,7 @@ export function Export({ sortedImages }: ExportProps) {
 
   /**
    * Creates a .zip file from the `sortedImages` array and triggers a download.
-   * - WebP files are stored as binary (decoded from base64).
+   * - Background images are stored as binary (decoded from base64).
    * - SVG files are stored as text (decoded from base64 to UTF-8).
    */
   async function handleDownloadEverything() {
@@ -137,10 +140,10 @@ export function Export({ sortedImages }: ExportProps) {
     // Dynamically import JSZip to reduce initial bundle size
     const JSZip = await loadJSZip()
     const zip = new JSZip()
-    const webpFolder = zip.folder('webp')
+    const imagesFolder = zip.folder('images')
     const svgFolder = zip.folder('svg')
 
-    if (!webpFolder || !svgFolder) {
+    if (!imagesFolder || !svgFolder) {
       throw new Error('Failed to create ZIP folders')
     }
 
@@ -152,10 +155,18 @@ export function Export({ sortedImages }: ExportProps) {
         // Remove extension from filename to use as base name
         const baseName = pair.filename.replace(/\.[^/.]+$/, '')
 
-        // 1. Add the WebP file with .webp extension
-        if (pair.webp && pair.webp.base64) {
-          const webpFilename = `${baseName}.webp`
-          webpFolder.file(webpFilename, pair.webp.base64, { base64: true })
+        // 1. Add the background image file with proper extension
+        if (pair.backgroundImage && pair.backgroundImage.base64) {
+          // Get file extension from the background image URL
+          const url = pair.backgroundImage.url
+          const urlWithoutQuery = url.split('?')[0] || url
+          const extension =
+            urlWithoutQuery.substring(urlWithoutQuery.lastIndexOf('.') + 1) ||
+            'jpg'
+          const imageFilename = `${baseName}.${extension}`
+          imagesFolder.file(imageFilename, pair.backgroundImage.base64, {
+            base64: true,
+          })
         }
 
         // 2. Add the SVG file (if it exists) with .svg extension
@@ -235,7 +246,7 @@ export function Export({ sortedImages }: ExportProps) {
 
       for (const flippingBook of sortedImages) {
         try {
-          // Generate combined image by overlaying SVG on WebP
+          // Generate combined image by overlaying SVG on background image
           const canvas = document.createElement('canvas')
           canvas.width = flippingBook.width
           canvas.height = flippingBook.height
@@ -248,21 +259,28 @@ export function Export({ sortedImages }: ExportProps) {
             continue
           }
 
-          // Load and draw WebP
-          const webpImg = new Image()
-          webpImg.crossOrigin = 'anonymous'
+          // Load and draw background image
+          const backgroundImg = new Image()
+          backgroundImg.crossOrigin = 'anonymous'
 
-          const webpSrc = flippingBook.webp.base64
-            ? `data:${flippingBook.webp.mimeType};base64,${flippingBook.webp.base64}`
-            : flippingBook.webp.url
+          const backgroundSrc = flippingBook.backgroundImage.base64
+            ? `data:${flippingBook.backgroundImage.mimeType};base64,${flippingBook.backgroundImage.base64}`
+            : flippingBook.backgroundImage.url
 
           await new Promise<void>((resolve, reject) => {
-            webpImg.onload = () => resolve()
-            webpImg.onerror = () => reject(new Error('Failed to load WebP'))
-            webpImg.src = webpSrc
+            backgroundImg.onload = () => resolve()
+            backgroundImg.onerror = () =>
+              reject(new Error('Failed to load background image'))
+            backgroundImg.src = backgroundSrc
           })
 
-          ctx.drawImage(webpImg, 0, 0, flippingBook.width, flippingBook.height)
+          ctx.drawImage(
+            backgroundImg,
+            0,
+            0,
+            flippingBook.width,
+            flippingBook.height,
+          )
 
           // Overlay SVG if present
           if (flippingBook.svg) {
@@ -409,7 +427,7 @@ export function Export({ sortedImages }: ExportProps) {
           onClick={handleDownloadEverything}
           className="btn btn-grey"
           disabled={sortedImages.length === 0 || isDownloading}
-          title="Download all WebP and SVG files as ZIP"
+          title="Download all background images and SVG files as ZIP"
         >
           {isDownloading && downloadProgress < 100 ? (
             <>

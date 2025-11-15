@@ -54,7 +54,7 @@ async function loadImageSafely(
 }
 
 /**
- * Adds a new page to an existing jsPDF document by combining a WebP background image
+ * Adds a new page to an existing jsPDF document by combining a background image
  * and an SVG overlay using canvas rendering.
  */
 export async function createNewPage(
@@ -65,6 +65,21 @@ export async function createNewPage(
   const originalWidth = flippingBook.width
   const originalHeight = flippingBook.height
 
+  // Validate dimensions
+  if (
+    !originalWidth ||
+    !originalHeight ||
+    originalWidth <= 0 ||
+    originalHeight <= 0
+  ) {
+    console.warn(
+      `[FlippingBook] Invalid dimensions for ${flippingBook.filename}: ${originalWidth}x${originalHeight}`,
+    )
+    throw new Error(
+      `Invalid image dimensions: ${originalWidth}x${originalHeight}`,
+    )
+  }
+
   // Calculate PDF page dimensions (fit within A4 landscape: 297x210mm = ~842x595 points at 72 DPI)
   const maxPdfWidth = 800 // points
   const maxPdfHeight = 600 // points
@@ -74,9 +89,32 @@ export async function createNewPage(
   const scaleY = maxPdfHeight / originalHeight
   const scale = Math.min(scaleX, scaleY)
 
+  // Validate scale values
+  if (!scale || scale <= 0 || !isFinite(scale)) {
+    console.warn(
+      `[FlippingBook] Invalid scale calculated: ${scale} from ${originalWidth}x${originalHeight}`,
+    )
+    throw new Error(`Invalid scale value: ${scale}`)
+  }
+
   // Final PDF dimensions
   const pdfWidth = originalWidth * scale
   const pdfHeight = originalHeight * scale
+
+  // Validate final PDF dimensions
+  if (
+    !pdfWidth ||
+    !pdfHeight ||
+    pdfWidth <= 0 ||
+    pdfHeight <= 0 ||
+    !isFinite(pdfWidth) ||
+    !isFinite(pdfHeight)
+  ) {
+    console.warn(
+      `[FlippingBook] Invalid PDF dimensions: ${pdfWidth}x${pdfHeight}`,
+    )
+    throw new Error(`Invalid PDF dimensions: ${pdfWidth}x${pdfHeight}`)
+  }
 
   // High-resolution canvas for better quality (2x pixel density)
   const canvasScale = 2
@@ -103,13 +141,13 @@ export async function createNewPage(
   ctx.fillStyle = '#ffffff'
   ctx.fillRect(0, 0, originalWidth, originalHeight)
 
-  // Load and draw WebP background
-  const webpSrc = flippingBook.webp.base64
-    ? `data:${flippingBook.webp.mimeType};base64,${flippingBook.webp.base64}`
-    : flippingBook.webp.url
+  // Load and draw background image
+  const backgroundSrc = flippingBook.backgroundImage.base64
+    ? `data:${flippingBook.backgroundImage.mimeType};base64,${flippingBook.backgroundImage.base64}`
+    : flippingBook.backgroundImage.url
 
-  const webpImg = await loadImageSafely(webpSrc, 'WebP background')
-  ctx.drawImage(webpImg, 0, 0, originalWidth, originalHeight)
+  const backgroundImg = await loadImageSafely(backgroundSrc, 'background image')
+  ctx.drawImage(backgroundImg, 0, 0, originalWidth, originalHeight)
 
   // Load and draw SVG overlay if present
   if (flippingBook.svg) {
@@ -133,7 +171,7 @@ export async function createNewPage(
       ctx.drawImage(svgImg, 0, 0, originalWidth, originalHeight)
     } catch (error) {
       console.warn(
-        'Failed to load SVG overlay, proceeding with WebP-only:',
+        'Failed to load SVG overlay, proceeding with background image only:',
         error,
       )
     }

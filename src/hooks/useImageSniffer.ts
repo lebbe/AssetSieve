@@ -173,21 +173,106 @@ export function useImageSniffer(requests: NetworkRequest[]) {
             },
           )
         } else {
-          const imageData: ImageData = {
-            url: request.url,
-            mimeType: request.mimeType,
-            size: request.size,
-            width: 0,
-            height: 0,
-            base64: content || '',
-          }
+          // For images with proper MIME type but no content, fetch content and get dimensions
+          chrome.runtime.sendMessage(
+            {
+              action: 'fetchAsDataURL',
+              url: request.url,
+            },
+            (dataUrl) => {
+              if (chrome.runtime.lastError) {
+                console.error(chrome.runtime.lastError.message)
+                // Fallback: add image with unknown dimensions and no content
+                const imageData: ImageData = {
+                  url: request.url,
+                  mimeType: request.mimeType,
+                  size: request.size,
+                  width: 0,
+                  height: 0,
+                  base64: '',
+                }
 
-          setImages((prev) => {
-            if (prev.some((img) => img.url === request.url)) {
-              return prev
-            }
-            return [...prev, imageData]
-          })
+                setImages((prev) => {
+                  if (prev.some((img) => img.url === request.url)) {
+                    return prev
+                  }
+                  return [...prev, imageData]
+                })
+                return
+              }
+
+              if (dataUrl) {
+                // Extract base64 content from data URL
+                const base64Content = dataUrl.includes('base64,')
+                  ? dataUrl.split('base64,')[1]
+                  : dataUrl
+
+                // Load image to get dimensions
+                const img = new Image()
+                img.crossOrigin = 'anonymous'
+
+                img.onload = () => {
+                  // Create ImageData with both dimensions and base64 content
+                  const imageData: ImageData = {
+                    url: request.url,
+                    mimeType: request.mimeType,
+                    size: request.size,
+                    width: img.width,
+                    height: img.height,
+                    base64: base64Content,
+                  }
+
+                  setImages((prev) => {
+                    if (prev.some((img) => img.url === request.url)) {
+                      return prev
+                    }
+                    return [...prev, imageData]
+                  })
+                }
+
+                img.onerror = () => {
+                  // If image fails to load, add with unknown dimensions but with content
+                  const imageData: ImageData = {
+                    url: request.url,
+                    mimeType: request.mimeType,
+                    size: request.size,
+                    width: 0,
+                    height: 0,
+                    base64: base64Content,
+                  }
+
+                  setImages((prev) => {
+                    if (prev.some((img) => img.url === request.url)) {
+                      return prev
+                    }
+                    return [...prev, imageData]
+                  })
+                }
+
+                img.src = dataUrl
+              } else {
+                console.error(
+                  'Failed to retrieve image content from background script.',
+                )
+                // Fallback: add image with unknown dimensions and no content
+                const imageData: ImageData = {
+                  url: request.url,
+                  mimeType: request.mimeType,
+                  size: request.size,
+                  width: 0,
+                  height: 0,
+                  base64: '',
+                }
+
+                setImages((prev) => {
+                  if (prev.some((img) => img.url === request.url)) {
+                    return prev
+                  }
+                  return [...prev, imageData]
+                })
+              }
+            },
+          )
         }
       })
     })

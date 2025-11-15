@@ -1,4 +1,4 @@
-import { FlippingBookPair } from '../tabs/Flippingbook/hooks/useCombiner'
+import { FlippingBookPair } from '../hooks/useCombiner'
 
 export interface CombineImageOptions {
   format?: 'png' | 'jpeg' | 'webp'
@@ -59,8 +59,10 @@ export async function generateCombinedImage(
   const { format = 'png', quality = 0.95 } = options
 
   // Validate FlippingBook data before processing
-  if (!flippingBook.webp) {
-    throw new Error(`Missing webp data for ${flippingBook.filename}`)
+  if (!flippingBook.backgroundImage) {
+    throw new Error(
+      `Missing background image data for ${flippingBook.filename}`,
+    )
   }
 
   if (flippingBook.width <= 0 || flippingBook.height <= 0) {
@@ -69,8 +71,13 @@ export async function generateCombinedImage(
     )
   }
 
-  if (!flippingBook.webp.url && !flippingBook.webp.base64) {
-    throw new Error(`No webp URL or base64 data for ${flippingBook.filename}`)
+  if (
+    !flippingBook.backgroundImage.url &&
+    !flippingBook.backgroundImage.base64
+  ) {
+    throw new Error(
+      `No background image URL or base64 data for ${flippingBook.filename}`,
+    )
   }
 
   // SVG is optional - validate only if present
@@ -85,22 +92,22 @@ export async function generateCombinedImage(
   const ctx = canvas.getContext('2d')
   if (!ctx) throw new Error('Could not get canvas context')
 
-  // Set canvas dimensions to WebP dimensions
+  // Set canvas dimensions to background image dimensions
   canvas.width = flippingBook.width
   canvas.height = flippingBook.height
 
   // Canvas ready
 
   // Prepare image sources
-  const webpSrc = flippingBook.webp.base64
-    ? `data:${flippingBook.webp.mimeType};base64,${flippingBook.webp.base64}`
-    : flippingBook.webp.url
+  const backgroundSrc = flippingBook.backgroundImage.base64
+    ? `data:${flippingBook.backgroundImage.mimeType};base64,${flippingBook.backgroundImage.base64}`
+    : flippingBook.backgroundImage.url
 
-  // Load WebP image (required)
-  const webpImg = await loadImageSafely(webpSrc, 'WebP background')
+  // Load background image (required)
+  const backgroundImg = await loadImageSafely(backgroundSrc, 'background image')
 
-  // Draw WebP as background
-  ctx.drawImage(webpImg, 0, 0, canvas.width, canvas.height)
+  // Draw background image
+  ctx.drawImage(backgroundImg, 0, 0, canvas.width, canvas.height)
 
   // Try to load and draw SVG overlay (optional)
   if (flippingBook.svg) {
@@ -115,10 +122,10 @@ export async function generateCombinedImage(
       ctx.drawImage(svgImg, 0, 0, canvas.width, canvas.height)
     } catch (svgError) {
       console.warn(
-        `[FlippingBook] ⚠️ SVG overlay failed to load for ${flippingBook.filename}, proceeding with WebP-only:`,
+        `[FlippingBook] ⚠️ SVG overlay failed to load for ${flippingBook.filename}, proceeding with background image only:`,
         svgError,
       )
-      // Continue without SVG - we still have the WebP background
+      // Continue without SVG - we still have the background image
     }
   }
 

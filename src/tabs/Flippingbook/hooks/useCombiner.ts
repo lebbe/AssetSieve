@@ -3,10 +3,10 @@ import { ImageData } from '../../../hooks/useImageSniffer'
 
 export interface FlippingBookPair {
   id: string
-  webp: ImageData
+  backgroundImage: ImageData
   svg: ImageData | null // SVG is now optional
   filename: string
-  webppath: string
+  imagePath: string
   svgpath: string
   size: number
   width: number
@@ -30,7 +30,7 @@ function getBaseFilename(url: string): string {
 // Extract FlippingBook page number from filename
 function extractPageNumber(filename: string): string | null {
   // For SVG files: "0004.svg" -> "0004"
-  // For WebP files: "page0004_3.webp" -> "0004"
+  // For image files: "page0004_3.jpg" -> "0004"
 
   // Match pattern like "0004" (4 digits)
   const directMatch = filename.match(/^(\d{4})$/)
@@ -60,7 +60,7 @@ function getPathFromUrl(url: string): string {
 }
 
 export function useCombiner(images: ImageData[]) {
-  const [pagePattern, setPagePattern] = useState('page\\d{4}_3\\.webp')
+  const [pagePattern, setPagePattern] = useState('page\\d{4}_5\\.jpg')
   const [removeDuplicates, setRemoveDuplicates] = useState(true)
 
   // First, create all pairs without deduplication
@@ -74,12 +74,11 @@ export function useCombiner(images: ImageData[]) {
         '[FlippingBook] Invalid regex pattern, using default:',
         error,
       )
-      pageRegex = /page\d{4}.*\.webp/i
+      pageRegex = /page\d{4}_5\.jpg/i
     }
 
-    // Filter WebP files using the regex pattern
-    const webpFiles = images.filter((img) => {
-      if (img.mimeType !== 'image/webp') return false
+    // Filter image files using the regex pattern
+    const imageFiles = images.filter((img) => {
       const filename = img.url.split('/').pop() || ''
       return pageRegex.test(filename)
     })
@@ -96,11 +95,11 @@ export function useCombiner(images: ImageData[]) {
 
     // Pairing process starts
 
-    // Create FlippingBook pairs for each matching WebP (SVG is optional)
-    webpFiles.forEach((webp) => {
-      const webpBasename = getBaseFilename(webp.url)
-      const webpPath = getPathFromUrl(webp.url)
-      const webpPageNumber = extractPageNumber(webpBasename)
+    // Create FlippingBook pairs for each matching image (SVG is optional)
+    imageFiles.forEach((backgroundImg) => {
+      const imgBasename = getBaseFilename(backgroundImg.url)
+      const imgPath = getPathFromUrl(backgroundImg.url)
+      const imgPageNumber = extractPageNumber(imgBasename)
 
       // Look for matching SVG file (optional)
       const matchingSvg = svgFiles.find((svg) => {
@@ -110,11 +109,7 @@ export function useCombiner(images: ImageData[]) {
         const svgPageNumber = extractPageNumber(svgBasename)
 
         // STRICT matching: Only match if both files have extractable page numbers AND they match
-        if (
-          webpPageNumber &&
-          svgPageNumber &&
-          webpPageNumber === svgPageNumber
-        ) {
+        if (imgPageNumber && svgPageNumber && imgPageNumber === svgPageNumber) {
           return true
         }
 
@@ -126,26 +121,33 @@ export function useCombiner(images: ImageData[]) {
         usedSvgUrls.add(matchingSvg.url)
       }
 
-      const displayFilename = webpPageNumber
-        ? `page${webpPageNumber}`
-        : webpBasename
+      const displayFilename = imgPageNumber
+        ? `page${imgPageNumber}`
+        : imgBasename
 
       const pair: FlippingBookPair = {
-        id: `${displayFilename}-${webpPath}`,
-        webp,
+        id: `${displayFilename}-${imgPath}`,
+        backgroundImage: backgroundImg,
         svg: matchingSvg || null,
         filename: displayFilename,
-        webppath: webpPath,
+        imagePath: imgPath,
         svgpath: matchingSvg ? getPathFromUrl(matchingSvg.url) : '',
-        size: webp.size + (matchingSvg?.size || 0),
-        width: webp.width,
-        height: webp.height,
+        size: backgroundImg.size + (matchingSvg?.size || 0),
+        width: backgroundImg.width || 0,
+        height: backgroundImg.height || 0,
         mimeType: matchingSvg
           ? 'flippingbook/combined'
-          : 'flippingbook/webp-only',
+          : 'flippingbook/image-only',
       }
 
-      pairs.push(pair)
+      // Only add pairs with valid dimensions
+      if (pair.width > 0 && pair.height > 0) {
+        pairs.push(pair)
+      } else {
+        console.warn(
+          `[FlippingBook] Skipping ${pair.filename} due to invalid dimensions: ${pair.width}x${pair.height}`,
+        )
+      }
     })
 
     return pairs
@@ -154,14 +156,14 @@ export function useCombiner(images: ImageData[]) {
   // Then, apply deduplication separately so it reacts to checkbox changes
   const flippingBookPairs = useMemo(() => {
     if (removeDuplicates) {
-      const seenWebpPaths = new Set<string>()
+      const seenImagePaths = new Set<string>()
       const uniquePairs: FlippingBookPair[] = []
 
       for (const pair of allFlippingBookPairs) {
         // Use the full pathname (including filename) for deduplication, but without domain/query
-        const fullPath = new URL(pair.webp.url).pathname
-        if (!seenWebpPaths.has(fullPath)) {
-          seenWebpPaths.add(fullPath)
+        const fullPath = new URL(pair.backgroundImage.url).pathname
+        if (!seenImagePaths.has(fullPath)) {
+          seenImagePaths.add(fullPath)
           uniquePairs.push(pair)
         }
       }

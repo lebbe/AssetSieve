@@ -29,10 +29,15 @@ This mode intercepts standard image requests as they load.
 
 ### 2. FlippingBook Tab
 
-Optimized for publications built with FlippingBook.com. It intelligently detects and pairs `WebP` background images with their `SVG` text overlays to reconstruct complete, high-fidelity pages.
+Optimized for publications built with FlippingBook.com. It intelligently detects and pairs background images with their `SVG` text overlays to reconstruct complete, high-fidelity pages.
 
 - **Use Case**: Archiving digital magazines and catalogs you have legitimate access to.
-- **Configuration**: The default regex (`page\d{4}_3\.webp`) should work for most publications, but can be adjusted.
+- **Image Formats**: Supports JPG, JPEG, PNG, and WebP background images.
+- **Resolution Intelligence**: FlippingBook uses numbered suffixes to indicate quality levels:
+  - `_5` suffix = High resolution (e.g., `page0001_5.jpg`) - recommended for quality
+  - `_3` suffix = Lower resolution (e.g., `page0001_3.webp`) - smaller file sizes
+  - **Pro-tip**: Resolution is based on your screen/zoom level. For higher quality images, zoom out (Ctrl+-) and use the "Reload page" button in AssetSieve to recapture at higher resolution.
+- **Configuration**: Defaults to high-quality pattern (`page\d{4}_5\.jpg`) with dropdown options for common patterns.
 
 ### 3. IIIF Tab
 
