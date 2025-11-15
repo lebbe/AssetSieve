@@ -162,9 +162,8 @@ export function Export({ sortedImages }: ExportProps) {
           // Get file extension from the background image URL
           const url = pair.backgroundImage.url
           const urlWithoutQuery = url.split('?')[0] || url
-          const extension =
-            urlWithoutQuery.substring(urlWithoutQuery.lastIndexOf('.') + 1) ||
-            'jpg'
+          const lastDotIndex = urlWithoutQuery.lastIndexOf('.')
+          const extension = lastDotIndex >= 0 ? urlWithoutQuery.substring(lastDotIndex + 1) || 'jpg' : 'jpg'
           const imageFilename = `${baseName}.${extension}`
           imagesFolder.file(imageFilename, pair.backgroundImage.base64, {
             base64: true,
