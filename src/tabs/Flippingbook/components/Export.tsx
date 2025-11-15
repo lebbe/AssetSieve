@@ -39,6 +39,8 @@ export function Export({ sortedImages }: ExportProps) {
   const [isExporting, setIsExporting] = useState(false)
   const [downloadProgress, setDownloadProgress] = useState(0)
   const [isDownloading, setIsDownloading] = useState(false)
+  const [combinedProgress, setCombinedProgress] = useState(0)
+  const [isGeneratingCombined, setIsGeneratingCombined] = useState(false)
 
   async function createPDF(
     flippingBookPages: FlippingBookPair[],
@@ -233,8 +235,8 @@ export function Export({ sortedImages }: ExportProps) {
    * This generates combined images on-the-fly
    */
   async function handleDownloadAllCombined() {
-    setIsDownloading(true)
-    setDownloadProgress(0)
+    setIsGeneratingCombined(true)
+    setCombinedProgress(0)
 
     try {
       // Dynamically import JSZip to reduce initial bundle size
@@ -341,7 +343,7 @@ export function Export({ sortedImages }: ExportProps) {
           zip.file(pngFilename, pngBlob)
 
           processed++
-          setDownloadProgress(Math.round((processed / total) * 95))
+          setCombinedProgress(Math.round((processed / total) * 95))
         } catch (error) {
           console.error(
             `Failed to create combined image for ${flippingBook.filename}:`,
@@ -350,7 +352,7 @@ export function Export({ sortedImages }: ExportProps) {
         }
       }
 
-      setDownloadProgress(96)
+      setCombinedProgress(96)
 
       // Generate ZIP
       const zipBlob = await zip.generateAsync({
@@ -362,7 +364,7 @@ export function Export({ sortedImages }: ExportProps) {
         streamFiles: true,
       })
 
-      setDownloadProgress(100)
+      setCombinedProgress(100)
 
       // Download the ZIP
       const url = URL.createObjectURL(zipBlob)
@@ -376,14 +378,14 @@ export function Export({ sortedImages }: ExportProps) {
       setTimeout(() => {
         document.body.removeChild(a)
         URL.revokeObjectURL(url)
-        setIsDownloading(false)
-        setDownloadProgress(0)
+        setIsGeneratingCombined(false)
+        setCombinedProgress(0)
       }, 1000)
     } catch (error) {
       console.error('Failed to create ZIP:', error)
       alert('Failed to create ZIP file. Check console for details.')
-      setIsDownloading(false)
-      setDownloadProgress(0)
+      setIsGeneratingCombined(false)
+      setCombinedProgress(0)
     }
   }
 
@@ -441,12 +443,12 @@ export function Export({ sortedImages }: ExportProps) {
         <button
           onClick={handleDownloadAllCombined}
           className="btn btn-red"
-          disabled={sortedImages.length === 0 || isDownloading}
+          disabled={sortedImages.length === 0 || isGeneratingCombined}
           title="Download all combined PNGs as ZIP"
         >
-          {isDownloading && downloadProgress < 100 ? (
+          {isGeneratingCombined && combinedProgress < 100 ? (
             <>
-              Generating... {downloadProgress}%
+              Generating... {combinedProgress}%
               <Spinner />
             </>
           ) : (
