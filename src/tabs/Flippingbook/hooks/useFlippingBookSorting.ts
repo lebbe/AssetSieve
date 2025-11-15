@@ -33,13 +33,19 @@ export function useFlippingBookSorting(flippingBooks: FlippingBookPair[]) {
     switch (sortBy) {
       case 'manual':
         // Use manual order, but filter to only include current flippingBooks
-        const currentUrls = new Set(flippingBooks.map((book) => book.webp.url))
-        sorted = manualOrder.filter((book) => currentUrls.has(book.webp.url))
+        const currentUrls = new Set(
+          flippingBooks.map((book) => book.backgroundImage.url),
+        )
+        sorted = manualOrder.filter((book) =>
+          currentUrls.has(book.backgroundImage.url),
+        )
 
         // Add any new books that aren't in manual order yet
-        const orderedUrls = new Set(sorted.map((book) => book.webp.url))
+        const orderedUrls = new Set(
+          sorted.map((book) => book.backgroundImage.url),
+        )
         const newBooks = flippingBooks.filter(
-          (book) => !orderedUrls.has(book.webp.url),
+          (book) => !orderedUrls.has(book.backgroundImage.url),
         )
         sorted = [...sorted, ...newBooks]
         break
@@ -58,7 +64,7 @@ export function useFlippingBookSorting(flippingBooks: FlippingBookPair[]) {
 
       case 'path':
         sorted = [...flippingBooks].sort((a, b) =>
-          a.webppath.localeCompare(b.webppath),
+          a.imagePath.localeCompare(b.imagePath),
         )
         break
 

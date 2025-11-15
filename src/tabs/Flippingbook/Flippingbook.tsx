@@ -64,9 +64,25 @@ export function Flippingbook({ requests, removeRequest }: Props) {
             type="text"
             value={pagePattern}
             onChange={(e) => setPagePattern(e.target.value)}
-            placeholder="page\\d{4}.*\\.webp"
-            title="Regex pattern to match WebP filenames (e.g., page\\d{4}.*\\.webp)"
+            list="pagePatterns"
+            placeholder="page\\d{4}_5\\.jpg"
+            title="Regex pattern to match image filenames. _5 = high resolution JPG, _3 = lower resolution WebP"
           />
+          <datalist id="pagePatterns">
+            <option value="page\\d{4}_5\\.jpg">High resolution JPG (_5)</option>
+            <option value="page\\d{4}_3\\.webp">
+              Lower resolution WebP (_3)
+            </option>
+            <option value="page\\d{4}_\\d+\\.(jpg|jpeg)">
+              Any JPG with number suffix
+            </option>
+            <option value="page\\d{4}_\\d+\\.webp">
+              Any WebP with number suffix
+            </option>
+            <option value="page\\d{4}_\\d+\\.(webp|jpg|jpeg|png)">
+              Any image format
+            </option>
+          </datalist>
         </InputContainer>
 
         <label className="checkbox-label">
@@ -75,7 +91,7 @@ export function Flippingbook({ requests, removeRequest }: Props) {
             className="input"
             checked={removeDuplicates}
             onChange={(e) => setRemoveDuplicates(e.target.checked)}
-            title="Remove duplicate FlippingBooks with identical WebP paths"
+            title="Remove duplicate FlippingBooks with identical background image paths"
           />
           <span className="checkbox-text">Remove duplicates</span>
         </label>
@@ -120,7 +136,7 @@ export function Flippingbook({ requests, removeRequest }: Props) {
         <div className={`flippingbooks-grid flippingbooks-grid--${density}`}>
           {sortedFlippingBooks.map((flippingBook, index) => (
             <FlippingbookItem
-              key={`${flippingBook.webp.url}-${index}`}
+              key={`${flippingBook.backgroundImage.url}-${index}`}
               flippingBook={flippingBook}
               size={previewSize}
               showDetails={showDetails}

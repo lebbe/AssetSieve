@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { FlippingBookPair } from '../hooks/useCombiner'
-import { downloadCombinedImage } from '../../../utils/combinedImageGenerator'
+import { downloadCombinedImage } from '../utils/combinedImageGenerator'
 import './FlippingbookItem.css'
 import '../../../components/Button.css'
 
@@ -74,16 +74,22 @@ export function FlippingbookItem({
       })
     } catch (error) {
       console.error('Failed to generate combined FlippingBook image:', error)
-      // Fallback: open WebP URL
-      window.open(flippingBook.webp.url, '_blank')
+      // Fallback: open background image URL
+      window.open(flippingBook.backgroundImage.url, '_blank')
     }
   }
 
-  const handleDownloadWebP = (e: React.MouseEvent) => {
+  const handleDownloadBackgroundImage = (e: React.MouseEvent) => {
     e.stopPropagation()
+    // Get file extension from the background image URL
+    const url = flippingBook.backgroundImage.url
+    const urlWithoutQuery = url.split('?')[0] || url
+    const lastDotIndex = urlWithoutQuery.lastIndexOf('.')
+    const extension = lastDotIndex >= 0 ? urlWithoutQuery.substring(lastDotIndex + 1) || 'jpg' : 'jpg'
+
     const link = document.createElement('a')
-    link.href = flippingBook.webp.url
-    link.download = `${flippingBook.filename}.webp`
+    link.href = url
+    link.download = `${flippingBook.filename}.${extension}`
     link.target = '_blank'
     document.body.appendChild(link)
     link.click()
@@ -104,7 +110,7 @@ export function FlippingbookItem({
   }
 
   async function handleDownloadBoth(e: React.MouseEvent) {
-    handleDownloadWebP(e)
+    handleDownloadBackgroundImage(e)
     // Download SVG if available
     if (flippingBook.svg) {
       await new Promise((resolve) => setTimeout(resolve, 100)) // Small delay to avoid browser blocking multiple downloads
@@ -120,13 +126,13 @@ export function FlippingbookItem({
 
   const handleDelete = (e: React.MouseEvent) => {
     e.stopPropagation()
-    onDelete?.(flippingBook.webp.url)
+    onDelete?.(flippingBook.backgroundImage.url)
   }
 
-  // WebP as background layer
-  const webpSrc = flippingBook.webp.base64
-    ? `data:${flippingBook.webp.mimeType};base64,${flippingBook.webp.base64}`
-    : flippingBook.webp.url
+  // Background image as background layer
+  const backgroundSrc = flippingBook.backgroundImage.base64
+    ? `data:${flippingBook.backgroundImage.mimeType};base64,${flippingBook.backgroundImage.base64}`
+    : flippingBook.backgroundImage.url
 
   // SVG as overlay layer (optional)
   const svgSrc = flippingBook.svg
@@ -161,9 +167,9 @@ export function FlippingbookItem({
         ⋮⋮
       </div>
       <div className="flippingbook-preview">
-        {/* WebP background layer */}
+        {/* Background image layer */}
         <img
-          src={webpSrc}
+          src={backgroundSrc}
           alt={`FlippingBook: ${flippingBook.filename}`}
           className="flippingbook-thumbnail flippingbook-background"
           loading="lazy"
@@ -203,9 +209,9 @@ export function FlippingbookItem({
                   </span>
                 )}
                 <div className="flippingbook-file">
-                  <span className="flippingbook-file-label">WebP:</span>
+                  <span className="flippingbook-file-label">Image:</span>
                   <span className="flippingbook-file-name">
-                    {getCleanFilename(flippingBook.webp.url)}
+                    {getCleanFilename(flippingBook.backgroundImage.url)}
                   </span>
                 </div>
                 {flippingBook.svg && (
@@ -227,18 +233,18 @@ export function FlippingbookItem({
           className="btn btn-sm btn-blue"
           data-testid="download-combined-button"
           onClick={handleClick}
-          aria-label="Download WebP file"
-          title="Download WebP file"
+          aria-label="Download background image file"
+          title="Download background image file"
         >
           Combined
         </button>
         <button
           className="btn btn-sm btn-blue"
-          onClick={handleDownloadWebP}
-          aria-label="Download WebP file"
-          title="Download WebP file"
+          onClick={handleDownloadBackgroundImage}
+          aria-label="Download background image file"
+          title="Download background image file"
         >
-          WebP
+          Image
         </button>
 
         {flippingBook.svg && (
@@ -254,8 +260,8 @@ export function FlippingbookItem({
             <button
               className="btn btn-sm"
               onClick={handleDownloadBoth}
-              aria-label="Download both WebP and SVG files"
-              title="Download both WebP and SVG files"
+              aria-label="Download both background image and SVG files"
+              title="Download both background image and SVG files"
             >
               Both
             </button>
@@ -266,8 +272,8 @@ export function FlippingbookItem({
           className="btn btn-sm btn-green"
           data-testid="download-all-button"
           onClick={handleAllDownloads}
-          aria-label="Download both WebP, SVG and combined png"
-          title="Download both WebP, SVG and combined png"
+          aria-label="Download background image, SVG and combined png"
+          title="Download background image, SVG and combined png"
         >
           All
         </button>
