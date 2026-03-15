@@ -16,23 +16,22 @@
     "pdf-from-webp-svg": "node --max-old-space-size=8192 --expose-gc scripts/createPDFFromwebpAndSvg.js"
   },
   "dependencies": {
-    "@types/jszip": "^3.4.0",
-    "jspdf": "^3.0.3",
+    "jspdf": "^4.2.0",
     "jszip": "^3.10.1",
-    "react": "^19.2.0",
-    "react-dom": "^19.2.0"
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4"
   },
   "devDependencies": {
-    "@types/chrome": "^0.1.24",
-    "@types/node": "^24.9.1",
-    "@types/react": "^19.2.2",
-    "@types/react-dom": "^19.2.2",
-    "@vitejs/plugin-react": "^5.1.0",
-    "canvas": "^3.2.0",
-    "oxlint": "^1.24.0",
-    "prettier": "^3.6.2",
+    "@types/chrome": "^0.1.37",
+    "@types/node": "^25.5.0",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^6.0.1",
+    "canvas": "^3.2.1",
+    "oxlint": "^1.55.0",
+    "prettier": "^3.8.1",
     "typescript": "^5.9.3",
-    "vite": "^7.1.12"
+    "vite": "^8.0.0"
   },
   "private": true
 }

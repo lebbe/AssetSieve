@@ -85,7 +85,10 @@ export function FlippingbookItem({
     const url = flippingBook.backgroundImage.url
     const urlWithoutQuery = url.split('?')[0] || url
     const lastDotIndex = urlWithoutQuery.lastIndexOf('.')
-    const extension = lastDotIndex >= 0 ? urlWithoutQuery.substring(lastDotIndex + 1) || 'jpg' : 'jpg'
+    const extension =
+      lastDotIndex >= 0
+        ? urlWithoutQuery.substring(lastDotIndex + 1) || 'jpg'
+        : 'jpg'
 
     const link = document.createElement('a')
     link.href = url
